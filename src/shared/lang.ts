@@ -423,6 +423,7 @@ const langTemplate = {
     'headerFileOperations',
     'headerEditCuration',
     'headerTest',
+    'headerFpfss',
     'importAll',
     'importAllDesc',
     'deleteAll',
@@ -505,6 +506,7 @@ const langTemplate = {
     'exportDataPacks',
     'exportSelectedDataPacks',
     'shortcuts',
+    'fpfssOpenSubmissionPage',
   ] as const,
   playlist: [
     'enterDescriptionHere',
@@ -638,6 +640,10 @@ const langTemplate = {
     'requiresAdditionalDownload',
     'requiresAdditionalDownloadPlural',
     'confirmClearPlaytime',
+    'badAntiVirus',
+    'openWiki',
+    'openDiscord',
+    'doNotShowAgain',
   ] as const,
   // libraries: [], // (This is dynamically populated in run-time)
 } as const;
@@ -751,6 +757,7 @@ export function getDefaultLocalization(): LangContainer {
   lang.dialog.requiresAdditionalDownloadPlural += ' {0}';
   lang.dialog.upgradeWillInstallTo = '{0} ' + lang.dialog.upgradeWillInstallTo;
   lang.dialog.importedPlaylistAlreadyExists = lang.dialog.importedPlaylistAlreadyExists + ' - "{0}"';
+  lang.dialog.badAntiVirus = lang.dialog.badAntiVirus + ' {0}';
   // Return object
   return lang;
 }

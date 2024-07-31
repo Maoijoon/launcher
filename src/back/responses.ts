@@ -1,3 +1,4 @@
+import { GameSearch, GameSearchDirection, GameSearchOffset, GameSearchSortable, PartialTagCategory, newSubfilter, parseUserSearchInput } from '@fparchive/flashpoint-archive';
 import { LogLevel } from '@shared/Log/interface';
 import { MetaEditFile, MetaEditMeta } from '@shared/MetaEdit';
 import { deepCopy, downloadFile, padEnd } from '@shared/Util';
@@ -5,7 +6,6 @@ import { BackIn, BackInit, BackOut, ComponentState, CurationImageEnum, DownloadD
 import { overwriteConfigData } from '@shared/config/util';
 import { CURATIONS_FOLDER_EXPORTED, CURATIONS_FOLDER_TEMP, CURATIONS_FOLDER_WORKING, LOGOS, SCREENSHOTS, VIEW_PAGE_SIZE } from '@shared/constants';
 import { convertGameToCurationMetaFile } from '@shared/curate/metaToMeta';
-import { LoadedCuration } from '@shared/curate/types';
 import { getContentFolderByKey, getCurationFolder } from '@shared/curate/util';
 import { AppProvider, BrowserApplicationOpts } from '@shared/extensions/interfaces';
 import { DeepPartial, GamePropSuggestions, ProcessAction, ProcessState } from '@shared/interfaces';
@@ -14,14 +14,13 @@ import { PreferencesFile } from '@shared/preferences/PreferencesFile';
 import { defaultPreferencesData, overwritePreferenceData } from '@shared/preferences/util';
 import { formatString } from '@shared/utils/StringFormatter';
 import { TaskProgress } from '@shared/utils/TaskProgress';
-import { chunkArray, newGame } from '@shared/utils/misc';
+import { chunkArray, getGameDataFilename, newGame } from '@shared/utils/misc';
 import { sanitizeFilename } from '@shared/utils/sanitizeFilename';
 import { throttle } from '@shared/utils/throttle';
 import * as axiosImport from 'axios';
 import * as child_process from 'child_process';
 import { execSync } from 'child_process';
-import { GameSearch, GameSearchDirection, GameSearchOffset, GameSearchSortable, PartialTagCategory, newSubfilter, parseUserSearchInput } from '@fparchive/flashpoint-archive';
-import { ConfigSchema, CurationState, Game, GameConfig, GameData, GameLaunchInfo, GameMetadataSource, GameMiddlewareInfo, RequestGameRange, ResponseGameRange, Tag, TagCategory } from 'flashpoint-launcher';
+import { ConfigSchema, CurationState, Game, GameConfig, GameData, GameLaunchInfo, GameMetadataSource, GameMiddlewareInfo, LoadedCuration, RequestGameRange, ResponseGameRange, Tag, TagCategory } from 'flashpoint-launcher';
 import * as fs from 'fs-extra';
 import * as fs_extra from 'fs-extra';
 import * as https from 'https';
@@ -54,6 +53,7 @@ import { BackState, MetadataRaw, TagsFile } from './types';
 import { pathToBluezip } from './util/Bluezip';
 import { pathTo7zBack } from './util/SevenZip';
 import { awaitDialog, createNewDialog } from './util/dialog';
+import { onDidUninstallGameData, onWillUninstallGameData } from './util/events';
 import {
   compareSemVerVersions,
   copyError,
@@ -68,7 +68,7 @@ import {
   runService
 } from './util/misc';
 import { uuid } from './util/uuid';
-import { onDidUninstallGameData, onWillUninstallGameData } from './util/events';
+import { FPFSS_INFO_FILENAME } from '@shared/curate/fpfss';
 
 const axios = axiosImport.default;
 
@@ -148,7 +148,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
     state.downloadController.abort();
   });
 
-  state.socketServer.register(BackIn.GET_RENDERER_LOADED_DATA, async () => {
+  state.socketServer.register(BackIn.GET_RENDERER_LOADED_DATA, async (event) => {
     const libraries = await fpDatabase.findAllGameLibraries();
 
     // Fetch update feed in background
@@ -247,7 +247,9 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
     };
 
     // Fire after return has sent
-    setTimeout(() => state.apiEmitters.onDidConnect.fire(), 100);
+    setTimeout(async () => {
+      state.apiEmitters.onDidConnect.fire();
+    }, 100);
 
     return res;
   });
@@ -584,7 +586,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
         log.debug('Launcher', 'Found active game data');
         const gameData = game.gameData?.find(gd => gd.id === game.activeDataId);
         if (gameData && !gameData.presentOnDisk) {
-          log.debug('Game Launcher', 'Downloading Game Data for ' + gameData.path || 'UNKNOWN');
+          log.debug('Game Launcher', 'Downloading Game Data for ' + getGameDataFilename(gameData) || 'UNKNOWN');
           // Download GameData
           try {
             await downloadGameDataRes(state, gameData);
@@ -883,13 +885,19 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
   state.socketServer.register(BackIn.GET_GAME_DATA, async (event, id) => {
     const gameData = await fpDatabase.findGameDataById(id);
     // Verify it's still on disk
-    if (gameData && gameData.presentOnDisk && gameData.path) {
+    if (gameData) {
+      const gameDataFilename = getGameDataFilename(gameData);
       try {
-        await fs.promises.access(path.join(state.config.flashpointPath, state.preferences.dataPacksFolderPath, gameData.path), fs.constants.F_OK);
+        await fs.promises.access(path.join(state.config.flashpointPath, state.preferences.dataPacksFolderPath, gameDataFilename), fs.constants.F_OK);
+        if (!gameData.presentOnDisk) {
+          gameData.presentOnDisk = true;
+          return fpDatabase.saveGameData(gameData);
+        }
       } catch (err) {
-        gameData.path = undefined;
-        gameData.presentOnDisk = false;
-        return fpDatabase.saveGameData(gameData);
+        if (gameData.presentOnDisk) {
+          gameData.presentOnDisk = false;
+          return fpDatabase.saveGameData(gameData);
+        }
       }
     }
     return gameData;
@@ -916,9 +924,10 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
   state.socketServer.register(BackIn.DELETE_GAME_DATA, async (event, gameDataId) => {
     const gameData = await fpDatabase.findGameDataById(gameDataId);
     if (gameData) {
-      if (gameData.presentOnDisk && gameData.path) {
+      if (gameData.presentOnDisk) {
+        const gameDataFilename = getGameDataFilename(gameData);
         await onWillUninstallGameData.fire(gameData);
-        const gameDataPath = path.join(state.config.flashpointPath, state.preferences.dataPacksFolderPath, gameData.path);
+        const gameDataPath = path.join(state.config.flashpointPath, state.preferences.dataPacksFolderPath, gameDataFilename);
         await fs.promises.unlink(gameDataPath);
         gameData.path = undefined;
         gameData.presentOnDisk = false;
@@ -953,10 +962,11 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
 
   state.socketServer.register(BackIn.UNINSTALL_GAME_DATA, async (event, id) => {
     const gameData = await fpDatabase.findGameDataById(id);
-    if (gameData && gameData.path && gameData.presentOnDisk) {
+    if (gameData && gameData.presentOnDisk) {
+      const gameDataFilename = getGameDataFilename(gameData);
       await onWillUninstallGameData.fire(gameData);
       // Delete Game Data
-      const gameDataPath = path.join(state.config.flashpointPath, state.preferences.dataPacksFolderPath, gameData.path);
+      const gameDataPath = path.join(state.config.flashpointPath, state.preferences.dataPacksFolderPath, gameDataFilename);
       await fs.promises.unlink(gameDataPath)
       .catch((error) => {
         if (error.code !== 'ENOENT') {
@@ -964,7 +974,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
           throw error;
         }
       });
-      gameData.path = '';
+      gameData.path = undefined;
       gameData.presentOnDisk = false;
       await fpDatabase.saveGameData(gameData);
       onDidUninstallGameData.fire(gameData);
@@ -1790,7 +1800,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
     // generics
 
     if (!fs.existsSync(path.join(state.config.flashpointPath, 'Legacy', 'router.php'))) {
-      diagnostics.generics.push('router.php is missing. Possible cause: Anti-Virus software has deleted it.');
+      diagnostics.generics.push('router.php is missing. Possible cause: Antivirus software has deleted it.');
     }
     if (state.log.findIndex(e => e.content.includes('Server exited with code 3221225781')) !== -1) {
       diagnostics.generics.push('Server exited with code 3221225781. Possible cause: .NET Framework or Visual C++ 2015 x86 Redists are not installed.');
@@ -1804,12 +1814,12 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
     message = message + padEnd('Architecture:', maxLen) + os.arch() + '\n';
     try {
       const output = execSync('powershell.exe -Command "Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct | Format-Wide -Property displayName"').toString().trim();
-      if (output.toLowerCase().includes('avast') || output.toLowerCase().includes('avg')) {
-        diagnostics.generics.push('AVG or Avast Anti-Virus is installed. This may cause problems with Flashpoint.');
+      if (output.toLowerCase().includes('avast antivirus') || output.toLowerCase().includes('avg antivirus')) {
+        diagnostics.generics.push('AVG or Avast Antivirus is installed. This may cause problems with Flashpoint.');
       }
-      message = message + padEnd('Anti-Virus:', maxLen) + output + '\n';
+      message = message + padEnd('Antivirus:', maxLen) + output + '\n';
     } catch (err) {
-      message = message + 'Anti-Virus:\tUnknown\n';
+      message = message + 'Antivirus:\tUnknown\n';
     }
     message = message + '\n';
     for (const service of diagnostics.services) {
@@ -1967,7 +1977,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
     for (const filePath of filePaths) {
       processed = processed + 1;
       taskProgress.setStage(processed, `Loading ${filePath}`);
-      await loadCurationArchive(filePath, throttle((progress: Progress) => {
+      await loadCurationArchive(filePath, null, throttle((progress: Progress) => {
         taskProgress.setStageProgress((progress.percent / 100), `Extracting Files - ${progress.fileCount}`);
       }, 200))
       .catch((error) => {
@@ -2160,9 +2170,10 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
       const curPath = path.resolve(state.config.flashpointPath, CURATIONS_FOLDER_WORKING, curation.folder);
       await saveCuration(curPath, curation);
       await new Promise<void>((resolve) => {
-        return add(filePath, curPath, { recursive: true, $bin: pathTo7zBack(state.isDev, state.exePath) })
+        // Cast required until types fixed
+        return (add as any)(filePath, curPath, { recursive: true, exclude: [`!${FPFSS_INFO_FILENAME}`], $bin: pathTo7zBack(state.isDev, state.exePath) })
         .on('end', () => { resolve(); })
-        .on('error', (error) => {
+        .on('error', (error: any) => {
           log.error('Curate', error.message);
           resolve();
         });
@@ -2223,6 +2234,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
           library:  'Arcade'.toLowerCase() // must be lower case
         },
         addApps: [],
+        fpfssInfo: null,
         thumbnail: await loadCurationIndexImage(path.join(curPath, 'logo.png')),
         screenshot: await loadCurationIndexImage(path.join(curPath, 'ss.png'))
       };
@@ -2241,7 +2253,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
     }
   });
 
-  state.socketServer.register(BackIn.FPFSS_OPEN_CURATION, async (event, url, accessToken, taskId) => {
+  state.socketServer.register(BackIn.FPFSS_OPEN_CURATION, async (event, fpfssInfo, url, accessToken, taskId) => {
     // Setup task info
     const taskProgress = new TaskProgress(2);
     if (taskId) {
@@ -2273,7 +2285,7 @@ export function registerRequestCallbacks(state: BackState, init: () => Promise<v
 
 
     taskProgress.setStage(2, `Loading ${tempFile}`);
-    await loadCurationArchive(tempFile, throttle((progress: Progress) => {
+    await loadCurationArchive(tempFile, fpfssInfo, throttle((progress: Progress) => {
       taskProgress.setStageProgress((progress.percent / 100), `Extracting Files - ${progress.fileCount}`);
     }, 200))
     .catch((error) => {

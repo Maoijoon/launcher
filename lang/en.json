@@ -411,6 +411,7 @@
     "headerFileOperations": "File",
     "headerEditCuration": "Edit",
     "headerTest": "Test",
+    "headerFpfss": "FPFSS",
     "importAll": "Import All",
     "importAllDesc": "Import all curations that are currently loaded",
     "deleteAll": "Delete All",
@@ -491,7 +492,8 @@
     "contextCopyAsURL": "Copy File Path as URL",
     "contextShowInExplorer": "Show File in Explorer",
     "contextOpenFolderInExplorer": "Open Folder in Explorer",
-    "shortcuts": "Shortcuts"
+    "shortcuts": "Shortcuts",
+    "fpfssOpenSubmissionPage": "Open Submission Page"
   },
   "playlist": {
     "enterDescriptionHere": "Enter a description here...",
@@ -621,7 +623,11 @@
     "exportCurationWithWarnings": "Export Curation even though it has Warnings?",
     "requiresAdditionalDownload": "You are missing the {0} support pack, which is required to launch this entry.\nDownload now?",
     "requiresAdditionalDownloadPlural": "You are missing {0} support packs which are required to launch this entry.\nDownload now?",
-    "confirmClearPlaytime": "Clear all game playtime and play history data? This is irreversible."
+    "confirmClearPlaytime": "Clear all game playtime and play history data? This is irreversible.",
+    "badAntiVirus": "You appear to be using '{0}'.\nThis particular Antivirus is known to cause issues, and we recommend adding an exception to the Flashpoint folder.\n\nIf you only see a white screen when running Flash games you may need to reinstall Flashpoint to restore deleted files.\n\nSee the Wiki or Help tab for detailed instructions.",
+    "openWiki": "Open Wiki",
+    "openDiscord": "Join Discord Server",
+    "doNotShowAgain": "Do not show again"
   },
   "libraries": {
     "arcade": "Games",

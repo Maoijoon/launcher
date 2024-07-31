@@ -1,6 +1,6 @@
 {
   "name": "flashpoint-launcher",
-  "version": "13.0.1",
+  "version": "13.0.2",
   "description": "A desktop application used to browse, manage and play games from Flashpoint Archive",
   "main": "build/main/index.js",
   "config": {
@@ -33,7 +33,8 @@
     "@fortawesome/fontawesome-svg-core": "1.2.36",
     "@fortawesome/free-solid-svg-icons": "5.15.4",
     "@fortawesome/react-fontawesome": "0.1.18",
-    "@fparchive/flashpoint-archive": "0.7.10",
+    "@fparchive/flashpoint-archive": "0.7.13",
+    "@types/node-7z": "2.1.8",
     "@types/react-virtualized": "^9.21.21",
     "axios": "1.6.7",
     "connected-react-router": "6.9.2",
@@ -46,7 +47,8 @@
     "lodash": "^4.17.21",
     "mime": "2.4.4",
     "minimist": "^1.2.7",
-    "node-7z": "1.1.1",
+    "node-7z": "3.0.0",
+    "open": "^10.1.0",
     "ps-tree": "1.2.0",
     "react": "17.0.2",
     "react-color": "2.18.0",
@@ -74,7 +76,7 @@
   "devDependencies": {
     "@kayahr/jest-electron-runner": "^29.3.1",
     "@swc/cli": "0.3.12",
-    "@swc/core": "1.4.11",
+    "@swc/core": "1.5.5",
     "@types/follow-redirects": "1.8.0",
     "@types/fs-extra": "8.1.0",
     "@types/jest": "27.5.1",
@@ -117,7 +119,7 @@
     "ts-node": "10.8.0",
     "ts-transform-paths": "^2.0.3",
     "tslint": "5.18.0",
-    "typescript": "4.6.2"
+    "typescript": "5.4.3"
   },
   "optionalDependencies": {
     "fsevents": "2.1.3"
