@@ -78,6 +78,8 @@ export type Contributions = {
   applications: Application[];
   configuration: ExtConfiguration[];
   curationTemplates: CurationTemplate[];
+  componentFiles: string[];
+  themeFiles: string[];
 }
 
 export interface CurationTemplate {

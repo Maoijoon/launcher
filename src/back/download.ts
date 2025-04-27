@@ -91,10 +91,10 @@ export async function importGameDataSkipHash(gameId: string, filePath: string, d
           } catch (err) {
             reject(err);
           }
-        })
+        });
       });
     } else {
-      return fpDatabase.saveGameData(existingGameData)
+      return fpDatabase.saveGameData(existingGameData);
     }
   } else {
     const newGameData: PartialGameData = {
@@ -125,7 +125,7 @@ export async function importGameDataSkipHash(gameId: string, filePath: string, d
           } catch (err) {
             reject(err);
           }
-        })
+        });
       });
     }
     const gameData = await fpDatabase.createGameData(newGameData);

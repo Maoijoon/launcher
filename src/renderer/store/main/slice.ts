@@ -6,12 +6,12 @@ import { AppExtConfigData } from '@shared/config/interfaces';
 import { PlatformAppPathSuggestions } from '@shared/curate/types';
 import { ExtensionContribution, IExtensionDescription, ILogoSet } from '@shared/extensions/interfaces';
 import { GamePropSuggestions, IService, WindowIPC } from '@shared/interfaces';
-import { createLangContainer, LangContainer, LangFile } from '@shared/lang';
+import { createLangContainer, LangFile } from '@shared/lang';
 import { ITheme } from '@shared/ThemeFile';
 import * as axiosImport from 'axios';
 import { ipcRenderer } from 'electron';
 import { UpdateInfo } from 'electron-updater';
-import { DialogField, DialogState, DownloaderState, DownloaderStatus, DownloadTask, DownloadWorkerState, Game, GameData, Playlist, PlaylistGame, ViewGame } from 'flashpoint-launcher';
+import { DialogField, DialogState, DownloaderState, DownloaderStatus, DownloadTask, DownloadWorkerState, Game, GameData, LangContainer, Playlist, PlaylistGame, ViewGame } from 'flashpoint-launcher';
 
 export const RANDOM_GAME_ROW_COUNT = 6;
 
@@ -218,7 +218,6 @@ const initialState: MainState = {
 export const requestKeyset = createAsyncThunk(
   'search/requestKeyset',
   async (payload: ResolveDialogActionData, { getState, dispatch }) => {
-    
     const state = getState() as { main: MainState };
     const dialogIdx = state.main.openDialogs.findIndex(d => d.id === payload.id);
     if (dialogIdx > -1) {

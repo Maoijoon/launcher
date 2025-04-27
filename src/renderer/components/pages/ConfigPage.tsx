@@ -9,7 +9,7 @@ import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
 import { AppExtConfigData } from '@shared/config/interfaces';
 import { ExtConfigurationProp, ExtensionContribution, IExtensionDescription, ILogoSet } from '@shared/extensions/interfaces';
 import { CustomIPC } from '@shared/interfaces';
-import { autoCode, LangContainer, LangFile } from '@shared/lang';
+import { autoCode, LangFile } from '@shared/lang';
 import { memoizeOne } from '@shared/memoize';
 import { Paths } from '@shared/Paths';
 import { updatePreferencesData, updatePreferencesDataAsync } from '@shared/preferences/util';
@@ -18,7 +18,7 @@ import { deepCopy } from '@shared/Util';
 import * as Coerce from '@shared/utils/Coerce';
 import { formatString } from '@shared/utils/StringFormatter';
 import { ipcRenderer } from 'electron';
-import { AppPathOverride, TagFilterGroup } from 'flashpoint-launcher';
+import { AppPathOverride, LangContainer, TagFilterGroup } from 'flashpoint-launcher';
 import * as React from 'react';
 import { clearFpfssConsentExt, getFpfssConsentExt, saveFpfssConsentExt } from '../../fpfss';
 import {
@@ -687,11 +687,11 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
                   title={strings.browse.tagFilterIcon}
                   style={{ backgroundImage: `url("${item.iconBase64}")` }} />
               ) :
-              (
-                <div
-                  key={index}
-                  className='config-page__tfg-extreme-logo' />
-              )))
+                (
+                  <div
+                    key={index}
+                    className='config-page__tfg-extreme-logo' />
+                )))
             }
             <div
               title={item.enabled ? 'Hidden' : 'Visible'}
@@ -769,7 +769,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
     const allStrings = this.context;
     return extensions.map((ext) => {
       const fpfssConsent = fpfssConsents[ext.id];
-      
+
       const shortContribs = [];
       if (ext.contributes) {
         if (ext.contributes.devScripts && ext.contributes.devScripts.length > 0) {
@@ -803,33 +803,33 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
       }
       return (
         <div key={ext.id} className='setting__row'>
-            <div className='setting__row__top'>
-              <div className='setting__row__title setting__row__title--flex setting__row__title--align-left'>
-                { ext.icon ? (
-                  <div
-                    style={{ backgroundImage: `url(${getExtIconURL(ext.id)})` }}
-                    className='setting__row__ext-icon' />
-                ): undefined }
-                <div>
-                  <div>{ext.displayName || ext.name}</div>
-                  <div>{ext.author}</div>
-                </div>
-              </div>
-              <div className='setting__row__content setting__row__content--right-align'>
-                {shortContribs}
+          <div className='setting__row__top'>
+            <div className='setting__row__title setting__row__title--flex setting__row__title--align-left'>
+              { ext.icon ? (
+                <div
+                  style={{ backgroundImage: `url(${getExtIconURL(ext.id)})` }}
+                  className='setting__row__ext-icon' />
+              ): undefined }
+              <div>
+                <div>{ext.displayName || ext.name}</div>
+                <div>{ext.author}</div>
               </div>
             </div>
+            <div className='setting__row__content setting__row__content--right-align'>
+              {shortContribs}
+            </div>
+          </div>
           <div className='setting__row__bottom setting__row__description'>
-              <p>{ext.description}</p>
-            </div>
+            <p>{ext.description}</p>
+          </div>
           <div className='setting__row__content setting__extension__config_row'>
             {(fpfssConsent === true) ? (
-            <ConfigBoxInnerButton
-              title={allStrings.extensions.fpssConsentRevokeTitle}
-              description={allStrings.extensions.fpssConsentRevokeDesc}
-              value={allStrings.curate.delete}
-              onClick={() => this.onExtFPFSSConsentChange(ext.id, 'revoke')} />
-          ) : undefined }
+              <ConfigBoxInnerButton
+                title={allStrings.extensions.fpssConsentRevokeTitle}
+                description={allStrings.extensions.fpssConsentRevokeDesc}
+                value={allStrings.curate.delete}
+                onClick={() => this.onExtFPFSSConsentChange(ext.id, 'revoke')} />
+            ) : undefined }
           </div>
         </div>
       );
@@ -891,7 +891,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
       </div>
     );
   };
-  
+
   onExtFPFSSConsentChange = (extId: string, action: string): void => {
     const updatedConsent = action === 'grant' ? true : undefined;
     if (updatedConsent) {
@@ -981,7 +981,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
     updatePreferencesData({
       loadViewsText: isChecked
     });
-  }
+  };
 
   onEnableEditingChange = (isChecked: boolean): void => {
     updatePreferencesData({ enableEditing: isChecked });
@@ -1038,7 +1038,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
 
   onToggleUseSelectedGameScroll = (isChecked: boolean) => {
     updatePreferencesData({ useSelectedGameScroll: isChecked });
-  }
+  };
 
   onExcludedLibraryCheckboxChange = (library: string): void => {
     const excludedRandomLibraries = [ ...this.props.preferencesData.excludedRandomLibraries ];
@@ -1167,7 +1167,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
 
   onChangeTagEditorIconEvent = (iconBase64: string): void => {
     if (this.state.editingTagFilterGroup) {
-      const newTFG = {...this.state.editingTagFilterGroup, iconBase64 };
+      const newTFG = { ...this.state.editingTagFilterGroup, iconBase64 };
       this.setState({ editingTagFilterGroup: newTFG });
     }
   };
@@ -1339,7 +1339,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
 
   onChangeAutoClearWininetCache = (isChecked: boolean) => {
     updatePreferencesData({ autoClearWininetCache: isChecked });
-  }
+  };
 
   onClearWininetCache = () => {
     window.Shared.back.request(BackIn.CLEAR_WININET_CACHE)
@@ -1349,7 +1349,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
     .catch((err) => {
       alert('Error: ' + err);
     });
-  }
+  };
 
 }
 

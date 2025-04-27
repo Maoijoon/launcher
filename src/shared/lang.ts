@@ -1,10 +1,7 @@
+import { BaseLangContainer, LangCategory, LangContainer, LangTemplate } from 'flashpoint-launcher';
 import { RecursivePartial } from './interfaces';
 
-/**
- * Template for the language types and containers.
- * Each property is a language category, and each of the strings is the name of a language string.
- */
-const langTemplate = {
+export const langTemplate = {
   config: [
     'configHeader',
     'configDesc',
@@ -696,30 +693,6 @@ const langTemplate = {
   ]
   // libraries: [], // (This is dynamically populated in run-time)
 } as const;
-
-/** Language template (short-hand). */
-type LangTemplate = typeof langTemplate
-
-/** A language category (based on a language template category). */
-type LangCategory<T extends readonly string[]> = {
-  -readonly [K in T[number]]: string;
-}
-
-/** A dynamic and partial language category. */
-type DynamicLangCategory = {
-  [key: string]: string | undefined;
-}
-
-/** Base type of LangContainer (). */
-export type BaseLangContainer = {
-  -readonly [key in keyof LangTemplate]: LangCategory<LangTemplate[key]>;
-}
-
-/** Container of all language strings used by the launcher. */
-export type LangContainer = BaseLangContainer & {
-  libraries: DynamicLangCategory;
-  upgrades: DynamicLangCategory;
-}
 
 /**
  * Create a language category object from a language template category.

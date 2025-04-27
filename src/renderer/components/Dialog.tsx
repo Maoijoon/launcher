@@ -1,16 +1,16 @@
-import { cancelDialog, resolveDialog, updateDialogField } from "@renderer/store/main/slice"
-import { DialogField, DialogState } from "flashpoint-launcher"
-import { SimpleButton } from "./SimpleButton";
-import { useMemo } from "react";
-import { compileSync, runSync } from "@mdx-js/mdx";
+import { cancelDialog, resolveDialog, updateDialogField } from '@renderer/store/main/slice';
+import { DialogField, DialogState } from 'flashpoint-launcher';
+import { SimpleButton } from './SimpleButton';
+import { useMemo } from 'react';
+import { compileSync, runSync } from '@mdx-js/mdx';
 import * as runtime from 'react/jsx-runtime';
-import { FloatingContainer } from "./FloatingContainer";
-import { OpenIcon } from "./OpenIcon";
-import { ProgressBar } from "./ProgressComponents";
-import { ProgressData } from "@renderer/context/ProgressContext";
-import { InputField } from "./InputField";
-import { getFileServerURL } from "@shared/Util";
-import { ErrorBoundary } from "react-error-boundary";
+import { FloatingContainer } from './FloatingContainer';
+import { OpenIcon } from './OpenIcon';
+import { ProgressBar } from './ProgressComponents';
+import { ProgressData } from '@renderer/context/ProgressContext';
+import { InputField } from './InputField';
+import { getFileServerURL } from '@shared/Util';
+import { ErrorBoundary } from 'react-error-boundary';
 
 export type DialogProps = {
   dialog: DialogState,
@@ -42,7 +42,7 @@ export function Dialog(props: DialogProps) {
 
   return (
     <FloatingContainer>
-      <div style={{textAlign: alignment}}>
+      <div style={{ textAlign: alignment }}>
         {dialog.userCanCancel && (
           <div className='dialog-cancel-button' onClick={() => {
             closeDialog(dialog.id);

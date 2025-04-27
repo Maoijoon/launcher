@@ -7,7 +7,6 @@ import { RANDOM_GAME_ROW_COUNT } from '@renderer/store/main/slice';
 import { BackIn, BackInit, BackOut, FpfssUser } from '@shared/back/types';
 import { APP_TITLE, LOGOS, SCREENSHOTS } from '@shared/constants';
 import { CustomIPC, IService, ProcessState, WindowIPC } from '@shared/interfaces';
-import { LangContainer } from '@shared/lang';
 import { memoizeOne } from '@shared/memoize';
 import { Paths } from '@shared/Paths';
 import { updatePreferencesData } from '@shared/preferences/util';
@@ -23,6 +22,7 @@ import {
   DialogState,
   Game,
   GameLaunchOverride,
+  LangContainer,
   Playlist,
   PlaylistGame
 } from 'flashpoint-launcher';
@@ -56,11 +56,41 @@ import { TitleBar } from './TitleBar';
 import uuid = require('uuid');
 import { isAxiosError } from 'axios';
 import { WithShortcutProps } from '@renderer/store/reactKeybindCompat';
+import { DynamicComponentProvider } from './DynamicComponentProvider';
+import { GameComponentDropdownSelectField, GameComponentInputField } from './DisplayComponent';
+import { DynamicThemeProvider } from './DynamicThemeProvider';
+import { DisplaySettings } from 'flashpoint-launcher-renderer';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
 
 type AppOwnProps = {};
+
+const DEFAULT_DISPLAYS: DisplaySettings = {
+  gameSidebar: {
+    middle: [
+      'game_alternateTitles',
+      'game_tags',
+      'game_series',
+      'game_publisher',
+      'game_source',
+      'game_platforms',
+      'game_playMode',
+      'game_status',
+      'game_version',
+      'game_language',
+      'game_ruffleSupport',
+    ],
+    bottom: [
+      'game_dates',
+      'game_playlistNotes',
+      'game_notes',
+      'game_originalDescription',
+      'game_addApps',
+      'game_legacyData'
+    ],
+  }
+};
 
 export type AppProps = AppOwnProps & RouteComponentProps & WithViewProps & WithFpfssProps & WithPreferencesProps & WithSearchProps & WithTagCategoriesProps & WithMainStateProps & WithTasksProps & WithCurateProps & WithShortcutProps;
 
@@ -71,6 +101,20 @@ export class App extends React.Component<AppProps> {
     super(props);
 
     this.appRef = React.createRef();
+
+    // Set up renderer ext model
+    window.ext = {
+      utils: {
+        getExtensionFileURL: (extId, filePath) => {
+          return `${getFileServerURL()}/extdata/${extId}/${filePath}`;
+        }
+      },
+      components: {
+        GameComponentInputField: GameComponentInputField,
+        GameComponentDropdownSelectField: GameComponentDropdownSelectField,
+      }
+    };
+    window.displaySettings = DEFAULT_DISPLAYS;
 
     // Dispatch the initial state info
     props.setMainState({
@@ -554,7 +598,7 @@ export class App extends React.Component<AppProps> {
       this.props.curateActions.setSelectedCurations(selectable);
     });
 
-    window.Shared.back.register(BackOut.UPDATE_TASK, (event,task) => {
+    window.Shared.back.register(BackOut.UPDATE_TASK, (event, task) => {
       // I don't know why length works with 1, don't change it
       if (!this.props.main.taskBarOpen && this.props.tasks.length === 1) {
         // Show task bar for first task added
@@ -930,8 +974,7 @@ export class App extends React.Component<AppProps> {
 
       if (
         this.props.preferencesData.browsePageShowExtreme !== prevProps.preferencesData.browsePageShowExtreme ||
-        JSON.stringify(prevProps.preferencesData.tagFilters) !== JSON.stringify(this.props.preferencesData.tagFilters)) 
-      {
+        JSON.stringify(prevProps.preferencesData.tagFilters) !== JSON.stringify(this.props.preferencesData.tagFilters)) {
         const tagsKey = JSON.stringify(this.props.preferencesData.tagFilters);
         this.props.searchActions.resetDropdownData(tagsKey);
       }
@@ -1110,7 +1153,7 @@ export class App extends React.Component<AppProps> {
         playlistId: this.props.currentView.selectedPlaylist.id,
         gameId: playlistGame.gameId
       });
-    } else { 
+    } else {
       logError('No playlist is selected?');
       return;
     }
@@ -1382,6 +1425,12 @@ export class App extends React.Component<AppProps> {
     const { currentView } = this.props;
     const playlists = this.orderPlaylistsMemo(this.props.main.playlists);
     const extremeTags = this.props.preferencesData.tagFilters.filter(t => t.extreme).reduce<string[]>((prev, cur) => prev.concat(cur.tags), []);
+    const dynamicComponentFileList = this.props.main.extensions.reduce<string[]>((prev, cur) => prev.concat(cur.contributes?.componentFiles.map(file => {
+      return `${getFileServerURL()}/extdata/${cur.id}/${file}`;
+    }) || []), []);
+    const dynamicThemeFileList = this.props.main.extensions.reduce<string[]>((prev, cur) => prev.concat(cur.contributes?.themeFiles.map(file => {
+      return `${getFileServerURL()}/extdata/${cur.id}/${file}`;
+    }) || []), []);
 
     // Props to set to the router
     const routerProps: AppRouterProps = {
@@ -1435,180 +1484,184 @@ export class App extends React.Component<AppProps> {
 
     // Render
     return (
-      <LangContext.Provider value={this.props.main.lang}>
-        {!this.props.main.stopRender ? (
-          <>
-            {/* Backend Crash Log and Report */}
-            {!this.props.main.socketOpen && !this.props.main.mainOutput && (
-              <FloatingContainer>
-                <div className='main-output-header'>Disconnected from Backend</div>
-                <div>Reconnecting...</div>
-              </FloatingContainer>
-            )}
-            {this.props.main.mainOutput && (
-              <FloatingContainer>
-                <div className='main-output-header'>Backend Crash Log</div>
-                <div className='main-output-content'>{this.props.main.mainOutput}</div>
-                <div className='main-output-buttons'>
-                  <SimpleButton
-                    value={'Copy Crash Log'}
-                    onClick={this.copyCrashLog} />
-                  <SimpleButton
-                    value={'Restart Launcher'}
-                    onClick={() => {
-                      this.props.setMainState({
-                        quitting: true
-                      });
-                      window.Shared.restart();
-                    }} />
-                </div>
-              </FloatingContainer>
-            )}
-            {/* First Open Dialog */}
-            {this.props.main.openDialogs.length > 0 && (
-              <Dialog
-                dialog={this.props.main.openDialogs[0]}
-                closeDialog={this.props.mainActions.cancelDialog}
-                finishDialog={this.props.mainActions.resolveDialog}
-                updateField={this.props.mainActions.updateDialogField} />
-            )}
-            {/** Fancy FPFSS edit */}
-            {this.props.fpfss.editingGame && (
-              <FloatingContainer floatingClassName='fpfss-edit-container'>
-                <ConnectedFpfssEditGame
-                  logoVersion={this.props.main.logoVersion}
-                  gameRunning={false}
-                  currentGame={this.props.fpfss.editingGame}
-                  currentLibrary={this.props.fpfss.editingGame.library}
-                  onGameLaunch={async () => alert('Cannot launch game during FPFSS edit')}
-                  onDeleteSelectedGame={() => {/** unused */ }}
-                  onDeselectPlaylist={() => {/** unused */ }}
-                  isEditing={true}
-                  isExtreme={false}
-                  isNewGame={false}
-                  suggestions={this.props.main.suggestions}
-                  tagCategories={this.props.tagCategories}
-                  busyGames={[]}
-                  onEditClick={() => {/** unused */ }}
-                  onRemovePlaylistGame={() => {/** unused */}}
-                  onDiscardClick={this.onCancelFpfssEditGame}
-                  onSaveGame={this.onSaveFpfssEditGame}
-                  onEditGame={this.onApplyFpfssEditGame}
-                  onFpfssEditGame={this.onFpfssEditGame}
-                  onSearch={this.onSearch}
-                  onUpdateActiveGameData={(disk, id) => id && this.onApplyFpfssEditGameData(id)} />
-              </FloatingContainer>
-            )}
-            {/* Splash screen */}
-            <SplashScreen
-              quitting={this.props.main.quitting}
-              loadedAll={this.props.main.loadedAll}
-              loaded={this.props.main.loaded} />
-            {/* Title-bar (if enabled) */}
-            {window.Shared.config.data.useCustomTitlebar ?
-              window.Shared.customVersion ? (
-                <TitleBar title={window.Shared.customVersion} />
-              ) : (
-                <TitleBar title={`${APP_TITLE} (${remote.app.getVersion()})`} />
-              ) : undefined}
-            {/* "Content" */}
-            {this.props.main.loadedAll ? (
+      <DynamicThemeProvider fileList={dynamicThemeFileList} >
+        <DynamicComponentProvider fileList={dynamicComponentFileList}>
+          <LangContext.Provider value={this.props.main.lang}>
+            {!this.props.main.stopRender ? (
               <>
-                {/* Header */}
-                <Header
-                  logoutUser={this.logoutUser}
-                  user={this.props.fpfss.user}
-                  libraries={this.props.main.libraries}
-                  onToggleLeftSidebarClick={this.onToggleLeftSidebarClick}
-                  onToggleRightSidebarClick={this.onToggleRightSidebarClick} />
-                {/* Main */}
-                <div className='main'
-                  ref={this.appRef} >
-                  <AppRouter {...routerProps} />
-                  <noscript className='nojs'>
-                    <div style={{ textAlign: 'center' }}>
-                      This website requires JavaScript to be enabled.
-                    </div>
-                  </noscript>
-                  {currentView.selectedGame && !hiddenRightSidebarPages.reduce((prev, cur) => prev || this.props.history.location.pathname.startsWith(cur), false) && (
-                    <ResizableSidebar
-                      show={this.props.preferencesData.browsePageShowRightSidebar}
-                      divider='before'
-                      width={this.props.preferencesData.browsePageRightSidebarWidth}
-                      onResize={this.onRightSidebarResize}>
-                      <ConnectedRightBrowseSidebar
-                        logoVersion={this.props.main.logoVersion}
-                        currentGame={currentView.selectedGame}
-                        currentPlaylist={currentView.selectedPlaylist}
-                        isExtreme={currentView.selectedGame ? currentView.selectedGame.tags.reduce<boolean>((prev, next) => extremeTags.includes(next) || prev, false) : false}
-                        gameRunning={routerProps.gameRunning}
-                        currentLibrary={routerProps.gameLibrary}
-                        onGameLaunch={this.onGameLaunch}
-                        onDeleteSelectedGame={this.onDeleteSelectedGame}
-                        onRemovePlaylistGame={this.onRemovePlaylistGame}
-                        onDeselectPlaylist={this.onRightSidebarDeselectPlaylist}
-                        isEditing={this.props.main.isEditingGame && this.props.preferencesData.enableEditing}
-                        isNewGame={false} /* Deprecated */
-                        onEditGame={this.onEditGame}
-                        onUpdateActiveGameData={this.onUpdateActiveGameData}
-                        onEditClick={this.onStartEditClick}
-                        onDiscardClick={this.onDiscardEditClick}
-                        onSaveGame={this.onSaveEditClick}
-                        tagCategories={this.props.tagCategories}
-                        suggestions={this.props.main.suggestions}
-                        busyGames={this.props.main.busyGames}
-                        onFpfssEditGame={this.onFpfssEditGame}
-                        onSearch={this.onSearch}/>
-                    </ResizableSidebar>
-                  )}
-                </div>
-                {/* Tasks - @TODO Find a better way to hide it than behind enableEditing */}
-                {this.props.preferencesData.enableEditing && this.props.tasks.length > 0 && (
-                  <TaskBar
-                    open={this.props.main.taskBarOpen}
-                    onToggleOpen={this.onToggleTaskBarOpen} />
+                {/* Backend Crash Log and Report */}
+                {!this.props.main.socketOpen && !this.props.main.mainOutput && (
+                  <FloatingContainer>
+                    <div className='main-output-header'>Disconnected from Backend</div>
+                    <div>Reconnecting...</div>
+                  </FloatingContainer>
                 )}
-                {/* Footer */}
-                <ConnectedFooter />
-                {/* Meta Edit Popup */}
+                {this.props.main.mainOutput && (
+                  <FloatingContainer>
+                    <div className='main-output-header'>Backend Crash Log</div>
+                    <div className='main-output-content'>{this.props.main.mainOutput}</div>
+                    <div className='main-output-buttons'>
+                      <SimpleButton
+                        value={'Copy Crash Log'}
+                        onClick={this.copyCrashLog} />
+                      <SimpleButton
+                        value={'Restart Launcher'}
+                        onClick={() => {
+                          this.props.setMainState({
+                            quitting: true
+                          });
+                          window.Shared.restart();
+                        }} />
+                    </div>
+                  </FloatingContainer>
+                )}
+                {/* First Open Dialog */}
+                {this.props.main.openDialogs.length > 0 && (
+                  <Dialog
+                    dialog={this.props.main.openDialogs[0]}
+                    closeDialog={this.props.mainActions.cancelDialog}
+                    finishDialog={this.props.mainActions.resolveDialog}
+                    updateField={this.props.mainActions.updateDialogField} />
+                )}
+                {/** Fancy FPFSS edit */}
+                {this.props.fpfss.editingGame && (
+                  <FloatingContainer floatingClassName='fpfss-edit-container'>
+                    <ConnectedFpfssEditGame
+                      logoVersion={this.props.main.logoVersion}
+                      gameRunning={false}
+                      currentGame={this.props.fpfss.editingGame}
+                      currentLibrary={this.props.fpfss.editingGame.library}
+                      onGameLaunch={async () => alert('Cannot launch game during FPFSS edit')}
+                      onDeleteSelectedGame={() => {/** unused */ }}
+                      onDeselectPlaylist={() => {/** unused */ }}
+                      isEditing={true}
+                      isExtreme={false}
+                      isNewGame={false}
+                      suggestions={this.props.main.suggestions}
+                      tagCategories={this.props.tagCategories}
+                      busyGames={[]}
+                      onEditClick={() => {/** unused */ }}
+                      onRemovePlaylistGame={() => {/** unused */ }}
+                      onDiscardClick={this.onCancelFpfssEditGame}
+                      onSaveGame={this.onSaveFpfssEditGame}
+                      onEditGame={this.onApplyFpfssEditGame}
+                      onFpfssEditGame={this.onFpfssEditGame}
+                      onSearch={this.onSearch}
+                      onUpdateActiveGameData={(disk, id) => id && this.onApplyFpfssEditGameData(id)} />
+                  </FloatingContainer>
+                )}
+                {/* Splash screen */}
+                <SplashScreen
+                  quitting={this.props.main.quitting}
+                  loadedAll={this.props.main.loadedAll}
+                  loaded={this.props.main.loaded} />
+                {/* Title-bar (if enabled) */}
+                {window.Shared.config.data.useCustomTitlebar ?
+                  window.Shared.customVersion ? (
+                    <TitleBar title={window.Shared.customVersion} />
+                  ) : (
+                    <TitleBar title={`${APP_TITLE} (${remote.app.getVersion()})`} />
+                  ) : undefined}
+                {/* "Content" */}
+                {this.props.main.loadedAll ? (
+                  <>
+                    {/* Header */}
+                    <Header
+                      logoutUser={this.logoutUser}
+                      user={this.props.fpfss.user}
+                      libraries={this.props.main.libraries}
+                      onToggleLeftSidebarClick={this.onToggleLeftSidebarClick}
+                      onToggleRightSidebarClick={this.onToggleRightSidebarClick} />
+                    {/* Main */}
+                    <div className='main'
+                      ref={this.appRef} >
+                      <AppRouter {...routerProps} />
+                      <noscript className='nojs'>
+                        <div style={{ textAlign: 'center' }}>
+                          This website requires JavaScript to be enabled.
+                        </div>
+                      </noscript>
+                      {currentView.selectedGame && !hiddenRightSidebarPages.reduce((prev, cur) => prev || this.props.history.location.pathname.startsWith(cur), false) && (
+                        <ResizableSidebar
+                          show={this.props.preferencesData.browsePageShowRightSidebar}
+                          divider='before'
+                          width={this.props.preferencesData.browsePageRightSidebarWidth}
+                          onResize={this.onRightSidebarResize}>
+                          <ConnectedRightBrowseSidebar
+                            logoVersion={this.props.main.logoVersion}
+                            currentGame={currentView.selectedGame}
+                            currentPlaylist={currentView.selectedPlaylist}
+                            isExtreme={currentView.selectedGame ? currentView.selectedGame.tags.reduce<boolean>((prev, next) => extremeTags.includes(next) || prev, false) : false}
+                            gameRunning={routerProps.gameRunning}
+                            currentLibrary={routerProps.gameLibrary}
+                            onGameLaunch={this.onGameLaunch}
+                            onDeleteSelectedGame={this.onDeleteSelectedGame}
+                            onRemovePlaylistGame={this.onRemovePlaylistGame}
+                            onDeselectPlaylist={this.onRightSidebarDeselectPlaylist}
+                            isEditing={this.props.main.isEditingGame && this.props.preferencesData.enableEditing}
+                            isNewGame={false} /* Deprecated */
+                            onEditGame={this.onEditGame}
+                            onUpdateActiveGameData={this.onUpdateActiveGameData}
+                            onEditClick={this.onStartEditClick}
+                            onDiscardClick={this.onDiscardEditClick}
+                            onSaveGame={this.onSaveEditClick}
+                            tagCategories={this.props.tagCategories}
+                            suggestions={this.props.main.suggestions}
+                            busyGames={this.props.main.busyGames}
+                            onFpfssEditGame={this.onFpfssEditGame}
+                            onSearch={this.onSearch} />
+                        </ResizableSidebar>
+                      )}
+                    </div>
+                    {/* Tasks - @TODO Find a better way to hide it than behind enableEditing */}
+                    {this.props.preferencesData.enableEditing && this.props.tasks.length > 0 && (
+                      <TaskBar
+                        open={this.props.main.taskBarOpen}
+                        onToggleOpen={this.onToggleTaskBarOpen} />
+                    )}
+                    {/* Footer */}
+                    <ConnectedFooter />
+                    {/* Meta Edit Popup */}
+                  </>
+                ) : undefined}
               </>
             ) : undefined}
-          </>
-        ) : undefined}
-        {this.props.main.downloadOpen && (
-          <FloatingContainer>
-            {this.props.main.downloadVerifying ? (
-              <>
-                <div className='placeholder-download-bar--title'>
-                  {this.props.main.lang.dialog.verifyingGame}
-                </div>
-                <div>{this.props.main.lang.dialog.aFewMinutes}</div>
-              </>
-            ) : (
-              <>
-                <div className='placeholder-download-bar--title'>
-                  {this.props.main.lang.dialog.downloadingGame}
-                </div>
-                <div>{`${sizeToString(this.props.main.downloadSize * (this.props.main.downloadPercent / 100))} / ${sizeToString(this.props.main.downloadSize)}`}</div>
-              </>
+            {this.props.main.downloadOpen && (
+              <FloatingContainer>
+                {this.props.main.downloadVerifying ? (
+                  <>
+                    <div className='placeholder-download-bar--title'>
+                      {this.props.main.lang.dialog.verifyingGame}
+                    </div>
+                    <div>{this.props.main.lang.dialog.aFewMinutes}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className='placeholder-download-bar--title'>
+                      {this.props.main.lang.dialog.downloadingGame}
+                    </div>
+                    <div>{`${sizeToString(this.props.main.downloadSize * (this.props.main.downloadPercent / 100))} / ${sizeToString(this.props.main.downloadSize)}`}</div>
+                  </>
+                )}
+                {this.props.main.downloadVerifying ? <></> : (
+                  <ProgressBar
+                    wrapperClass='placeholder-download-bar__wrapper'
+                    progressData={{
+                      ...placeholderProgressData,
+                      percentDone: this.props.main.downloadPercent,
+                      usePercentDone: true
+                    }}
+                  />
+                )}
+                <SimpleButton
+                  className='cancel-download-button'
+                  value={this.props.main.lang.dialog.cancel}
+                  onClick={() => window.Shared.back.send(BackIn.CANCEL_DOWNLOAD)} />
+              </FloatingContainer>
             )}
-            {this.props.main.downloadVerifying ? <></> : (
-              <ProgressBar
-                wrapperClass='placeholder-download-bar__wrapper'
-                progressData={{
-                  ...placeholderProgressData,
-                  percentDone: this.props.main.downloadPercent,
-                  usePercentDone: true
-                }}
-              />
-            )}
-            <SimpleButton
-              className='cancel-download-button'
-              value={this.props.main.lang.dialog.cancel}
-              onClick={() => window.Shared.back.send(BackIn.CANCEL_DOWNLOAD)} />
-          </FloatingContainer>
-        )}
-      </LangContext.Provider>
+          </LangContext.Provider>
+        </DynamicComponentProvider>
+      </DynamicThemeProvider>
     );
   }
 
@@ -1892,7 +1945,7 @@ export class App extends React.Component<AppProps> {
       // Check if the error is an axios error, so we can handle lack of auth
       if (isAxiosError(err)) {
         // Axios being dumb as bricks here
-        let jsonErr = JSON.parse(JSON.stringify(err));
+        const jsonErr = JSON.parse(JSON.stringify(err));
         if (jsonErr.status === 401) {
           // Must reauth
           this.props.fpfssActions.setUser(null);
@@ -1912,7 +1965,7 @@ export class App extends React.Component<AppProps> {
   /**
    * Performs a callback with the active FPFSS user.
    * If the callback throws an axios 401 error, it will automatically try to reauth and retry.
-   * 
+   *
    * @param cb Callback to perform with user
    */
   async performFpfssAction(cb: (user: FpfssUser) => any) {

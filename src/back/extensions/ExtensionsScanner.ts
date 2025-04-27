@@ -120,6 +120,7 @@ export async function scanExtensions(configData: AppConfigData, extensionPath: s
  * @param name Name of the extension
  */
 function getExtensionID(author: string, name: string) {
+  author = author ? author : 'system';
   const fAuthor = author.toLowerCase().replace(' ', '-');
   if (name.includes(' ') || name.toLowerCase() !== name) {
     throw new Error('Extension names may not include uppercase or space characters!');
@@ -183,6 +184,8 @@ function parseContributions(parser: IObjectParserProp<Contributions>): Contribut
     applications: [],
     configuration: [],
     curationTemplates: [],
+    componentFiles: [],
+    themeFiles: [],
   };
   parser.prop('logoSets',          true).array(item => contributes.logoSets.push(parseLogoSet(item)));
   parser.prop('themes',            true).array(item => contributes.themes.push(parseTheme(item)));
@@ -191,6 +194,8 @@ function parseContributions(parser: IObjectParserProp<Contributions>): Contribut
   parser.prop('applications',      true).array(item => contributes.applications.push(parseApplication(item)));
   parser.prop('configuration',     true).array(item => contributes.configuration.push(parseConfiguration(item)));
   parser.prop('curationTemplates', true).array(item => contributes.curationTemplates.push(parseCurationTemplate(item)));
+  parser.prop('componentFiles',    true).arrayRaw(item => contributes.componentFiles.push(str(item)));
+  parser.prop('themeFiles',        true).arrayRaw(item => contributes.themeFiles.push(str(item)));
   return contributes;
 }
 

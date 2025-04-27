@@ -1,16 +1,21 @@
 import * as remote from '@electron/remote';
+import { SearchBar } from '@renderer/components/SearchBar';
+import { WithSearchProps } from '@renderer/containers/withSearch';
 import { WithTagCategoriesProps } from '@renderer/containers/withTagCategories';
-import { BackIn, BackOut } from '@shared/back/types';
+import { WithViewProps } from '@renderer/containers/withView';
+import { RequestState } from '@renderer/store/search/slice';
+import { BackIn } from '@shared/back/types';
 import { BrowsePageLayout } from '@shared/BrowsePageLayout';
 import { ExtensionContribution } from '@shared/extensions/interfaces';
-import { LangContainer } from '@shared/lang';
 import { memoizeOne } from '@shared/memoize';
 import { updatePreferencesData } from '@shared/preferences/util';
 import { formatString } from '@shared/utils/StringFormatter';
+import { delayedThrottle } from '@shared/utils/throttle';
 import { uuid } from '@shared/utils/uuid';
 import { Menu, MenuItemConstructorOptions } from 'electron';
-import { GameLaunchOverride, Playlist } from 'flashpoint-launcher';
+import { GameLaunchOverride, LangContainer, Playlist } from 'flashpoint-launcher';
 import * as React from 'react';
+import { ScrollIndices } from 'react-virtualized-reactv17';
 import { ConnectedLeftBrowseSidebar } from '../../containers/ConnectedLeftBrowseSidebar';
 import { WithPreferencesProps } from '../../containers/withPreferences';
 import { gameDragDataType, gameScaleSpan } from '../../Util';
@@ -20,13 +25,7 @@ import { GameList } from '../GameList';
 import { InputElement } from '../InputField';
 import { ResizableSidebar, SidebarResizeEvent } from '../ResizableSidebar';
 import { Spinner } from '../Spinner';
-import { RequestState } from '@renderer/store/search/slice';
-import { WithSearchProps } from '@renderer/containers/withSearch';
-import { WithViewProps } from '@renderer/containers/withView';
-import { SearchBar } from '@renderer/components/SearchBar';
-import { delayedThrottle } from '@shared/utils/throttle';
 import path = require('path');
-import { ScrollIndices } from 'react-virtualized-reactv17';
 
 type Pick<T, K extends keyof T> = { [P in K]: T[P]; };
 
@@ -119,14 +118,14 @@ export class BrowsePage extends React.Component<BrowsePageProps, BrowsePageState
       view: this.props.currentView.id,
       scrollTop
     });
-  }
+  };
 
   onGridScrollToChange = (params: ScrollIndices, columns: number) => {
     const game = this.props.currentView.data.games[params.scrollToRow * columns + params.scrollToColumn];
-    if (game) { 
+    if (game) {
       this.onGridGameSelect(game.id, params.scrollToColumn, params.scrollToRow);
     }
-  }
+  };
 
   onListScrollToChange = (row: number) => {
     console.log(row);
@@ -135,14 +134,14 @@ export class BrowsePage extends React.Component<BrowsePageProps, BrowsePageState
       console.log(game.id);
       this.onListGameSelect(game.id, row);
     }
-  }
+  };
 
   render() {
     const strings = this.context;
     const { currentView } = this.props;
     const { draggedGameIndex } = this.state;
     const extremeTags = this.props.preferencesData.tagFilters.filter(t => !t.enabled && t.extreme).reduce<string[]>((prev, cur) => prev.concat(cur.tags), []);
-    const tagGroupIcons = this.props.preferencesData.tagFilters.filter(t => !t.enabled && t.iconBase64 !== '').map(({tags, iconBase64: tagGroupIcon}) => ({tagFilter:tags, iconBase64:tagGroupIcon}));
+    const tagGroupIcons = this.props.preferencesData.tagFilters.filter(t => !t.enabled && t.iconBase64 !== '').map(({ tags, iconBase64: tagGroupIcon }) => ({ tagFilter:tags, iconBase64:tagGroupIcon }));
     // Render
     return (
       <div
@@ -419,7 +418,7 @@ export class BrowsePage extends React.Component<BrowsePageProps, BrowsePageState
         });
       }
     }
-  }
+  };
 
 
   onListGameSelect = async (gameId?: string, row?: number): Promise<void> => {
@@ -716,7 +715,7 @@ export class BrowsePage extends React.Component<BrowsePageProps, BrowsePageState
 
   onDownloadPlaylistContents = (playlistId: string): void => {
     window.Shared.back.send(BackIn.DOWNLOAD_PLAYLIST_CONTENTS, playlistId);
-  }
+  };
 
   onExportPlaylist = (strings: LangContainer, playlistId: string): void => {
     const playlist = this.props.playlists.find(p => p.id === playlistId);

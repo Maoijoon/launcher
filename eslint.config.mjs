@@ -10,8 +10,10 @@ export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
     {
-        files: ['**/*.{js,jsx,ts,tsx}'],
-        ignores: ['gulpfile.js'],
+        ignores: ['**/*.js']
+    },
+    {
+        files: ['**/*.{ts,tsx}'],
         plugins: {
             react,
             '@stylistic': stylistic,

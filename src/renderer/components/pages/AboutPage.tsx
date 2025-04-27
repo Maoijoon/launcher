@@ -1,4 +1,3 @@
-import { LangContainer } from '@shared/lang';
 import { memoizeOne } from '@shared/memoize';
 import * as React from 'react';
 import { CreditsBlock, CreditsData, CreditsDataProfile, CreditsDataRole } from '../../credits/types';
@@ -9,6 +8,7 @@ import * as remote from '@electron/remote';
 import { CHANGELOG } from '@renderer/changelog';
 import { withMainState, WithMainStateProps } from '@renderer/containers/withMainState';
 import { uuid } from '@shared/utils/uuid';
+import { LangContainer } from 'flashpoint-launcher';
 
 export type AboutPageProps = {
   /** Credits data (if any). */
@@ -62,14 +62,14 @@ class _AboutPage extends React.Component<_AboutPageProps, AboutPageState> {
               textAlign: 'left',
               message: data.message,
               buttons: ['Close']
-            })
+            });
           }}
           className='about-page__section__changelog-preview simple-button'>
           <div><b>Date:</b> {(new Date(date)).toLocaleDateString()}</div>
           <div><b>{data.title}</b></div>
         </div>
-      )
-    })
+      );
+    });
 
     return (
       <div className='about-page simple-scroll'>

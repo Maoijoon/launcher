@@ -1,6 +1,5 @@
 import { BackIn } from '@shared/back/types';
 import { CustomIPC, IBackProcessInfo, IService, ProcessAction, ProcessState } from '@shared/interfaces';
-import { LangContainer } from '@shared/lang';
 import { ILogEntry } from '@shared/Log/interface';
 import { escapeHTML, formatTime, padLines, timeChars } from '@shared/Log/LogCommon';
 import { ipcRenderer } from 'electron';
@@ -9,6 +8,7 @@ import { setInterval } from 'timers';
 import { LangContext } from '../util/lang';
 import { LogData } from './LogData';
 import { SimpleButton } from './SimpleButton';
+import { LangContainer } from 'flashpoint-launcher';
 
 export type ServiceBoxProps = {
   /** Service to display. */

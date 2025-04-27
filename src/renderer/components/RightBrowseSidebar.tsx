@@ -1,31 +1,26 @@
 import * as remote from '@electron/remote';
 import { WithConfirmDialogProps } from '@renderer/containers/withConfirmDialog';
+import { LangContext } from '@renderer/util/lang';
 import { ArchiveState, BackIn, BackOut, BackOutTemplate } from '@shared/back/types';
 import { LOGOS, SCREENSHOTS } from '@shared/constants';
-import { ModelUtils } from '@shared/game/util';
 import { GamePropSuggestions, PickType, ProcessAction } from '@shared/interfaces';
-import { LangContainer } from '@shared/lang';
-import { deepCopy, generateTagFilterGroup, sizeToString } from '@shared/Util';
+import { generateTagFilterGroup, sizeToString } from '@shared/Util';
 import { formatString } from '@shared/utils/StringFormatter';
-import { uuid } from '@shared/utils/uuid';
 import { clipboard, Menu, MenuItemConstructorOptions } from 'electron';
-import { AdditionalApp, Game, GameData, GameLaunchOverride, Platform, PlaylistGame, Tag, TagCategory, TagSuggestion } from 'flashpoint-launcher';
+import { Game, GameData, GameLaunchOverride, LangContainer, Platform, Playlist, PlaylistGame, Tag, TagCategory, TagSuggestion } from 'flashpoint-launcher';
+import { GameComponentProps } from 'flashpoint-launcher-renderer';
 import * as React from 'react';
 import { WithPreferencesProps } from '../containers/withPreferences';
-import { axios, getGameImagePath, getGameImageURL, getPlatformIconURL, wrapSearchTerm } from '../Util';
+import { axios, getGameImagePath, getGameImageURL, wrapSearchTerm } from '../Util';
 import { ConfirmElement, ConfirmElementArgs } from './ConfirmElement';
-import { DropdownInputField, DropdownInputFieldMapped } from './DropdownInputField';
+import { DropdownInputField } from './DropdownInputField';
+import { DynamicComponent } from './DynamicComponent';
 import { GameDataBrowser } from './GameDataBrowser';
 import { GameImageSplit } from './GameImageSplit';
 import { ImagePreview } from './ImagePreview';
 import { InputElement, InputField } from './InputField';
 import { OpenIcon } from './OpenIcon';
-import { RightBrowseSidebarAddApp } from './RightBrowseSidebarAddApp';
 import { SimpleButton } from './SimpleButton';
-import { TagInputField } from './TagInputField';
-import { LangContext } from '@renderer/util/lang';
-import { mapRuffleSupportString } from '@shared/utils/misc';
-import { Playlist } from 'flashpoint-launcher';
 
 type OwnProps = {
   logoVersion: number;
@@ -92,32 +87,19 @@ type RightBrowseSidebarState = {
 export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps, RightBrowseSidebarState> {
   static contextType = LangContext;
   // Bound "on change" callbacks for game fields
-  onLibraryChange             = this.wrapOnTextChange((game, text) => this.props.onEditGame({ library: text }));
-  onTitleChange               = this.wrapOnTextChange((game, text) => this.props.onEditGame({ title: text }));
-  onAlternateTitlesChange     = this.wrapOnTextChange((game, text) => this.props.onEditGame({ alternateTitles: text }));
-  onDeveloperChange           = this.wrapOnTextChange((game, text) => this.props.onEditGame({ developer: text }));
-  onSeriesChange              = this.wrapOnTextChange((game, text) => this.props.onEditGame({ series: text }));
-  onSourceChange              = this.wrapOnTextChange((game, text) => this.props.onEditGame({ source: text }));
-  onPublisherChange           = this.wrapOnTextChange((game, text) => this.props.onEditGame({ publisher: text }));
-  onPlayModeChange            = this.wrapOnTextChange((game, text) => this.props.onEditGame({ playMode: text }));
-  onStatusChange              = this.wrapOnTextChange((game, text) => this.props.onEditGame({ status: text }));
-  onVersionChange             = this.wrapOnTextChange((game, text) => this.props.onEditGame({ version: text }));
-  onReleaseDateChange         = this.wrapOnTextChange((game, text) => this.props.onEditGame({ releaseDate: text }));
-  onLanguageChange            = this.wrapOnTextChange((game, text) => this.props.onEditGame({ language: text }));
-  onLaunchCommandChange       = this.wrapOnTextChange((game, text) => this.props.onEditGame({ legacyLaunchCommand: text }));
-  onApplicationPathChange     = this.wrapOnTextChange((game, text) => this.props.onEditGame({ legacyApplicationPath: text }));
-  onNotesChange               = this.wrapOnTextChange((game, text) => this.props.onEditGame({ notes: text }));
-  onOriginalDescriptionChange = this.wrapOnTextChange((game, text) => this.props.onEditGame({ originalDescription: text }));
+  onLibraryChange = this.wrapOnTextChange((game, text) => this.props.onEditGame({ library: text }));
+  onTitleChange = this.wrapOnTextChange((game, text) => this.props.onEditGame({ title: text }));
+  onDeveloperChange = this.wrapOnTextChange((game, text) => this.props.onEditGame({ developer: text }));
   // Bound "on click" callbacks for game fields
-  onDeveloperClick            = this.wrapOnTextClick('developer');
-  onSeriesClick               = this.wrapOnExactTextClick('series');
-  onSourceClick               = this.wrapOnTextClick('source');
-  onPublisherClick            = this.wrapOnTextClick('publisher');
-  onPlayModeClick             = this.wrapOnTextClick('playMode');
-  onStatusClick               = this.wrapOnTextClick('status');
-  onVersionClick              = this.wrapOnTextClick('version');
-  onLanguageClick             = this.wrapOnTextClick('language');
-  onRuffleSupportClick        = this.wrapOnTextClick('ruffleSupport');
+  onDeveloperClick = this.wrapOnTextClick('developer');
+  onSeriesClick = this.wrapOnExactTextClick('series');
+  onSourceClick = this.wrapOnTextClick('source');
+  onPublisherClick = this.wrapOnTextClick('publisher');
+  onPlayModeClick = this.wrapOnTextClick('playMode');
+  onStatusClick = this.wrapOnTextClick('status');
+  onVersionClick = this.wrapOnTextClick('version');
+  onLanguageClick = this.wrapOnTextClick('language');
+  onRuffleSupportClick = this.wrapOnTextClick('ruffleSupport');
 
   launchCommandRef: React.RefObject<HTMLInputElement> = React.createRef();
 
@@ -189,7 +171,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       }
     }
 
-    if ((this.props.currentGame?.id !== prevProps.currentGame?.id) 
+    if ((this.props.currentGame?.id !== prevProps.currentGame?.id)
       || (this.props.currentPlaylist?.id !== prevProps.currentPlaylist?.id)) {
       // Playlist or game has changed, update PlaylistGame
       console.log('change');
@@ -218,7 +200,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       this.setState({ showExtremeScreenshots: false });
       // Move scroll bar of middle section back to the top
       if (this.state.middleScrollRef.current) {
-        this.state.middleScrollRef.current.scrollTo(0,0);
+        this.state.middleScrollRef.current.scrollTo(0, 0);
       }
     }
     if (prevProps.currentGame && prevProps.currentGame.activeDataId && (!this.props.currentGame || !this.props.currentGame.activeDataId)) {
@@ -234,23 +216,12 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     }
   }
 
-  onEditAddApp(game: Game, addApp: AdditionalApp) {
-    if (game !== undefined && game.addApps !== undefined) {
-      const addApps = deepCopy(game.addApps);
-      const addAppIdx = addApps.findIndex(aa => aa.id === addApp.id);
-      if (addAppIdx > -1) {
-        addApps[addAppIdx] = addApp;
-        this.props.onEditGame({ addApps });
-      }
-    }
-  }
-
   onSaveGame = () => {
     if (this.state.playlistGame && this.props.currentPlaylist) {
       window.Shared.back.send(BackIn.SAVE_PLAYLIST_GAME, this.props.currentPlaylist.id, this.state.playlistGame);
     }
     this.props.onSaveGame();
-  }
+  };
 
   render() {
     const allStrings = this.context as LangContainer;
@@ -258,8 +229,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     const { playlistGame } = this.state;
     const game: Game | undefined = this.props.currentGame;
     if (game) {
-      const { isEditing, isNewGame, preferencesData, suggestions, tagCategories } = this.props;
-      const currentAddApps = game.addApps;
+      const { isEditing, isNewGame, preferencesData, suggestions } = this.props;
       const editDisabled = !preferencesData.enableEditing;
       const editable = isEditing;
       const screenshotSrc = getGameImageURL(SCREENSHOTS, game.id);
@@ -287,18 +257,15 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
           label: strings.uninstallGame,
           click: async () => {
             if (this.state.activeData) {
-              let dataId = this.state.activeData.id;
               if (!this.state.activeData.presentOnDisk) {
                 if (game.gameData) {
                   const gameData = game.gameData.find((gd) => gd.presentOnDisk);
-                  if (gameData !== undefined) {
-                    dataId = gameData.id;
-                  } else {
-                    alert("Broken uninstall logic, heckin confused");
+                  if (gameData === undefined) {
+                    alert('Broken uninstall logic, heckin confused');
                     return;
                   }
                 } else {
-                  alert("Broken uninstall logic, heckin confused");
+                  alert('Broken uninstall logic, heckin confused');
                   return;
                 }
               }
@@ -440,6 +407,42 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       // const configNamePrefix = activeConfig && activeConfig.gameId === 'template' ? '(Template) ' : '';
 
       const isDownloadState = this.state.activeData && !anyActiveDataDownloaded;
+      const extData = game.extData ? game.extData : {};
+
+      const gameComponentProps: GameComponentProps = {
+        lang: allStrings,
+        logoVersion: this.props.logoVersion,
+        preferences: this.props.preferencesData,
+        tagCategories: this.props.tagCategories,
+        editable,
+        game,
+        playlistGame,
+        suggestions: this.props.suggestions,
+        fpfssEditMode: this.props.fpfssEditMode || false,
+        launchAddApp: this.onAddAppLaunch,
+        updateGame: this.props.onEditGame,
+        updatePlaylistNotes: (notes) => {
+          if (this.state.playlistGame) {
+            this.setState({
+              playlistGame: {
+                ...this.state.playlistGame,
+                notes,
+              }
+            });
+          }
+        },
+        updateGameExtData: (extId, key, value) => {
+          this.props.onEditGame({
+            extData: {
+              ...extData,
+              [extId]: {
+                ...(extData[extId] ? extData[extId] : {}),
+                [key]: value
+              }
+            }
+          });
+        }
+      };
 
       return (
         <div
@@ -469,14 +472,14 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                       onChange={this.onTitleChange} />
                   </div>
                   <div className='browse-right-sidebar__title-row__buttons'>
-                    { editDisabled ? (
+                    {editDisabled ? (
                       <>
                         {/* "Remove From Playlist" Button */}
-                        { playlistGame ? removeGameFromPlaylistElement : undefined }
+                        {playlistGame ? removeGameFromPlaylistElement : undefined}
                       </>
                     ) : (
                       <>
-                        { isEditing ? ( /* While Editing */
+                        {isEditing ? ( /* While Editing */
                           <>
                             {/* "Save" Button */}
                             <div
@@ -495,37 +498,37 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                           </>
                         ) : ( /* While NOT Editing */
                           <>
-                            { this.props.preferencesData.fpfssBaseUrl && !editDisabled && (
+                            {this.props.preferencesData.fpfssBaseUrl && !editDisabled && (
                               <div
                                 className='browse-right-sidebar__title-row__buttons__edit-button'
                                 title={strings.editFpfssGame}
                                 onClick={() => this.props.onFpfssEditGame(game.id)}>
                                 <OpenIcon icon='cloud-upload' />
                               </div>
-                            ) }
+                            )}
                             {/* "Edit" Button */}
-                            { editDisabled ? undefined : (
+                            {editDisabled ? undefined : (
                               <div
                                 className='browse-right-sidebar__title-row__buttons__edit-button'
                                 title={strings.editGame}
                                 onClick={this.props.onEditClick}>
                                 <OpenIcon icon='pencil' />
                               </div>
-                            ) }
+                            )}
                             {/* "Remove From Playlist" Button */}
-                            { playlistGame ? removeGameFromPlaylistElement : undefined }
+                            {playlistGame ? removeGameFromPlaylistElement : undefined}
                             {/* "Delete Game" Button */}
-                            { (isNewGame || playlistGame) && !editDisabled ? undefined : (
+                            {(isNewGame || playlistGame) && !editDisabled ? undefined : (
                               <ConfirmElement
                                 message={allStrings.dialog.deleteGame}
                                 onConfirm={this.onDeleteGameClick}
                                 render={this.renderDeleteGameButton}
                                 extra={strings} />
-                            ) }
+                            )}
                           </>
-                        ) }
+                        )}
                       </>
-                    ) }
+                    )}
                   </div>
                 </div>
               </div>
@@ -563,19 +566,19 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
             {/** Mini download info */}
             <div className='browse-right-sidebar__mini-download-info'>
               <div className='browse-right-sidebar__mini-download-info__state'>
-                { this.props.fpfssEditMode ? strings.fpfssGame :
+                {this.props.fpfssEditMode ? strings.fpfssGame :
                   game.archiveState === 0 ? strings.notArchived :
                     game.archiveState === 1 ? strings.archived :
-                      this.state.activeData ? (anyActiveDataDownloaded ? strings.installed : strings.notInstalled): strings.legacyGame}
+                      this.state.activeData ? (anyActiveDataDownloaded ? strings.installed : strings.notInstalled) : strings.legacyGame}
               </div>
-              { game.archiveState === 2 && this.state.activeData && (
+              {game.archiveState === 2 && this.state.activeData && (
                 <div className='browse-right-sidebar__mini-download-info__size'>
                   {`${sizeToString(this.state.activeData.size)}`}
                 </div>
               )}
             </div>
             {/* -- Play Button -- */}
-            { this.props.fpfssEditMode ? undefined :
+            {this.props.fpfssEditMode ? undefined :
               (this.props.currentGame && this.props.busyGames.includes(this.props.currentGame.id)) ? (
                 <div className='browse-right-sidebar__play-button--busy'>
                   {strings.busy}
@@ -615,38 +618,38 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                     {strings.playOnline}
                   </div>
                 ) : (
-                    <div className={`browse-right-sidebar__play-button ${isDownloadState ? 'browse-right-sidebar__play-button--download' : ''}`}>
-                      {isDownloadState ? (
-                        <div
-                          className='browse-right-sidebar__play-button--text browse-right-sidebar__play-button--download-text'
-                          onClick={() => {
-                            this.props.currentGame && this.props.onGameLaunch(this.props.currentGame.id, null)
-                            .then(this.onForceUpdateGameData);
-                          }}>
-                          {strings.download}
-                        </div>
-                      ) : (
-                        <div 
-                          className='browse-right-sidebar__play-button--text browse-right-sidebar__play-button--play-text'
-                          onClick={() => {
-                            this.props.currentGame && this.props.onGameLaunch(this.props.currentGame.id, null)
-                          }}>
-                          {strings.play}
-                        </div>
-                      )}
-                      { contextMenu.length > 0 ? (
-                        <div className={`browse-right-sidebar__play-button--dropdown ${isDownloadState ? 'browse-right-sidebar__play-button--download-dropdown' : 'browse-right-sidebar__play-button--play-dropdown'}`}
-                          onClick={() => {
-                            openContextMenu(contextMenu);
-                          }}>
-                          <OpenIcon icon='chevron-bottom'/>
-                        </div>
-                      ) : undefined }
-                    </div>
-                  )
+                  <div className={`browse-right-sidebar__play-button ${isDownloadState ? 'browse-right-sidebar__play-button--download' : ''}`}>
+                    {isDownloadState ? (
+                      <div
+                        className='browse-right-sidebar__play-button--text browse-right-sidebar__play-button--download-text'
+                        onClick={() => {
+                          this.props.currentGame && this.props.onGameLaunch(this.props.currentGame.id, null)
+                          .then(this.onForceUpdateGameData);
+                        }}>
+                        {strings.download}
+                      </div>
+                    ) : (
+                      <div
+                        className='browse-right-sidebar__play-button--text browse-right-sidebar__play-button--play-text'
+                        onClick={() => {
+                          this.props.currentGame && this.props.onGameLaunch(this.props.currentGame.id, null);
+                        }}>
+                        {strings.play}
+                      </div>
+                    )}
+                    {contextMenu.length > 0 ? (
+                      <div className={`browse-right-sidebar__play-button--dropdown ${isDownloadState ? 'browse-right-sidebar__play-button--download-dropdown' : 'browse-right-sidebar__play-button--play-dropdown'}`}
+                        onClick={() => {
+                          openContextMenu(contextMenu);
+                        }}>
+                        <OpenIcon icon='chevron-bottom' />
+                      </div>
+                    ) : undefined}
+                  </div>
+                )
             }
             {/** Gameplay Statistics */}
-            { (this.props.fpfssEditMode || game.archiveState !== ArchiveState.Available) ? undefined : (
+            {(this.props.fpfssEditMode || game.archiveState !== ArchiveState.Available) ? undefined : (
               <div className='browse-right-sidebar__stats'>
                 <div className='browse-right-sidebar__stats-box'>
                   <div className='browse-right-sidebar__stats-row-top'>
@@ -681,7 +684,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
             {/* -- Most Fields -- */}
             <>
               <div className='browse-right-sidebar__section'>
-                { editable && (
+                {editable && (
                   <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
                     <p>{strings.library}: </p>
                     {/** TODO: Localize library options, make visible once library searching has merged */}
@@ -695,324 +698,29 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                       onItemSelect={text => this.props.onEditGame({ library: text })} />
                   </div>
                 )}
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.alternateTitles}: </p>
-                  <InputField
-                    text={game.alternateTitles}
-                    placeholder={strings.noAlternateTitles}
-                    className='browse-right-sidebar__searchable'
-                    onChange={this.onAlternateTitlesChange}
-                    editable={editable} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.tags}: </p>
-                  <TagInputField
-                    text={this.state.currentTagInput}
-                    placeholder={strings.enterTag}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    onChange={this.onCurrentTagChange}
-                    tags={game.detailedTags || []}
-                    suggestions={this.state.tagSuggestions}
-                    categories={tagCategories}
-                    onTagSelect={this.onTagSelect}
-                    onTagEditableSelect={this.onRemoveTag}
-                    onTagSuggestionSelect={this.onAddTagSuggestion}
-                    onTagSubmit={this.onAddTagByString} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.series}: </p>
-                  <InputField
-                    text={game.series}
-                    placeholder={strings.noSeries}
-                    className='browse-right-sidebar__searchable'
-                    onChange={this.onSeriesChange}
-                    editable={editable}
-                    onClick={this.onSeriesClick} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.publisher}: </p>
-                  <InputField
-                    text={game.publisher}
-                    placeholder={strings.noPublisher}
-                    className='browse-right-sidebar__searchable'
-                    onChange={this.onPublisherChange}
-                    editable={editable}
-                    onClick={this.onPublisherClick} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.source}: </p>
-                  <InputField
-                    text={game.source}
-                    placeholder={strings.noSource}
-                    onChange={this.onSourceChange}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    onClick={this.onSourceClick} />
-                </div>
-                { !editable && (
-                  <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                    <p>{strings.platform}: </p>
-                    <TagInputField
-                      text={''}
-                      className='browse-right-sidebar__searchable'
-                      editable={false}
-                      tags={game.detailedPlatforms?.filter(p => p.name == game.primaryPlatform) || []}
-                      suggestions={[]}
-                      categories={[]}
-                      onTagSelect={this.onPlatformSelect}
-                      renderIcon={this.renderPlatformIcon}
-                      renderIconSugg={this.renderPlatformIconSugg} />
-                  </div>
+                { window.displaySettings.gameSidebar.middle.map(key =>
+                  <DynamicComponent
+                    name={key}
+                    props={gameComponentProps} />
                 )}
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{editable ? allStrings.config.platforms : strings.otherTechnologies}: </p>
-                  <TagInputField
-                    text={this.state.currentPlatformInput}
-                    placeholder={strings.enterTag}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    onChange={this.onCurrentPlatformChange}
-                    tags={editable ? game.detailedPlatforms || [] : game.detailedPlatforms?.filter(p => p.name !== game.primaryPlatform) || []}
-                    suggestions={this.state.platformSuggestions}
-                    categories={tagCategories}
-                    onTagSelect={this.onPlatformSelect}
-                    onTagEditableSelect={this.onRemovePlatform}
-                    onTagSuggestionSelect={this.onAddPlatformSuggestion}
-                    onTagSubmit={this.onAddPlatformByString}
-                    renderIcon={this.renderPlatformIcon}
-                    renderIconSugg={this.renderPlatformIconSugg}
-                    primaryValue={game.primaryPlatform}
-                    selectPrimaryValue={this.promotePlatform} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.playMode}: </p>
-                  <DropdownInputField
-                    text={game.playMode}
-                    placeholder={strings.noPlayMode}
-                    onChange={this.onPlayModeChange}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    items={suggestions && filterSuggestions(suggestions.playMode) || []}
-                    onItemSelect={text => this.props.onEditGame({ playMode: text })}
-                    onClick={this.onPlayModeClick} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.status}: </p>
-                  <DropdownInputField
-                    text={game.status}
-                    placeholder={strings.noStatus}
-                    onChange={this.onStatusChange}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    items={suggestions && filterSuggestions(suggestions.status) || []}
-                    onItemSelect={text => this.props.onEditGame({ status: text })}
-                    onClick={this.onStatusClick} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.version}: </p>
-                  <InputField
-                    text={game.version}
-                    placeholder={strings.noVersion}
-                    className='browse-right-sidebar__searchable'
-                    onChange={this.onVersionChange}
-                    editable={editable}
-                    onClick={this.onVersionClick} />
-                </div>
-                { editable && (
-                  <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                    <p>{strings.releaseDate}: </p>
-                    <InputField
-                      text={game.releaseDate}
-                      placeholder={strings.noReleaseDate}
-                      onChange={this.onReleaseDateChange}
-                      className='browse-right-sidebar__searchable'
-                      editable={editable}/>
-                  </div>
-                )}
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.language}: </p>
-                  <InputField
-                    text={game.language}
-                    placeholder={strings.noLanguage}
-                    onChange={this.onLanguageChange}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    onClick={this.onLanguageClick} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.ruffleSupport}: </p>
-                  <DropdownInputFieldMapped
-                    text={mapRuffleSupportString(game.ruffleSupport)}
-                    placeholder={'None'}
-                    className='browse-right-sidebar__searchable'
-                    editable={editable}
-                    items={[{
-                      key: '',
-                      value: 'None'
-                    }, {
-                      key: 'standalone',
-                      value: 'Standalone'
-                    }]}
-                    onChange={(key) => {
-                      this.props.onEditGame({ ruffleSupport: key });
-                    }}
-                    onClick={this.onRuffleSupportClick} />
-                  { !editable && game.ruffleSupport !== '' ? (
-                    <div className='browse-right-sidebar-floating-icon'>
-                      <OpenIcon icon='check'/>
-                    </div>
-                  ) : undefined }
-                </div>
               </div>
             </>
-            {/* -- Date Display -- */}
-            { !editable && (
-              <div className='browse-right-sidebar__section'>
-                <div className='browse-right-sidebar__stats'>
-                  <div className='browse-right-sidebar__stats-box'>
-                    <div className='browse-right-sidebar__stats-row-top'>
-                      <div className='browse-right-sidebar__stats-cell'>
-                        {strings.dateAdded}
-                      </div>
-                    </div>
-                    <div className='browse-right-sidebar__stats-row-bottom'>
-                      <div className='browse-right-sidebar__stats-cell'>
-                        {formatSidebarDate(new Date(game.dateAdded))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className='browse-right-sidebar__stats-box'>
-                    <div className='browse-right-sidebar__stats-row-top'>
-                      <div className='browse-right-sidebar__stats-cell'>
-                        {strings.dateModified}
-                      </div>
-                    </div>
-                    <div className='browse-right-sidebar__stats-row-bottom'>
-                      <div className='browse-right-sidebar__stats-cell'>
-                        {formatSidebarDate(new Date(game.dateModified))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className='browse-right-sidebar__stats-box'>
-                    <div className='browse-right-sidebar__stats-row-top'>
-                      <div className='browse-right-sidebar__stats-cell'>
-                        {strings.releaseDate}
-                      </div>
-                    </div>
-                    <div className='browse-right-sidebar__stats-row-bottom'>
-                      <div className={`browse-right-sidebar__stats-cell ${game.releaseDate ? '' : 'browse-right-sidebar__stats-cell-placeholder simple-disabled-text'}`}>
-                        {game.releaseDate ? game.releaseDate : strings.noneFound}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            { window.displaySettings.gameSidebar.bottom.map(key =>
+              <DynamicComponent
+                name={key}
+                props={gameComponentProps} />
             )}
-            {/* -- Playlist Game Entry Notes -- */}
-            { playlistGame ? (
-              <div className='browse-right-sidebar__section'>
-                <div className='browse-right-sidebar__row'>
-                  <p>{strings.playlistNotes}: </p>
-                  <InputField
-                    text={playlistGame.notes}
-                    placeholder={strings.noPlaylistNotes}
-                    onChange={this.onEditPlaylistNotes}
-                    editable={editable}
-                    multiline={true} />
-                </div>
-              </div>
-            ) : undefined }
-            {/* -- Notes -- */}
-            { ((!editDisabled && editable) || game.notes) ? (
-              <div className='browse-right-sidebar__section'>
-                <div className='browse-right-sidebar__row'>
-                  <p>{strings.notes}: </p>
-                  <InputField
-                    text={game.notes}
-                    placeholder={strings.noNotes}
-                    onChange={this.onNotesChange}
-                    editable={editable}
-                    multiline={true} />
-                </div>
-              </div>
-            ) : undefined }
-            {/* -- Original Description -- */}
-            { ((!editDisabled && editable) || game.originalDescription) ? (
-              <div className='browse-right-sidebar__section'>
-                <div className='browse-right-sidebar__row'>
-                  <p>{strings.originalDescription}: </p>
-                  <InputField
-                    text={game.originalDescription}
-                    placeholder={strings.noOriginalDescription}
-                    onChange={this.onOriginalDescriptionChange}
-                    editable={editable}
-                    multiline={true} />
-                </div>
-              </div>
-            ) : undefined }
-            {/* -- Additional Applications -- */}
-            { editable || (currentAddApps && currentAddApps.length > 0) ? (
-              <div className='browse-right-sidebar__section'>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--additional-applications-header'>
-                  <p>{strings.additionalApplications}:</p>
-                  { editable ? (
-                    <input
-                      type='button'
-                      value={strings.new}
-                      className='simple-button'
-                      onClick={this.onNewAddAppClick} />
-                  ) : undefined }
-                </div>
-                { currentAddApps && currentAddApps.map((addApp) => (
-                  <RightBrowseSidebarAddApp
-                    key={addApp.id}
-                    addApp={addApp}
-                    editDisabled={!editable}
-                    onEdit={(aa) => {
-                      this.onEditAddApp(game, aa);
-                    }}
-                    onLaunch={this.onAddAppLaunch}
-                    onDelete={this.onAddAppDelete} />
-                )) }
-              </div>
-            ) : undefined }
-            {/* -- LEGACY GAMES ONLY - Application Path & Launch Command -- */}
-            { !game.activeDataId ? (
-              <div className='browse-right-sidebar__section'>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.applicationPath}: </p>
-                  <DropdownInputField
-                    text={game.legacyApplicationPath}
-                    placeholder={strings.noApplicationPath}
-                    onChange={this.onApplicationPathChange}
-                    onExpand={this.onApplicationPathExpand}
-                    editable={editable}
-                    items={suggestions && filterSuggestions(suggestions.applicationPath) || []}
-                    onItemSelect={text => this.props.onEditGame({ legacyApplicationPath: text })} />
-                </div>
-                <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
-                  <p>{strings.launchCommand}: </p>
-                  <InputField
-                    text={game.legacyLaunchCommand}
-                    placeholder={strings.noLaunchCommand}
-                    onChange={this.onLaunchCommandChange}
-                    editable={editable}
-                    reference={this.launchCommandRef} />
-                </div>
-              </div>
-            ) : undefined }
             {/* -- Game ID -- */}
-            { editable ? (
+            {editable ? (
               <div className='browse-right-sidebar__section'>
                 <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
                   <p>ID: </p>
                   <p className='browse-right-sidebar__row__game-id'>{game.id}</p>
                 </div>
               </div>
-            ) : undefined }
+            ) : undefined}
           </div>
-          { !this.props.fpfssEditMode && (
+          {!this.props.fpfssEditMode && (
             <div className='browse-right-sidebar__bottom'>
               {/* -- Screenshot -- */}
               <div className='browse-right-sidebar__section browse-right-sidebar__section--below-gap'>
@@ -1021,7 +729,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                   <div
                     className='browse-right-sidebar__row__screenshot'
                     onContextMenu={this.onScreenshotContextMenu}>
-                    { isEditing ? (
+                    {isEditing ? (
                       <div className='browse-right-sidebar__row__screenshot__placeholder'>
                         <div className='browse-right-sidebar__row__screenshot__placeholder__back'>
                           <GameImageSplit
@@ -1064,26 +772,26 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                 </div>
               </div>
               {/* -- Screenshot Preview -- */}
-              { this.state.showPreview ? (
+              {this.state.showPreview ? (
                 <ImagePreview
                   src={screenshotSrc}
                   onCancel={this.onScreenshotPreviewClick} />
-              ) : undefined }
+              ) : undefined}
             </div>
           )}
-          { !this.props.fpfssEditMode && (
+          {!this.props.fpfssEditMode && (
             <div className='browse-right-sidebar__super-bottom'>
               <SimpleButton
                 value={strings.openGameDataBrowser}
-                onClick={() => this.setState({ gameDataBrowserOpen: !this.state.gameDataBrowserOpen })}/>
-              { this.props.preferencesData.enableEditing && !this.props.isEditing && (
+                onClick={() => this.setState({ gameDataBrowserOpen: !this.state.gameDataBrowserOpen })} />
+              {this.props.preferencesData.enableEditing && !this.props.isEditing && (
                 <>
                   <SimpleButton
                     value={allStrings.menu.copyGameUUID}
                     onClick={() => this.props.currentGame && clipboard.writeText(this.props.currentGame.id)} />
                 </>
               )}
-              { this.state.gameDataBrowserOpen && (
+              {this.state.gameDataBrowserOpen && (
                 <GameDataBrowser
                   onClose={() => this.setState({ gameDataBrowserOpen: false })}
                   game={game}
@@ -1111,7 +819,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
         behavior: 'smooth'
       });
     }
-  }
+  };
 
   renderDeleteGameButton({ confirm, extra }: ConfirmElementArgs<LangContainer['browse']>): JSX.Element {
     return (
@@ -1137,7 +845,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
 
   onResponse: Parameters<typeof window.Shared.back.registerAny>[0] = (event, type, args) => {
     if (type === BackOut.IMAGE_CHANGE) {
-      const [ folder, id ] = args as Parameters<BackOutTemplate[typeof type]>;
+      const [folder, id] = args as Parameters<BackOutTemplate[typeof type]>;
 
       // Refresh image if it was replaced or removed
       if (this.props.isEditing && this.props.currentGame && this.props.currentGame.id === id) {
@@ -1171,7 +879,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
   onGlobalKeyDown = (event: KeyboardEvent) => {
     // Start editing
     if (event.ctrlKey && event.code === 'KeyE' && // (CTRL + E ...
-        !this.props.isEditing && this.props.currentGame) { // ... while not editing, and a game is selected)
+      !this.props.isEditing && this.props.currentGame) { // ... while not editing, and a game is selected)
       this.props.onEditClick();
       if (this.launchCommandRef.current) { this.launchCommandRef.current.focus(); }
       event.preventDefault();
@@ -1181,7 +889,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
   onLocalKeyDown = (event: React.KeyboardEvent) => {
     // Save changes
     if (event.ctrlKey && event.key === 's' && // (CTRL + S ...
-        this.props.isEditing && this.props.currentGame) { // ... while editing, and a game is selected)
+      this.props.isEditing && this.props.currentGame) { // ... while editing, and a game is selected)
       this.props.onSaveGame();
       event.preventDefault();
     }
@@ -1317,42 +1025,12 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     window.Shared.back.send(BackIn.LAUNCH_ADDAPP, addAppId, null);
   }
 
-  onAddAppDelete = (addAppId: string): void => {
-    if (this.props.currentGame) {
-      const newAddApps = deepCopy(this.props.currentGame.addApps);
-      if (!newAddApps) { throw new Error('editAddApps is missing.'); }
-      const index = newAddApps.findIndex(addApp => addApp.id === addAppId);
-      if (index === -1) { throw new Error('Cant remove additional application because it was not found.'); }
-      newAddApps.splice(index, 1);
-      this.props.onEditGame({ addApps: newAddApps });
-    }
-  };
-
-  onNewAddAppClick = (): void => {
-    if (!this.props.currentGame)    { throw new Error('Unable to add a new AddApp. "currentGame" is missing.'); }
-    const newAddApp = ModelUtils.createAddApp(this.props.currentGame);
-    newAddApp.id = uuid();
-    const existingAddApps = this.props.currentGame.addApps || [];
-    this.props.onEditGame({ addApps: [...existingAddApps, ...[newAddApp]] });
-  };
-
   onScreenshotClick = (): void => {
     this.setState({ showPreview: true });
   };
 
   onScreenshotPreviewClick = (): void => {
     this.setState({ showPreview: false });
-  };
-
-  onEditPlaylistNotes = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-    if (this.state.playlistGame) {
-      this.setState({
-        playlistGame: {
-          ...this.state.playlistGame,
-          notes: event.currentTarget.value
-        }
-      });
-    }
   };
 
   onTagSelect = (tag: Tag): void => {
@@ -1367,176 +1045,12 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     this.props.onSearch(search);
   };
 
-  onAddTagSuggestion = (suggestion: TagSuggestion): void => {
-    window.Shared.back.request(BackIn.GET_TAG_BY_ID, suggestion.id)
-    .then((tag) => {
-      if (tag) {
-        const game = this.props.currentGame;
-        // Ignore dupe tags
-        if (game && !game.tags.map(t => t.toLowerCase()).includes(tag.name.toLowerCase())) {
-          if (!game.detailedTags) {
-            game.detailedTags = [];
-          }
-          this.props.onEditGame({ tags: [...game.tags, tag.name], detailedTags: [...game.detailedTags, tag] });
-          console.log('ADDED TAG ' + tag.id);
-        }
-      }
-    });
-    // Clear out suggestions box
-    this.setState({
-      tagSuggestions: [],
-      currentTagInput: ''
-    });
-  };
-
-  onAddPlatformSuggestion = (suggestion: TagSuggestion): void => {
-    window.Shared.back.request(BackIn.GET_PLATFORM_BY_ID, suggestion.id)
-    .then((platform) => {
-      if (platform) {
-        const game = this.props.currentGame;
-        // Ignore dupe tags
-        if (game && !game.platforms.map(t => t.toLowerCase()).includes(platform.name.toLowerCase())) {
-          if (!game.detailedPlatforms) {
-            game.detailedPlatforms = [];
-          }
-          const primary = game.platforms.length === 0 ? platform.name : game.primaryPlatform;
-          this.props.onEditGame({ platforms: [...game.platforms, platform.name], primaryPlatform: primary, detailedPlatforms: [...game.detailedPlatforms, platform] });
-          console.log('ADDED PLATFORM ' + platform.id);
-        }
-      }
-    });
-    // Clear out suggestions box
-    this.setState({
-      platformSuggestions: [],
-      currentPlatformInput: ''
-    });
-  };
-
   onForceUpdateGameData = (): void => {
     if (this.props.currentGame && this.props.currentGame.activeDataId) {
       window.Shared.back.request(BackIn.GET_GAME_DATA, this.props.currentGame.activeDataId)
       .then((gameData) => {
         this.setState({ activeData: gameData });
       });
-    }
-  };
-
-  onAddTagByString = (text: string): void => {
-    if (text !== '') {
-      if (this.props.fpfssEditMode) {
-        const newTagText = text.trim();
-        const game = this.props.currentGame;
-        if (game && !game.tags.map(t => t.toLowerCase()).includes(newTagText.toLowerCase())) {
-          if (!game.detailedTags) {
-            game.detailedTags = [];
-          }
-          const tag: Tag = {
-            id: -1,
-            name: newTagText,
-            aliases: [newTagText],
-            description: '',
-            dateModified: (new Date()).toISOString(),
-            category: 'default'
-          };
-          this.props.onEditGame({ tags: [...game.tags, tag.name], detailedTags: [...game.detailedTags, tag] });
-        }
-      } else {
-        window.Shared.back.request(BackIn.GET_OR_CREATE_TAG, text)
-        .then((tag) => {
-          if (tag) {
-            const game = this.props.currentGame;
-            // Ignore dupe tags
-            if (game && !game.tags.map(t => t.toLowerCase()).includes(tag.name.toLowerCase())) {
-              if (!game.detailedTags) {
-                game.detailedTags = [];
-              }
-              this.props.onEditGame({ tags: [...game.tags, tag.name], detailedTags: [...game.detailedTags, tag] });
-            }
-          }
-        });
-      }
-
-    }
-    // Clear out suggestions box
-    this.setState({
-      tagSuggestions: [],
-      currentTagInput: ''
-    });
-  };
-
-  onAddPlatformByString = (text: string): void => {
-    if (text !== '') {
-      if (this.props.fpfssEditMode) {
-        const newPlatformText = text.trim();
-        const game = this.props.currentGame;
-        if (game && !game.platforms.map(t => t.toLowerCase()).includes(newPlatformText.toLowerCase())) {
-          if (!game.detailedPlatforms) {
-            game.detailedPlatforms = [];
-          }
-          const platform: Platform = {
-            id: -1,
-            name: newPlatformText,
-            aliases: [newPlatformText],
-            description: '',
-            dateModified: (new Date()).toISOString()
-          };
-          const primary = game.platforms.length === 0 ? platform.name : game.primaryPlatform;
-          this.props.onEditGame({ platforms: [...game.platforms, platform.name], primaryPlatform: primary, detailedPlatforms: [...game.detailedPlatforms, platform] });
-        }
-      } else {
-        window.Shared.back.request(BackIn.GET_OR_CREATE_PLATFORM, text)
-        .then((platform) => {
-          if (platform) {
-            const game = this.props.currentGame;
-            // Ignore dupe platforms
-            if (game && !game.platforms.map(t => t.toLowerCase()).includes(platform.name.toLowerCase())) {
-              if (!game.detailedPlatforms) {
-                game.detailedPlatforms = [];
-              }
-              const primary = game.platforms.length === 0 ? platform.name : game.primaryPlatform;
-              this.props.onEditGame({ platforms: [...game.platforms, platform.name], primaryPlatform: primary, detailedPlatforms: [...game.detailedPlatforms, platform] });
-            }
-          }
-        });
-      }
-    }
-    this.setState({
-      currentPlatformInput: ''
-    });
-  };
-
-  onRemoveTag = (tag: Tag, index: number): void => {
-    const game = this.props.currentGame;
-    if (game) {
-      if (!game.detailedTags) {
-        game.detailedTags = [];
-      }
-      const newDetailedTags = deepCopy(game.detailedTags);
-      const newTags = deepCopy(game.tags);
-      const tagsIndex = newTags.findIndex(t => t.toLowerCase() === tag.name.toLowerCase());
-      if (tagsIndex > -1) {
-        newTags.splice(tagsIndex, 1);
-      }
-      const detailedTagsIndex = newDetailedTags.findIndex(t => t.name.toLowerCase() === tag.name.toLowerCase());
-      if (detailedTagsIndex > -1) {
-        newDetailedTags.splice(detailedTagsIndex, 1);
-      }
-      this.props.onEditGame({ tags: newTags, detailedTags: newDetailedTags });
-    }
-  };
-
-  onRemovePlatform = (platform: Platform, index: number): void => {
-    const game = this.props.currentGame;
-    if (game) {
-      if (!game.detailedPlatforms) {
-        game.detailedPlatforms = [];
-      }
-      const newDetailedPlatforms = deepCopy(game.detailedPlatforms);
-      const newPlatforms = deepCopy(game.platforms);
-      const platIndex = newPlatforms.findIndex(p => p.toLowerCase() === newDetailedPlatforms[index].name.toLowerCase());
-      newPlatforms.splice(platIndex, 1);
-      newDetailedPlatforms.splice(index, 1);
-      this.props.onEditGame({ platforms: newPlatforms, detailedPlatforms: newDetailedPlatforms });
     }
   };
 
@@ -1591,31 +1105,6 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       }
     };
   }
-
-  renderPlatformIcon = (platform: Platform): JSX.Element => {
-    const platformIcon = getPlatformIconURL(platform.name, this.props.logoVersion);
-    return (
-      <div
-        className='tag-icon tag-icon-image'
-        style={{ backgroundImage: `url('${platformIcon}')` }} />
-    );
-  };
-
-  renderPlatformIconSugg = (platformSugg: TagSuggestion) => {
-    const iconUrl = getPlatformIconURL(platformSugg.name, this.props.logoVersion);
-    return (
-      <div
-        className='platform-tag__icon'
-        style={{ backgroundImage: `url(${iconUrl})` }} />
-    );
-  };
-
-  promotePlatform = (value: string) => {
-    console.log(value);
-    if (this.props.currentGame?.platforms.includes(value)) {
-      this.props.onEditGame({ primaryPlatform: value });
-    }
-  };
 }
 
 function filterSuggestions(suggestions?: string[]): string[] {
@@ -1695,12 +1184,4 @@ function ordinalSuffixOf(i: number) {
     return i + 'rd';
   }
   return i + 'th';
-}
-
-function formatSidebarDate(d: Date): string {
-  try {
-    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-  } catch {
-    return 'Invalid Date ' + typeof d;
-  }
 }

@@ -87,6 +87,30 @@ declare module 'flashpoint-launcher' {
      */
   function focusWindow(): void;
 
+  interface ExtensionIndex {
+    name: string;
+    key: string;
+
+  }
+
+  enum ExtSearchableType {
+    String = 0,
+    Boolean = 1,
+    Number = 2
+  }
+
+  interface ExtSearchable {
+    key: string;
+    valueType: ExtSearchableType;
+    searchKey: string;
+  }
+
+  interface DataExtensionInfo {
+    id: string;
+    searchables: Array<ExtSearchable>;
+    indexes: Array<ExtensionIndex>;
+  }
+
   /**
      * Log functions to properly pass messages to the Logs Page.
      */
@@ -97,6 +121,17 @@ declare module 'flashpoint-launcher' {
     const warn: (message: string) => void;
     const error: (message: string) => void;
     const onLog: Event<ILogEntry>;
+  }
+
+  type SidebarDisplay = {
+    order: string[];
+  };
+
+  namespace dataExtensions {
+    /**
+     * Installs a data extension
+     */
+    function registerDataExtension(extension: DataExtensionInfo): void;
   }
 
   /** Collection of Command related API functions */
@@ -678,6 +713,8 @@ declare module 'flashpoint-launcher' {
        * Valid values: 'standalone', '' (none)
        */
       ruffleSupport: string;
+      /** Extension data (key is ext id) */
+      extData?: Record<string, any>;
     };
 
     type GameData = {
@@ -1232,7 +1269,7 @@ declare module 'flashpoint-launcher' {
       stepProgress: number;
       text: string;
     }
-    
+
     type DownloadTask = {
       status: DownloadTaskStatus;
       game: Game;
@@ -1574,7 +1611,7 @@ declare module 'flashpoint-launcher' {
     export type DialogState = {
       id: string;
       mdx?: boolean;
-      textAlign?: 'left' | 'center' | 'right'; 
+      textAlign?: 'left' | 'center' | 'right';
       largeMessage?: boolean;
       userCanCancel?: boolean;
       message: string;
@@ -1710,6 +1747,804 @@ declare module 'flashpoint-launcher' {
     }
 
     namespace fpfss {
-        function getAccessToken(): Promise<string>;
+      function getAccessToken(): Promise<string>;
     }
+
+    const langTemplate = {
+      config: [
+        'configHeader',
+        'configDesc',
+        'preferencesHeader',
+        'extremeGames',
+        'extremeGamesDesc',
+        'hideExtremeScreenshots',
+        'hideExtremeScreenshotsDesc',
+        'fancyAnimations',
+        'fancyAnimationsDesc',
+        'hideNewViewButton',
+        'hideNewViewButtonDesc',
+        'searchLimit',
+        'searchLimitDesc',
+        'searchLimitUnlimited',
+        'searchLimitValue',
+        'useCustomViews',
+        'useCustomViewsDesc',
+        'loadViewsText',
+        'loadViewsTextDesc',
+        'defaultOpeningPage',
+        'defaultOpeningPageDesc',
+        'restoreSearchViews',
+        'restoreSearchViewsDesc',
+        'useSelectedGameScroll',
+        'useSelectedGameScrollDesc',
+        'enableEditing',
+        'enableEditingDesc',
+        'symlinkCuration',
+        'symlinkCurationDesc',
+        'onDemandImages',
+        'onDemandImagesDesc',
+        'onDemandImagesEnabled',
+        'onDemandImagesEnabledDesc',
+        'onDemandImagesCompressed',
+        'onDemandImagesCompressedDesc',
+        'onDemandImagesDelete',
+        'onDemandImagesDeleteDesc',
+        'playtimeTracking',
+        'playtimeTrackingDesc',
+        'enablePlaytimeTracking',
+        'enablePlaytimeTrackingDesc',
+        'enableTagFilterIndex',
+        'enableTagFilterIndexDesc',
+        'enableVerboseLogging',
+        'enableVerboseLoggingDesc',
+        'enablePlaytimeTrackingExtreme',
+        'enablePlaytimeTrackingExtremeDesc',
+        'clearPlaytimeTracking',
+        'clearPlaytimeTrackingDesc',
+        'clearData',
+        'currentLanguage',
+        'currentLanguageDesc',
+        'fallbackLanguage',
+        'fallbackLanguageDesc',
+        'auto',
+        'none',
+        'contentFiltersHeader',
+        'flashpointHeader',
+        'flashpointPath',
+        'flashpointPathDesc',
+        'useWine',
+        'useWineDesc',
+        'libraries',
+        'randomLibraries',
+        'randomLibrariesDesc',
+        'updateSource',
+        'platforms',
+        'nativePlatforms',
+        'nativePlatformsDesc',
+        'tagFilterGroups',
+        'tagFilterGroupsDesc',
+        'editTagFilter',
+        'duplicateTagFilter',
+        'nukeTagFilter',
+        'nukeInProgress',
+        'deleteTagFilter',
+        'appPathOverrides',
+        'appPathOverridesDesc',
+        'visualsHeader',
+        'useCustomTitleBar',
+        'useCustomTitleBarDesc',
+        'theme',
+        'noTheme',
+        'themeDesc',
+        'logoSet',
+        'noLogoSet',
+        'logoSetDesc',
+        'screenshotPreviewMode',
+        'screenshotPreviewModeDesc',
+        'screenshotPreviewModeOff',
+        'screenshotPreviewModeOn',
+        'screenshotPreviewModeAlways',
+        'screenshotPreviewDelay',
+        'screenshotPreviewDelayDesc',
+        'advancedHeader',
+        'autoClearWininetCache',
+        'autoClearWininetCacheDesc',
+        'clearWininetCache',
+        'clearWininetCacheDesc',
+        'optimizeDatabase',
+        'optimizeDatabaseDesc',
+        'showDeveloperTab',
+        'showDeveloperTabDesc',
+        'registerProtocol',
+        'registerProtocolDesc',
+        'server',
+        'serverDesc',
+        'curateServer',
+        'curateServerDesc',
+        'metadataServerHost',
+        'metadataServerHostDesc',
+        'extensionsHeader',
+        'noExtensionsLoaded',
+        'extDevScripts',
+        'extThemes',
+        'extLogoSets',
+        'extApplications',
+        'saveAndRestart',
+        'saveAndClose',
+        'browse',
+        'tagFilterGroupEditor',
+      ] as const,
+      home: [
+        'gotdHeader',
+        'updateHeader',
+        'currentVersion',
+        'nextVersion',
+        'updateAvailable',
+        'upToDate',
+        'downloadingUpdate',
+        'quickStartHeader',
+        'hallOfFameInfo',
+        'hallOfFame',
+        'allGamesInfo',
+        'allGames',
+        'allAnimationsInfo',
+        'allAnimations',
+        'configInfo',
+        'config',
+        'helpInfo',
+        'help',
+        'upgradesHeader',
+        'updateFeedHeader',
+        'installComplete',
+        'alreadyInstalled',
+        'download',
+        'error',
+        'checkForUpdates',
+        'checkingUpdate',
+        'updatedGamesReady',
+        'update',
+        'checkingUpgradeState',
+        'extrasHeader',
+        'playHistory',
+        'favoritesPlaylist',
+        'tagList',
+        'filterByPlatform',
+        'plannedFeatures',
+        'notesHeader',
+        'notes',
+        'linuxSupport',
+        'linuxSupportLinkText',
+        'randomPicks',
+        'rerollPicks',
+        'componentUpToDate',
+        'componentUpdatesReady',
+        'lastUpdated',
+        'updateComplete',
+      ] as const,
+      logs: [
+        'filters',
+        'logLevels',
+        'copyText',
+        'clearLog',
+        'copy404Urls',
+        'uploadLog',
+        'copiedToClipboard',
+        'openLogsWindow',
+        'copyDiagnostics',
+      ] as const,
+      app: [
+        'home',
+        'browse',
+        'tags',
+        'categories',
+        'logs',
+        'config',
+        'about',
+        'curate',
+        'developer',
+        'searchPlaceholder',
+        'searchPlaceholderCountable',
+        'hideRightSidebar',
+        'showRightSidebar',
+        'hideLeftSidebar',
+        'showLeftSidebar',
+        'total',
+        'newGame',
+        'list',
+        'grid',
+        'searchResults',
+        'manual',
+        'layout',
+        'openFlashpointManager',
+        'fpfssProfile',
+        'fpfssLogout',
+        'softwareUpdateRequired',
+        'noLauncherUpdateReady',
+        'deleteView',
+        'deleteOnlyBrowseView',
+        'renameView',
+        'duplicateView',
+        'createNewView',
+        'errorLoadingServices',
+      ] as const,
+      filter: [
+        'dateAdded',
+        'dateModified',
+        'platform',
+        'series',
+        'title',
+        'developer',
+        'publisher',
+        'ascending',
+        'descending',
+      ] as const,
+      developer: [
+        'developerHeader',
+        'developerDesc',
+        'checkMissingImages',
+        'checkMissingImagesDesc',
+        'checkGameIds',
+        'checkGameIdsDesc',
+        'checkGameTitles',
+        'checkGameTitlesDesc',
+        'checkGameFields',
+        'checkGameFieldsDesc',
+        'checkPlaylists',
+        'checkPlaylistsDesc',
+        'checkGameFileLocation',
+        'checkGameFileLocationDesc',
+        'checkMissingExecMappings',
+        'checkMissingExecMappingsDesc',
+        'renameImagesTitleToId',
+        'renameImagesTitleToIdDesc',
+        'renameImagesIdToTitle',
+        'renameImagesIdToTitleDesc',
+        'createMissingFolders',
+        'createMissingFoldersDesc',
+        'importLegacyPlatforms',
+        'importLegacyPlatformsDesc',
+        'importLegacyPlaylists',
+        'importLegacyPlaylistsDesc',
+        'exportTags',
+        'exportTagsDesc',
+        'exportDatabase',
+        'exportDatabaseDesc',
+        'importTags',
+        'importTagsDesc',
+        'deleteAllPlaylists',
+        'deleteAllPlaylistsDesc',
+        'fixPrimaryAliases', // @NOT_ASSIGNED
+        'fixPrimaryAliasesDesc', // @NOT_ASSIGNED
+        'fixCommaTags', // @NOT_ASSIGNED
+        'fixCommaTagsDesc', // @NOT_ASSIGNED
+        'updateTagsString',
+        'updateTagsStringDesc',
+        'updatePlatformsString',
+        'updatePlatformsStringDesc',
+        'massImportGameData',
+        'massImportGameDataDesc',
+        'migrateExtremeGames',
+        'migrateExtremeGamesDesc',
+        'importMetaEdits',
+        'importMetaEditsDesc',
+        'servicesHeader',
+        'servicesMissing',
+        'running',
+        'stopped',
+        'killing',
+        'start',
+        'startDesc',
+        'stop',
+        'stopDesc',
+        'restart',
+        'restartDesc',
+        'details',
+        'detailsDesc',
+      ] as const,
+      about: [
+        'aboutHeader',
+        'flashpoint',
+        'flashpointDesc',
+        'website',
+        'flashpointLauncher',
+        'flashpointLauncherDesc',
+        'version',
+        'license',
+        'licenseInfo',
+        'creditsHeader',
+        'specialThanks',
+      ] as const,
+      browse: [
+        'noTitle',
+        'by',
+        'play',
+        'lastPlayed',
+        'playtime',
+        'playCount',
+        'never',
+        'today',
+        'yesterday',
+        'daysAgo',
+        'weeksAgo',
+        'seconds',
+        'minutes',
+        'hours',
+        'stop',
+        'noDeveloper',
+        'alternateTitles',
+        'noAlternateTitles',
+        'tags',
+        'noTags',
+        'enterTag',
+        'series',
+        'noSeries',
+        'publisher',
+        'noPublisher',
+        'source',
+        'noSource',
+        'platform',
+        'noPlatform',
+        'otherTechnologies',
+        'playMode',
+        'noPlayMode',
+        'status',
+        'noStatus',
+        'version',
+        'noVersion',
+        'releaseDate',
+        'noReleaseDate',
+        'noneFound',
+        'language',
+        'noLanguage',
+        'dateAdded',
+        'dateModified',
+        'brokenInInfinity',
+        'extreme',
+        'playlistNotes',
+        'noPlaylistNotes',
+        'notes',
+        'noNotes',
+        'originalDescription',
+        'noOriginalDescription',
+        'additionalApplications',
+        'noName',
+        'launch',
+        'new',
+        'autoRunBefore',
+        'waitForExit',
+        'applicationPath',
+        'noApplicationPath',
+        'launchCommand',
+        'noLaunchCommand',
+        'library',
+        'noLibrary',
+        'defaultLibrary',
+        'thumbnail',
+        'screenshot',
+        'dropImageHere',
+        'noGameSelected',
+        'clickToSelectGame',
+        'deleteAdditionalApplication',
+        'deleteGameAndAdditionalApps',
+        'removeGameFromPlaylist',
+        'saveChanges',
+        'discardChanges',
+        'editFpfssGame',
+        'showOnFpfss',
+        'editGame',
+        'allGames',
+        'newPlaylist',
+        'importPlaylist',
+        'noGamesFoundInsidePlaylist',
+        'emptyPlaylist',
+        'noGamesFound',
+        'dropGameOnLeft',
+        'leftSidebar',
+        'setFlashpointPathQuestion',
+        'flashpointPath',
+        'config',
+        'noteSaveAndRestart',
+        'saveAndRestart',
+        'noGameMatchedDesc',
+        'noGameMatchedSearch',
+        'thereAreNoGames',
+        'searching',
+        'library',
+        'defaultLibrary',
+        'legacyGame',
+        'fpfssGame',
+        'notInstalled',
+        'installed',
+        'download',
+        'notArchived',
+        'archived',
+        'playOnline',
+        'uninstallGame',
+        'mountParameters',
+        'noMountParameters',
+        'ruffleSupport',
+        'showExtremeScreenshot',
+        'busy',
+        'openGameDataBrowser',
+        'allGenericEntries',
+        'usePlaylistOrder',
+        'hideFilters',
+        'showFilters',
+        'tagFilterIcon',
+        'runWithFlashPlayer',
+        'runWithRuffle',
+        'runWithRuffleUnsupported',
+      ] as const,
+      tags: [
+        'name',
+        'noName',
+        'description',
+        'noDescription',
+        'category',
+        'noCategory',
+        'newCategory',
+        'enterAlias',
+        'aliases',
+        'editTag',
+        'color',
+        'noTagSelected',
+        'clickToSelectTag',
+        'deleteTagAlias',
+        'setPrimaryAlias',
+        'mergeIntoTag',
+        'mergeTag',
+        'makeAliasWhenMerged',
+        'deleteTag',
+        'deleteTagCategory',
+        'locked',
+        'filterIcon',
+      ] as const,
+      curate: [
+        'noCurationSelected',
+        'headerFileOperations',
+        'headerEditCuration',
+        'headerTest',
+        'headerFpfss',
+        'importAll',
+        'importAllDesc',
+        'deleteAll',
+        'deleteAllDesc',
+        'openCurationsFolder',
+        'openCurationsFolderDesc',
+        'openExportsFolder',
+        'openExportsFolderDesc',
+        'openImportedFolder',
+        'openImportedFolderDesc',
+        'newCuration',
+        'newCurationDesc',
+        'duplicateCuration',
+        'newCurationFromTemplate',
+        'loadMeta',
+        'loadMetaDesc',
+        'loadArchive',
+        'loadArchiveDesc',
+        'loadFolder',
+        'loadFolderDesc',
+        'scanNewCurationFolders',
+        'scanNewCurationFoldersDesc',
+        'saveImportedCurations',
+        'keepArchiveKey',
+        'symlinkCurationContent',
+        'useTagFilters',
+        'noCurations',
+        'id',
+        'heading',
+        'noHeading',
+        'folderName',
+        'noFolderName',
+        'message',
+        'noMessage',
+        'curationNotes',
+        'noCurationNotes',
+        'newAddApp',
+        'addExtras',
+        'addMessage',
+        'removeAddApp',
+        'delete',
+        'deleteSelected',
+        'deleteCurationDesc',
+        'openFolder',
+        'indexContent',
+        'run',
+        'runWithMAD4FP',
+        'export',
+        'exportSelected',
+        'import',
+        'importSelected',
+        'contentFiles',
+        'default',
+        'warnings',
+        'noTitle',
+        'noApplicationPath',
+        'noPlatforms',
+        'noLaunchCommand',
+        'invalidLaunchCommand',
+        'releaseDateInvalid',
+        'unusedApplicationPath',
+        'unusedTags',
+        'unusedPlatform',
+        'nonExistingLibrary',
+        'nonContentFolders',
+        'noTags',
+        'noSource',
+        'unenteredTag',
+        'noLogo',
+        'noScreenshot',
+        'ilc_notHttp',
+        'ilc_nonExistant',
+        'documentStatus',
+        'sort',
+        'contextCopyName',
+        'contextCopyPath',
+        'contextCopyAsURL',
+        'contextShowInExplorer',
+        'contextOpenFolderInExplorer',
+        'exportDataPacks',
+        'exportSelectedDataPacks',
+        'shortcuts',
+        'fpfssOpenSubmissionPage',
+      ] as const,
+      playlist: [
+        'enterDescriptionHere',
+        'noDescription',
+        'save',
+        'saveDesc',
+        'discard',
+        'discardDesc',
+        'edit',
+        'editDesc',
+        'changeIcon',
+        'duplicatePlaylistDesc',
+        'exportPlaylistDesc',
+        'delete',
+        'deleteDesc',
+        'areYouSure',
+        'noTitle',
+        'titlePlaceholder',
+        'noAuthor',
+        'authorPlaceholder',
+        'id',
+        'by',
+        'extreme'
+      ] as const,
+      misc: [
+        'noBlankFound',
+        'addBlank',
+        'removeBlank',
+        'deleteAllBlankImages',
+        'yes',
+        'no',
+        'downloading',
+        'extracting',
+        'installingFiles',
+        'complete',
+        'exportMetaEditTitle',
+        'exportMetaEditDesc',
+        'showImage',
+        'searching',
+        'loading',
+        'ok',
+        'allow',
+        'andCapitals',
+        'orCapitals',
+      ] as const,
+      menu: [
+        'viewThumbnailInFolder',
+        'viewScreenshotInFolder',
+        'openFileLocation',
+        'openLogoLocation',
+        'openScreenshotLocation',
+        'addToFavorites',
+        'addToPlaylist',
+        'duplicateMetaOnly',
+        'duplicateMetaAndImages',
+        'copyGameUUID',
+        'exportMetaOnly',
+        'exportMetaAndImages',
+        'exportMetaEdit',
+        'duplicatePlaylist',
+        'exportPlaylist',
+        'makeCurationFromGame',
+        'copyShortcutURL',
+        'downloadPlaylistContent',
+      ] as const,
+      dialog: [
+        'programNotFound',
+        'phpNotFound',
+        'wineNotFound', // @UNUSED
+        'flashpointPathNotFound',
+        'fileNotFound',
+        'flashpointPathInvalid',
+        'pathNotFound', // @UNUSED
+        'playlistConflict',
+        'importedPlaylistAlreadyExists',
+        'importPlaylistAs',
+        'selectDataPackToImport',
+        'selectFileToExportMeta',
+        'selectFolderToExportMetaAndImages',
+        'selectFileToExportPlaylist',
+        'replaceFilesQuestion', // @UNUSED
+        'exportedAlreadyExistsYesNo', // @UNUSED
+        'selectFolder',
+        'selectScreenshot',
+        'selectThumbnail',
+        'selectCurationFolder',
+        'selectCurationArchive',
+        'selectCurationMeta',
+        'selectPlaylistToImport',
+        'dataRequired',
+        'dataRequiredDesc',
+        'upgradeWillInstallTo',
+        'verifyPathSelection',
+        'badFolderPerms', // @NOT_ASSIGNED
+        'pickAnotherFolder', // @NOT_ASSIGNED
+        'restartNow',
+        'restartToApplyUpgrade',
+        'areYouSure',
+        'areYouSureDelete',
+        'areYouSurePlaylistRemove',
+        'cancel',
+        'mergePlaylists',
+        'newPlaylist',
+        'uploadPrivacyWarning',
+        'overwriteFileTitle',
+        'overwriteFileMessage',
+        'overwriteFileDetail',
+        'nukeTagFilterGroup',
+        'deleteTagFilterGroup',
+        'deleteCuration',
+        'importCuration',
+        'deleteGameImage',
+        'deletePlaylist',
+        'importAllCurations',
+        'deleteAllCurations',
+        'removePlaylistGame',
+        'deleteGame',
+        'deleteAddApp',
+        'deleteTagCategory',
+        'deleteTag',
+        'deleteTagAlias',
+        'deleteSource',
+        'uninstallGame',
+        'deleteGameData',
+        'unableToUninstallGameData',
+        'unableToDeleteGame',
+        'downloadingGame',
+        'verifyingGame',
+        'aFewMinutes',
+        'importCurationWithWarnings',
+        'exportCurationWithWarnings',
+        'errorImportingCuration',
+        'mustBePngImage',
+        'mustBe7zArchiveSkipping',
+        'failedToLoadCuration',
+        'requiresAdditionalDownload',
+        'requiresAdditionalDownloadPlural',
+        'confirmClearPlaytime',
+        'badAntiVirus',
+        'openWiki',
+        'openDiscord',
+        'doNotShowAgain',
+        'extFpfssConsent',
+        'gameDataUpdateReady',
+        'gameDataUpdateReadyLcDifferent',
+      ] as const,
+      extensions: [
+        'fpssConsentRevokeTitle',
+        'fpssConsentRevokeDesc',
+        'fpssConsentGrantTitle',
+        'fpssConsentGrantDesc',
+      ]
+      // libraries: [], // (This is dynamically populated in run-time)
+    } as const;
+
+    /** Language template (short-hand). */
+    type LangTemplate = typeof langTemplate
+
+    /** A language category (based on a language template category). */
+    type LangCategory<T extends readonly string[]> = {
+      -readonly [K in T[number]]: string;
+    }
+
+    /** A dynamic and partial language category. */
+    type DynamicLangCategory = {
+      [key: string]: string | undefined;
+    }
+
+    /** Base type of LangContainer (). */
+    type BaseLangContainer = {
+      -readonly [key in keyof LangTemplate]: LangCategory<LangTemplate[key]>;
+    }
+
+    /** Container of all language strings used by the launcher. */
+    type LangContainer = BaseLangContainer & {
+      libraries: DynamicLangCategory;
+      upgrades: DynamicLangCategory;
+    }
+}
+
+declare module 'flashpoint-launcher-renderer' {
+  import { Game, PlaylistGame, TagCategory, AppPreferencesData } from 'flashpoint-launcher';
+  import { LangContainer } from 'flashpoint-launcher';
+
+  /** Game properties that will have suggestions gathered and displayed. */
+  type SuggestionProps = (
+    | 'tags'
+    | 'playMode'
+    | 'status'
+    | 'platforms'
+    | 'applicationPath'
+    | 'library'
+  )
+
+  /** Suggestions for game properties organized by property. */
+  type GamePropSuggestions = {
+    [P in SuggestionProps]: string[];
+  }
+
+  type GameComponentProps = {
+    lang: LangContainer;
+    logoVersion: number;
+    preferences: AppPreferencesData;
+    game: Game;
+    tagCategories: TagCategory[];
+    playlistGame: PlaylistGame | null;
+    fpfssEditMode: boolean;
+    editable: boolean;
+    suggestions: Partial<GamePropSuggestions>;
+    launchAddApp: (addAppId: string) => void;
+    updateGame: (game: Partial<Game>) => void;
+    updatePlaylistNotes: (notes: string) => void;
+    updateGameExtData: (extId: string, key: string, value: any) => void;
+  }
+
+  type DropdownItem = {
+    key: string;
+    value: string;
+  }
+
+  type GameComponentInputFieldProps = GameComponentProps & {
+    header: string;
+    text: string;
+    placeholder: string;
+    multiline?: boolean;
+    onChange: (value: string) => void;
+  };
+
+  type GameComponentDropdownSelectFieldProps = GameComponentProps & {
+    header: string;
+    text: string;
+    placeholder: string;
+    items: DropdownItem[];
+    onChange: (value: string) => void;
+  }
+
+  interface IExtensionWindow {
+    utils: {
+      getExtensionFileURL: (extId: string, filePath: string) => string;
+    },
+    components: {
+      GameComponentInputField: React.ComponentType<GameComponentInputFieldProps>,
+      GameComponentDropdownSelectField: React.ComponentType<GameComponentDropdownSelectFieldProps>,
+    }
+  }
+
+  type DisplaySettings = {
+    gameSidebar: {
+      middle: string[],
+      bottom: string[],
+    }
+  }
+
+  declare global {
+    interface Window {
+      ext: IExtensionWindow,
+      displaySettings: DisplaySettings,
+    }
+  }
 }

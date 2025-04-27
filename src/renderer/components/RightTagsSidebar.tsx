@@ -1,6 +1,5 @@
 import * as remote from '@electron/remote';
 import { BackIn } from '@shared/back/types';
-import { LangContainer } from '@shared/lang';
 import { deepCopy, generateTagFilterGroup } from '@shared/Util';
 import * as React from 'react';
 import { WithPreferencesProps } from '../containers/withPreferences';
@@ -13,7 +12,7 @@ import { OpenIcon } from './OpenIcon';
 import { SimpleButton } from './SimpleButton';
 import { TagAliasInputField } from './TagAliasInputField';
 import { TagInputField } from './TagInputField';
-import { Tag, TagCategory, TagSuggestion } from 'flashpoint-launcher';
+import { LangContainer, Tag, TagCategory, TagSuggestion } from 'flashpoint-launcher';
 
 type OwnProps = {
   /** Currently selected game (if any) */

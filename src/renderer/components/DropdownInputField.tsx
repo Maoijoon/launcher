@@ -50,7 +50,7 @@ export function DropdownInputFieldMapped(props: DropdownInputFieldMappedProps) {
     if (props.onChange && item) {
       props.onChange(item.key);
     }
-  }
+  };
 
   return (
     <DropdownInputField
@@ -63,7 +63,7 @@ export function DropdownInputFieldMapped(props: DropdownInputFieldMappedProps) {
       disabled={props.disabled}
       multiline={props.multiline}
       editable={props.editable} />
-  )
+  );
 }
 
 /** An input element with a drop-down menu that can list any number of selectable and clickable text elements. */

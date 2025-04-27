@@ -1,8 +1,8 @@
 import { SocketClient } from '@shared/back/SocketClient';
 import { OpenDialogOptions } from 'electron';
-import { AppPreferencesData } from 'flashpoint-launcher';
+import { AppPreferencesData, LangContainer } from 'flashpoint-launcher';
 import { AppConfigData } from './config/interfaces';
-import { LangContainer, LangFile } from './lang';
+import { LangFile } from './lang';
 import { ILogEntry } from './Log/interface';
 import { ITheme } from './ThemeFile';
 import { EventEmitter } from 'events';

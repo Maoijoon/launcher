@@ -1,0 +1,133 @@
+import { DropdownItem, GameComponentProps } from 'flashpoint-launcher-renderer';
+
+type ExtData = {
+  score?: number;
+  rating?: string;
+  views?: number;
+  faves?: number;
+}
+
+const numFormat = new Intl.NumberFormat();
+
+export function mapNgRatingString(rs: string) {
+  switch (rs) {
+    case '':
+      return 'None';
+    case 'e':
+      return 'Standalone';
+    default:
+      return 'Broken Value';
+  }
+}
+
+export function NgRating(props: GameComponentProps) {
+  const extData: ExtData | undefined = props.game.extData?.nga;
+  const { GameComponentDropdownSelectField } = window.ext.components;
+  const rating = extData?.rating || '';
+  const { editable } = props;
+
+  const items: DropdownItem[] = [{
+    key: '',
+    value: 'None',
+  }, {
+    key: 'e',
+    value: 'Everyone'
+  }, {
+    key: 't',
+    value: 'Teen'
+  }, {
+    key: 'm',
+    value: 'Mature'
+  }, {
+    key: 'a',
+    value: 'Adult'
+  }];
+
+  return editable ? (
+    <GameComponentDropdownSelectField
+      header='NG Rating'
+      text={rating}
+      placeholder='No Rating'
+      items={items}
+      onChange={(value) => props.updateGameExtData('nga', 'rating', value)}
+      {...props} />
+  ) : (
+    <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
+      <p>NG Rating: </p>
+      { rating === '' ? (
+        <p>None</p>
+      ) : (
+        <div className={`ng-rating-sidebar ng-image-rating_${rating.toLowerCase()}`}></div>
+      )}
+    </div>
+  );
+}
+
+export function NgScore(props: GameComponentProps) {
+  const extData: ExtData | undefined = props.game.extData?.nga;
+  const { GameComponentInputField } = window.ext.components;
+  const score = Number(extData?.score) || 0;
+  const { updateGameExtData } = props;
+
+  return (
+    <GameComponentInputField
+      header='NG Score'
+      text={score.toString()}
+      placeholder='No Score'
+      onChange={(value) => {
+        // Strip leading zeroes
+        const cleanValue = value.replace(/^0+/, '');
+        // Make sure we're a numeric (allow decimals)
+        if (/^-?\d+(\.\d+)?$/.test(cleanValue)) {
+          updateGameExtData('nga', 'score', Number(cleanValue));
+        }
+      }}
+      {...props} />
+  );
+}
+
+export function NgViews(props: GameComponentProps) {
+  const extData: ExtData | undefined = props.game.extData?.nga;
+  const { GameComponentInputField } = window.ext.components;
+  const views = Number(extData?.views) || 0;
+  const { editable, updateGameExtData } = props;
+
+  return (
+    <GameComponentInputField
+      header='NG Views'
+      text={editable ? views.toString() : numFormat.format(views)}
+      placeholder='No Views'
+      onChange={(value) => {
+        // Strip leading zeroes
+        const cleanValue = value.replace(/^0+/, '');
+        // Make sure we're an integer
+        if (/^\d+$/.test(cleanValue)) {
+          updateGameExtData('nga', 'views', cleanValue);
+        }
+      }}
+      {...props} />
+  );
+}
+
+export function NgFaves(props: GameComponentProps) {
+  const extData: ExtData | undefined = props.game.extData?.nga;
+  const { GameComponentInputField } = window.ext.components;
+  const faves = Number(extData?.faves) || 0;
+  const { editable, updateGameExtData } = props;
+
+  return (
+    <GameComponentInputField
+      header='NG Favorites'
+      text={editable ? faves.toString(): numFormat.format(faves)}
+      placeholder='No Favorites'
+      onChange={(value) => {
+        // Strip leading zeroes
+        const cleanValue = value.replace(/^0+/, '');
+        // Make sure we're an integer
+        if (/^\d+$/.test(cleanValue)) {
+          updateGameExtData('nga', 'faves', Number(cleanValue));
+        }
+      }}
+      {...props} />
+  );
+}

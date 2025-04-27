@@ -1,7 +1,7 @@
-import { BackInit, ComponentStatus, FpfssUser } from '@shared/back/types';
+import { BackInit, ComponentStatus } from '@shared/back/types';
 import { AppConfigData, AppExtConfigData } from '@shared/config/interfaces';
 import { ExecMapping, GamePropSuggestions, IBackProcessInfo, INamedBackProcessInfo } from '@shared/interfaces';
-import { LangContainer, LangFile } from '@shared/lang';
+import { LangFile } from '@shared/lang';
 import { ILogEntry } from '@shared/Log/interface';
 import { OpenDialogOptions, OpenExternalOptions, SaveDialogOptions } from 'electron';
 import { EventEmitter } from 'events';
@@ -63,7 +63,7 @@ export type BackState = {
   languageWatcher: FolderWatcher;
   languageQueue: EventQueue;
   languages: LangFile[];
-  languageContainer: LangContainer;
+  languageContainer: flashpoint.LangContainer;
   readonly themeState: ThemeState;
   playlists: flashpoint.Playlist[];
   execMappings: ExecMapping[];

@@ -10,18 +10,17 @@ import { PlatformAppPath, PlatformAppPathSuggestions } from '@shared/curate/type
 import { getCurationFolder } from '@shared/curate/util';
 import { BrowserApplicationOpts } from '@shared/extensions/interfaces';
 import { IBackProcessInfo, INamedBackProcessInfo, IService, ProcessState } from '@shared/interfaces';
-import { LangContainer, LangFile, autoCode, getDefaultLocalization } from '@shared/lang';
+import { LangFile, autoCode, getDefaultLocalization } from '@shared/lang';
 import { Legacy_IAdditionalApplicationInfo, Legacy_IGameInfo } from '@shared/legacy/interfaces';
 import { newGame } from '@shared/utils/misc';
 import * as child_process from 'child_process';
-import { AdditionalApp, Game, Tag } from 'flashpoint-launcher';
+import { AdditionalApp, Game, LangContainer, Tag } from 'flashpoint-launcher';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 import * as kill from 'tree-kill';
 import { promisify } from 'util';
 import { uuid } from './uuid';
-import { GameSearch, parseUserSearchInput } from '@fparchive/flashpoint-archive';
 
 const unlink = promisify(fs.unlink);
 

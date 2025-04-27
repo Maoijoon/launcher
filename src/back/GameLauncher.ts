@@ -1,7 +1,6 @@
 import { BackOut, ComponentState, ComponentStatus } from '@shared/back/types';
 import { AppProvider } from '@shared/extensions/interfaces';
 import { ExecMapping, Omit, ProcessState } from '@shared/interfaces';
-import { LangContainer } from '@shared/lang';
 import { fixSlashes, padStart, stringifyArray } from '@shared/Util';
 import * as Coerce from '@shared/utils/Coerce';
 import { getGameDataFilename } from '@shared/utils/misc';
@@ -9,7 +8,7 @@ import { formatString } from '@shared/utils/StringFormatter';
 import * as child_process from 'child_process';
 import { ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
-import { AdditionalApp, AppPathOverride, DialogStateTemplate, Game, GameConfig, GameData, GameLaunchInfo, GameLaunchOverride, LaunchInfo, ManagedChildProcess, Platform } from 'flashpoint-launcher';
+import { AdditionalApp, AppPathOverride, DialogStateTemplate, Game, GameConfig, GameData, GameLaunchInfo, GameLaunchOverride, LangContainer, LaunchInfo, ManagedChildProcess, Platform } from 'flashpoint-launcher';
 import * as fs from 'fs-extra';
 import * as minimist from 'minimist';
 import * as path from 'path';
@@ -362,7 +361,7 @@ export namespace GameLauncher {
    * @param path Override PATH environmental variable
    */
   function getEnvironment(fpPath: string, proxy: string, path?: string): NodeJS.ProcessEnv {
-    let newEnvVars: NodeJS.ProcessEnv = {'FP_PATH': fpPath, 'PATH': path ?? process.env.PATH};
+    let newEnvVars: NodeJS.ProcessEnv = { 'FP_PATH': fpPath, 'PATH': path ?? process.env.PATH };
     // On Linux, we tell native applications to use Flashpoint's proxy using the HTTP_PROXY env var
     // On Windows, executables are patched to load the FlashpointProxy library
     // On Linux/Mac, WINE obeys the HTTP_PROXY env var so we can run unpatched Windows executables
@@ -370,13 +369,13 @@ export namespace GameLauncher {
       // Add proxy env vars and prevent WINE from flooding the logs with debug messages
       newEnvVars = {
         ...newEnvVars, 'WINEDEBUG': 'fixme-all',
-        ...(proxy !== '' ? {'http_proxy': `http://${proxy}/`, 'HTTP_PROXY': `http://${proxy}/`} : null)
+        ...(proxy !== '' ? { 'http_proxy': `http://${proxy}/`, 'HTTP_PROXY': `http://${proxy}/` } : null)
       };
       // If WINE's bin directory exists in FPSoftware, add it to the PATH
       if (fs.existsSync(`${fpPath}/FPSoftware/Wine/bin`)) {
         newEnvVars = {
           ...newEnvVars, 'PATH': `${fpPath}/FPSoftware/Wine/bin:` + process.env.PATH
-        }
+        };
       }
     }
     return {

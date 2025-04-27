@@ -1,3 +1,4 @@
+import { GameSearch, GameSearchOffset } from '@fparchive/flashpoint-archive';
 import { ChangedMeta, MetaEditFlags } from '@shared/MetaEdit';
 import { EditCurationMeta } from '@shared/curate/OLD_types';
 import { AddAppCuration, ContentTree, PlatformAppPathSuggestions } from '@shared/curate/types';
@@ -25,6 +26,7 @@ import {
   GameMetadataSource,
   GameMiddlewareConfig,
   GameMiddlewareInfo, GameOrderBy, GameOrderDirection,
+  LangContainer,
   LoadedCuration,
   MergeTagData,
   Platform,
@@ -40,8 +42,7 @@ import { ILogEntry, ILogPreEntry, LogLevel } from '../Log/interface';
 import { Theme } from '../ThemeFile';
 import { AppConfigData, AppExtConfigData } from '../config/interfaces';
 import { ExecMapping, GamePropSuggestions, IService, ProcessAction, Task } from '../interfaces';
-import { LangContainer, LangFile } from '../lang';
-import { GameSearchOffset, GameSearch, GameSearchOrder } from '@fparchive/flashpoint-archive';
+import { LangFile } from '../lang';
 
 export enum BackIn {
   UNKNOWN = 1000,

@@ -1,0 +1,19 @@
+.ng-rating-sidebar {
+  width: 1rem;
+  height: 1rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.ng-image-rating_e {
+  background-image: url("assets/rating_everyone.png");
+}
+.ng-image-rating_t {
+  background-image: url("assets/rating_teen.png");
+}
+.ng-image-rating_m {
+  background-image: url("assets/rating_mature.png");
+}
+.ng-image-rating_a {
+  background-image: url("assets/rating_adult.png");
+}

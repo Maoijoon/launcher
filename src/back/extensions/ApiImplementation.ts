@@ -19,9 +19,10 @@ import {
   runService,
   setStatus
 } from '@back/util/misc';
+import { ExtSearchable } from '@fparchive/flashpoint-archive';
 import { BrowsePageLayout, ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
 import { ILogEntry, LogLevel } from '@shared/Log/interface';
-import { BackOut, FpfssUser } from '@shared/back/types';
+import { BackOut } from '@shared/back/types';
 import { CURATIONS_FOLDER_WORKING } from '@shared/constants';
 import { CurationMeta } from '@shared/curate/types';
 import { getContentFolderByKey } from '@shared/curate/util';
@@ -36,12 +37,19 @@ import * as fs from 'fs';
 import * as fsExtra from 'fs-extra';
 import { extractFull } from 'node-7z';
 import * as path from 'path';
+import * as stream from 'stream';
+import * as uuid from 'uuid';
 import { fpDatabase, loadCurationArchive } from '..';
 import { addPlaylistGame, deletePlaylist, deletePlaylistGame, filterPlaylists, findPlaylist, findPlaylistByName, getPlaylistGame, savePlaylistGame, updatePlaylist } from '../playlist';
 import { newExtLog } from './ExtensionUtils';
 import { Command, RegisteredMiddleware } from './types';
-import * as uuid from 'uuid';
-import * as stream from 'stream';
+import { langTemplate } from '@shared/lang';
+
+enum ExtSearchableType {
+  String = 0,
+  Boolean = 1,
+  Number = 2
+}
 
 /**
  * Create a Flashpoint API implementation specific to an extension, used during module load interception
@@ -98,6 +106,15 @@ export function createApiFactory(extId: string, extManifest: IExtensionManifest,
     });
   };
 
+  const registerDataExtension = (extension: flashpoint.DataExtensionInfo): void => {
+    // Silly enum won't convert
+    fpDatabase.registerExtension({
+      id: extension.id,
+      searchables: extension.searchables as unknown as ExtSearchable[],
+      indexes: extension.indexes,
+    });
+  };
+
   const getExtConfigValue = (key: string): any => {
     return state.extConfig[key];
   };
@@ -110,6 +127,11 @@ export function createApiFactory(extId: string, extManifest: IExtensionManifest,
 
   const focusWindow = () => {
     state.socketServer.broadcast(BackOut.FOCUS_WINDOW);
+  };
+
+  // Data extensions Namespace
+  const extDataExtensions: typeof flashpoint.dataExtensions = {
+    registerDataExtension: registerDataExtension,
   };
 
   // Log Namespace
@@ -658,8 +680,10 @@ export function createApiFactory(extId: string, extManifest: IExtensionManifest,
     setExtConfigValue: setExtConfigValue,
     onExtConfigChange: state.apiEmitters.ext.onExtConfigChange.extEvent(extManifest.displayName || extManifest.name),
     focusWindow: focusWindow,
+    langTemplate: langTemplate,
 
     // Namespaces
+    dataExtensions: extDataExtensions,
     log: extLog,
     commands: extCommands,
     curations: extCurations,
@@ -685,6 +709,7 @@ export function createApiFactory(extId: string, extManifest: IExtensionManifest,
     BrowsePageLayout: BrowsePageLayout,
     LogLevel: LogLevel,
     ScreenshotPreviewMode: ScreenshotPreviewMode,
+    ExtSearchableType: ExtSearchableType,
 
     // Disposable funcs
     dispose: dispose,

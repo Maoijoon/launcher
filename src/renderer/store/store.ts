@@ -31,7 +31,11 @@ export const store = configureStore({
     tasks: tasksReducer,
   },
   middleware: (getDefaultMiddleware) => {
-    const middleware = getDefaultMiddleware();
+    const middleware = getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: ['search'] // Big performance drop in dev with this on search views
+      },
+    });
     middleware.push(listenerMiddleware.middleware);
     middleware.push(routerMiddleware(history) as any);
     return middleware;
