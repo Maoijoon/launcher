@@ -11,8 +11,7 @@ import { SimpleButton } from '../SimpleButton';
 import { TagCategoriesList } from '../TagCategoriesList';
 import { TagCategory } from 'flashpoint-launcher';
 
-type OwnProps = {
-}
+type OwnProps = Record<string, never>;
 
 export type TagCategoriesPageProps = OwnProps & WithTagCategoriesProps & WithPreferencesProps;
 

@@ -349,7 +349,7 @@ export type CurationAction = (
     value: EditAddAppCurationMeta[keyof EditAddAppCurationMeta];
   }> |
   /** Sort Curations A-Z */
-  ReducerAction<'sort-curations', {}> |
+  ReducerAction<'sort-curations'> |
   /** Change the lock status of a curation. */
   ReducerAction<'change-curation-lock', {
     /** Key of the curation to change the lock status of. */

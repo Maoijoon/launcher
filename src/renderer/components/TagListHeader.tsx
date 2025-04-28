@@ -2,7 +2,7 @@ import { LangContext } from '@renderer/util/lang';
 import * as React from 'react';
 import { useMemo } from 'react';
 
-export type TagListHeaderProps = {};
+export type TagListHeaderProps = Record<string, never>;
 
 /**
  * Header on top of the GameList.

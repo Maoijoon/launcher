@@ -35,7 +35,7 @@ type OwnProps = {
 
 export type HeaderProps = OwnProps & RouteComponentProps & WithMainStateProps & WithConfirmDialogProps & WithPreferencesProps & WithTagCategoriesProps & WithSearchProps & WithViewProps;
 
-type HeaderState = {};
+type HeaderState = Record<string, never>;
 
 /** The header that is always visible at the top of the main window (just below the title bar). */
 export class Header extends React.Component<HeaderProps, HeaderState> {

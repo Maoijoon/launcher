@@ -19,8 +19,7 @@ const categoryOrder = [
   'copyright',
 ];
 
-type OwnProps = {
-}
+type OwnProps = Record<string, never>;
 
 export type TagsPageProps = OwnProps & WithTagCategoriesProps & WithPreferencesProps;
 

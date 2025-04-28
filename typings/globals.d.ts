@@ -14,11 +14,6 @@ declare global {
     Shared: IMainWindowExternal;
     log: LogFuncs;
   }
-  namespace NodeJS {
-    interface Global {
-      log: LogFuncs;
-    }
-  }
   let log: LogFuncs;
 }
 

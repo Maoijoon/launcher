@@ -51,7 +51,7 @@ export class LogData extends React.Component<LogDataProps> {
    * @param _prevState Unused
    * @param snapshot The return value of `getSnapshotBeforeUpdate`
    */
-  componentDidUpdate(_prevProps: LogDataProps, _prevState: {}, snapshot: LogDataSnapshot) {
+  componentDidUpdate(_prevProps: LogDataProps, _prevState: Record<string, never>, snapshot: LogDataSnapshot) {
     if (snapshot && snapshot.scrolledToBottom) {
       this.scrollAllTheDown();
     }

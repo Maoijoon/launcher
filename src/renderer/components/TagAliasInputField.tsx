@@ -1,10 +1,10 @@
 import { LangContext } from '@renderer/util/lang';
-import { LangContainer } from '@shared/lang';
 import * as React from 'react';
 import { checkIfAncestor } from '../Util';
 import { ConfirmElement, ConfirmElementArgs } from './ConfirmElement';
 import { InputField, InputFieldProps } from './InputField';
 import { OpenIcon } from './OpenIcon';
+import { LangContainer } from 'flashpoint-launcher';
 
 /** A function that receives a HTML element (or null). */
 type RefFunc<T extends HTMLElement> = (instance: T | null) => void;
@@ -27,9 +27,7 @@ export type TagAliasInputFieldProps = InputFieldProps & {
   inputRef?: RefFunc<InputElement>;
 };
 
-type TagAliasInputFieldState = {
-
-};
+type TagAliasInputFieldState = Record<string, never>;
 
 /** An input element with a drop-down menu that can list any number of selectable and clickable text elements. */
 export class TagAliasInputField extends React.Component<TagAliasInputFieldProps, TagAliasInputFieldState> {

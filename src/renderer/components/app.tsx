@@ -64,7 +64,7 @@ import { uuid } from '@shared/utils/uuid';
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
 
-type AppOwnProps = {};
+type AppOwnProps = Record<string, never>;
 
 const DEFAULT_DISPLAYS: DisplaySettings = {
   gameSidebar: {

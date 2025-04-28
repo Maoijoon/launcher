@@ -11,7 +11,10 @@ for (const module of builtinModules) {
 }
 
 const ReactCompilerConfig = {
-  target: '17'
+  target: '17',
+  sources: (filename) => {
+    return filename.indexOf('src/renderer/') !== -1;
+  },
 };
 
 export default defineConfig({

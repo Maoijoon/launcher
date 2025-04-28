@@ -623,8 +623,10 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                       <div
                         className='browse-right-sidebar__play-button--text browse-right-sidebar__play-button--download-text'
                         onClick={() => {
-                          this.props.currentGame && this.props.onGameLaunch(this.props.currentGame.id, null)
-                          .then(this.onForceUpdateGameData);
+                          if (this.props.currentGame) {
+                            this.props.onGameLaunch(this.props.currentGame.id, null)
+                            .then(this.onForceUpdateGameData);
+                          }
                         }}>
                         {strings.download}
                       </div>
@@ -632,7 +634,9 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                       <div
                         className='browse-right-sidebar__play-button--text browse-right-sidebar__play-button--play-text'
                         onClick={() => {
-                          this.props.currentGame && this.props.onGameLaunch(this.props.currentGame.id, null);
+                          if (this.props.currentGame) {
+                            this.props.onGameLaunch(this.props.currentGame.id, null);
+                          }
                         }}>
                         {strings.play}
                       </div>

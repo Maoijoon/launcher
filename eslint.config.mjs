@@ -38,15 +38,9 @@ export default tseslint.config(
         rules: {
             "@stylistic/object-curly-spacing": ["warn", "always"],
             "@typescript-eslint/adjacent-overload-signatures": "off",
-            "@typescript-eslint/ban-types": ["error", {
-                "types": {
-                    "{}": false
-                },
-                "extendDefaults": true
-            }],
             "@typescript-eslint/explicit-function-return-type": "off",
             "@typescript-eslint/explicit-module-boundary-types": "off",
-            "@typescript-eslint/indent": ["error", 2, {
+            "@stylistic/indent": ["error", 2, {
                 "MemberExpression": 0,
                 "SwitchCase": 1
             }],

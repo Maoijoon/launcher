@@ -23,8 +23,7 @@ type OwnProps = {
 
 export type RightTagCategoriesSidebarProps = OwnProps & WithPreferencesProps;
 
-type RRightTagCategoriesSidebarState = {
-};
+type RRightTagCategoriesSidebarState = Record<string, never>;
 
 /** Sidebar on the right side of BrowsePage. */
 export class RightTagCategoriesSidebar extends React.Component<RightTagCategoriesSidebarProps, RRightTagCategoriesSidebarState> {

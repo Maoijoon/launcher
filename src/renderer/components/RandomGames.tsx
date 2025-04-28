@@ -99,7 +99,7 @@ export function RandomGames(props: RandomGamesProps) {
       title={strings.home.randomPicks}
       cssKey='random-games'
       onToggleMinimize={props.onToggleMinimize}>
-        {render}
+      {render}
     </HomePageBox>
   );
 }
