@@ -214,8 +214,8 @@ export class LogsPage extends React.Component<LogsPageProps, LogsPageState> {
   }
 
   onCopyClick = (): void => {
-    if (!navigator.clipboard) { 
-      alert("Clipboard not available, failed to copy logs to clipboard");
+    if (!navigator.clipboard) {
+      alert('Clipboard not available, failed to copy logs to clipboard');
     }
     const logData = window.Shared.log.entries.filter(l => window.Shared.preferences.data.showLogLevel[l.logLevel])
     .map(formedLog => {
@@ -309,18 +309,6 @@ export class LogsPage extends React.Component<LogsPageProps, LogsPageState> {
   onMessage: Parameters<typeof window.Shared.back.registerAny>[0] = (event, type) => {
     if (type === BackOut.LOG_ENTRY_ADDED) { this.forceUpdate(); }
   };
-}
-
-/**
- * Parse a HTML string into plain text (potentially unsafe).
- *
- * @param text HTML string.
- * @returns text representation of HTML.
- */
-function parseHtmlToText(text: string): string {
-  const element = document.createElement('div');
-  element.innerHTML = text;
-  return element.innerText;
 }
 
 /**

@@ -25,7 +25,6 @@ import { SimpleButton } from '../SimpleButton';
 import { SizeProvider } from '../SizeProvider';
 import { GENERAL_VIEW_ID } from '@renderer/store/search/slice';
 import { idToGame } from '@renderer/util/async';
-import { useView } from '@renderer/hooks/search';
 
 type OwnProps = {
   gotdList: GameOfTheDay[] | undefined;
@@ -94,6 +93,7 @@ export function HomePage(props: HomePageProps) {
 
   const allStrings = React.useContext(LangContext);
   const strings = allStrings.home;
+  const { onLaunchGame: onLaunchGameProp, platforms, search, searchActions, logoVersion } = props;
 
   const toggleMinimizeBox = React.useCallback((cssKey: string) => {
     const newBoxes = [...props.preferencesData.minimizedHomePageBoxes];
@@ -121,18 +121,11 @@ export function HomePage(props: HomePageProps) {
   };
 
   const onLaunchGame = React.useCallback((gameId: string) => {
-    props.onLaunchGame(gameId, null);
-  }, [props.onLaunchGame]);
+    onLaunchGameProp(gameId, null);
+  }, [onLaunchGameProp]);
 
   const onHallOfFameClick = React.useCallback(() => {
     const playlist = props.playlists.find(p => p.title.toLowerCase().includes('hall of fame'));
-    if (playlist) {
-      // TODO: Reimplement
-    }
-  }, [props.playlists]);
-
-  const onFavoriteClick = React.useCallback(() => {
-    const playlist = props.playlists.find(p => p.title === ' Favorites' || p.title === '*Favorites*');
     if (playlist) {
       // TODO: Reimplement
     }
@@ -155,11 +148,9 @@ export function HomePage(props: HomePageProps) {
     // TODO: Reimplement
   }, []);
 
-  const currentView = useView();
-
   const platformList = React.useMemo(() => {
     const elements: JSX.Element[] = [];
-    const views = Object.keys(props.search.views);
+    const views = Object.keys(search.views);
     let viewName = '';
     for (const view of views) {
       if (view !== GENERAL_VIEW_ID) {
@@ -167,7 +158,7 @@ export function HomePage(props: HomePageProps) {
         break;
       }
     }
-    const sortedPlatforms = [...props.platforms].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    const sortedPlatforms = [...platforms].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
     elements.push(
       <div className='home-page__platform-box'>
         {sortedPlatforms.map((platform, idx) => (
@@ -176,19 +167,19 @@ export function HomePage(props: HomePageProps) {
             className='home-page__platform-entry'
             to={joinLibraryRoute(viewName)}
             onClick={() => {
-              props.searchActions.setSearchText({
+              searchActions.setSearchText({
                 view: viewName,
                 text: `platform:"${platform}"`
               });
               setTimeout(() => {
-                props.searchActions.forceSearch({
+                searchActions.forceSearch({
                   view: viewName
                 });
               }, 100);
             }}>
             <div
               className='home-page__platform-entry__logo'
-              style={{ backgroundImage: `url("${getPlatformIconURL(platform, props.logoVersion)}")` }}/>
+              style={{ backgroundImage: `url("${getPlatformIconURL(platform, logoVersion)}")` }}/>
             <div className='home-page__platform-entry__text'>{platform}</div>
           </Link>
         )
@@ -196,7 +187,7 @@ export function HomePage(props: HomePageProps) {
       </div>
     );
     return elements;
-  }, [props.platforms, props.search.views]);
+  }, [platforms, search, searchActions, logoVersion]);
 
   // (These are kind of "magic numbers" and the CSS styles are designed to fit with them)
   const height = 140;
@@ -251,7 +242,7 @@ export function HomePage(props: HomePageProps) {
         {render}
       </HomePageBox>
     );
-  }, [strings, onFavoriteClick, platformList, props.preferencesData.minimizedHomePageBoxes, toggleMinimizeBox]);
+  }, [strings, platformList, props.preferencesData.minimizedHomePageBoxes, toggleMinimizeBox]);
 
   const renderedNotes = React.useMemo(() => {
     const render = (
@@ -270,7 +261,7 @@ export function HomePage(props: HomePageProps) {
     );
   }, [strings, props.preferencesData.minimizedHomePageBoxes, toggleMinimizeBox]);
 
-  const tagGroupIcons = props.preferencesData.tagFilters.filter(t => !t.enabled && t.iconBase64 !== '').map(({tags, iconBase64: tagGroupIcon}) => ({tagFilter:tags, iconBase64:tagGroupIcon}));
+  const tagGroupIcons = props.preferencesData.tagFilters.filter(t => !t.enabled && t.iconBase64 !== '').map(({ tags, iconBase64: tagGroupIcon }) => ({ tagFilter:tags, iconBase64:tagGroupIcon }));
 
   const renderedRandomGames = React.useMemo(() => (
     <SizeProvider width={width} height={height}>

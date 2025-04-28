@@ -30,7 +30,7 @@ export function DownloadsPage() {
                   itemCount: 0,
                   totalItems: 0,
                   isDone,
-                  text: `Downloading game...`,
+                  text: 'Downloading game...',
                   secondaryText: worker.text,
                 }} />
             </div>
@@ -38,5 +38,5 @@ export function DownloadsPage() {
         })}
       </div>
     </div>
-  )
+  );
 }

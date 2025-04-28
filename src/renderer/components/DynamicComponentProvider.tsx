@@ -50,7 +50,7 @@ export function DynamicComponentProvider({ fileList, children }: DynamicComponen
       const loadFiles = async (files: string[]) => {
         for (const file of files) {
           try {
-            const module = await import(file);
+            const module = await import(/* webpackIgnore: true */ file);
             const newComponents = module.default || {};
             console.log('Imported components: ', Object.keys(newComponents));
             setComponents(prevComponents => ({

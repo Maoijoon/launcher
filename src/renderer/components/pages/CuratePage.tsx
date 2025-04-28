@@ -53,9 +53,7 @@ export function CuratePage(props: CuratePageProps) {
   const [platformText, setPlatformText] = React.useState<string>('');
   const [platformSuggestions, setPlatformSuggestions] = React.useState<TagSuggestion[]>([]);
 
-  const onCheckboxChange = (key: keyof AppPreferencesData) => React.useCallback((checked: boolean) => {
-    updatePreferencesData({ [key]: checked });
-  }, []);
+  const onCheckboxChange = (key: keyof AppPreferencesData) => (checked: boolean) => updatePreferencesData({ [key]: checked });
 
   const onSymlinkCurationContentChange = onCheckboxChange('symlinkCurationContent');
   const onSaveImportedCurationChange = onCheckboxChange('saveImportedCurations');
@@ -723,7 +721,7 @@ export function CuratePage(props: CuratePageProps) {
           <SimpleButton
             className='curate-page__right--button'
             disabled={disabled || (!curation.game.launchCommand?.endsWith('.swf') && !curation.game.ruffleSupport)}
-            value={(!!(curation?.game.ruffleSupport)) ? strings.browse.runWithRuffle : strings.browse.runWithRuffleUnsupported}
+            value={(curation?.game.ruffleSupport) ? strings.browse.runWithRuffle : strings.browse.runWithRuffleUnsupported}
             onClick={() => onRunCurationOverride('ruffle')}/>
           <div className='curate-page__right--checkbox'>
             <div>{strings.curate.symlinkCurationContent}</div>

@@ -53,13 +53,13 @@ import { SimpleButton } from './SimpleButton';
 import { SplashScreen } from './SplashScreen';
 import { TaskBar } from './TaskBar';
 import { TitleBar } from './TitleBar';
-import uuid = require('uuid');
 import { isAxiosError } from 'axios';
 import { WithShortcutProps } from '@renderer/store/reactKeybindCompat';
 import { DynamicComponentProvider } from './DynamicComponentProvider';
 import { GameComponentDropdownSelectField, GameComponentInputField } from './DisplayComponent';
 import { DynamicThemeProvider } from './DynamicThemeProvider';
 import { DisplaySettings } from 'flashpoint-launcher-renderer';
+import { uuid } from '@shared/utils/uuid';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];

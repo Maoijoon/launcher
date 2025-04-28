@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unused-state */
+
 import { chunkArray, newGame } from '@shared/utils/misc';
 import * as remote from '@electron/remote';
 import { getGamePath } from '@renderer/Util';

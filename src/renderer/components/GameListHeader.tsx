@@ -1,11 +1,10 @@
 import { WithPreferencesProps } from '@renderer/containers/withPreferences';
-import { updatePreferencesData } from '@shared/preferences/util';
+import { useView } from '@renderer/hooks/search';
+import { searchActions } from '@renderer/store/search/slice';
 import { GameOrderBy, GameOrderDirection } from 'flashpoint-launcher';
 import { useMemo } from 'react';
-import { OpenIcon } from './OpenIcon';
-import { useView } from '@renderer/hooks/search';
 import { useDispatch } from 'react-redux';
-import { searchActions } from '@renderer/store/search/slice';
+import { OpenIcon } from './OpenIcon';
 
 export type GameListHeaderProps = WithPreferencesProps & {
   showExtremeIcon: boolean;
@@ -13,7 +12,6 @@ export type GameListHeaderProps = WithPreferencesProps & {
 
 // Header on top of the GameList. It contains the resizable columns that decide how wide each column is.
 export function GameListHeader(props: GameListHeaderProps) {
-  const { gamesOrderBy, gamesOrder } = props.preferencesData;
   const currentView = useView();
   const dispatch = useDispatch();
 

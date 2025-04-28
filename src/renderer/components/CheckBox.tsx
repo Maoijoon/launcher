@@ -1,7 +1,7 @@
 import { Omit } from '@shared/interfaces';
 import * as React from 'react';
 import { useCallback } from 'react';
-import {FancyAnimation} from '@renderer/components/FancyAnimation';
+import { FancyAnimation } from '@renderer/components/FancyAnimation';
 
 /** Props for an input element. */
 type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

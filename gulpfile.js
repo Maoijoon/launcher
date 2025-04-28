@@ -10,6 +10,7 @@ const { execute } = require('./gulpfile.util');
 const { execSync } = require('child_process');
 const { promisify } = require('util');
 const esbuild = require('esbuild');
+const { createRsbuild, loadConfig } = require('@rsbuild/core');
 
 // Promisify the pipeline function
 const pipeline = promisify(require('stream').pipeline);
@@ -200,18 +201,13 @@ function watchBack(done) {
 }
 
 async function watchRenderer() {
-  const ctx = await esbuild.context({
-    bundle: true,
-    loader: { '.node': 'file' },
-    entryPoints: ['./src/renderer/index.tsx'],
-    outdir: './build/window',
-    minify: false,
-    outExtension: {
-      '.js': '.bundle.js'
-    },
-    external: ['electron', ...require('module').builtinModules],
+  const config = await loadConfig();
+  const rsbuild = await createRsbuild({
+    rsbuildConfig: config.content
   });
-  return ctx.watch();
+  await rsbuild.build({
+    watch: true
+  });
 }
 
 function watchStatic() {
@@ -225,17 +221,23 @@ function buildBack(done) {
 }
 
 async function buildRenderer() {
-  return esbuild.build({
-    bundle: true,
-    loader: { '.node': 'file' },
-    entryPoints: ['./src/renderer/index.tsx'],
-    outdir: './build/window',
-    minify: true,
-    outExtension: {
-      '.js': '.bundle.js'
-    },
-    external: ['electron', ...require('module').builtinModules],
+  const config = await loadConfig();
+  const rsbuild = await createRsbuild({
+    rsbuildConfig: config.content
   });
+  return rsbuild.build();
+  // return esbuild.build({
+  //   bundle: true,
+  //   loader: { '.node': 'file' },
+  //   entryPoints: ['./src/renderer/index.tsx'],
+  //   outdir: './build/window',
+  //   minify: true,
+  //   plugins: [ReactCompilerEsbuildPlugin],
+  //   outExtension: {
+  //     '.js': '.bundle.js'
+  //   },
+  //   external: ['electron', ...require('module').builtinModules],
+  // });
 }
 
 function buildStatic() {
@@ -418,11 +420,11 @@ exports.build = series(
   clean,
   createVersionFile,
   installCrossDeps,
+  buildStatic,
   parallel(
     buildBack,
     buildRenderer,
     buildExtensions,
-    buildStatic,
     configVersion
   )
 );
@@ -431,11 +433,11 @@ exports.watch = series(
   clean,
   createVersionFile,
   installCrossDeps,
+  buildStatic,
   parallel(
     watchBack,
     watchRenderer,
     watchExtensions,
-    buildStatic,
     watchStatic
   )
 );

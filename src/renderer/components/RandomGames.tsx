@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/indent */
 import { LangContext } from '@renderer/util/lang';
+import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
 import { LOGOS, SCREENSHOTS } from '@shared/constants';
+import { TagFilter, ViewGame } from 'flashpoint-launcher';
 import * as React from 'react';
 import { findGameDragEventDataGrid, getExtremeIconURL, getGameImageURL } from '../Util';
 import { GameGridItem } from './GameGridItem';
 import { GameItemContainer } from './GameItemContainer';
 import { HomePageBox } from './HomePageBox';
 import { SimpleButton } from './SimpleButton';
-import { Game, TagFilter, ViewGame } from 'flashpoint-launcher';
-import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
 
 type RandomGamesProps = {
   games: ViewGame[];

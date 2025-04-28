@@ -11,7 +11,7 @@ type OwnProps = {
 export type TaskBarProps = OwnProps & WithTasksProps;
 
 // Title bar of the window (the top-most part of the window).
-function taskBar(props: TaskBarProps) {
+function TaskBarInternal(props: TaskBarProps) {
   const tasksRender = React.useMemo(() => {
     return props.tasks.length == 0 ? (<div className='task-bar-empty'>No Tasks</div>) : props.tasks.map(task => {
       const { progress, finished } = task;
@@ -24,7 +24,7 @@ function taskBar(props: TaskBarProps) {
               {progress != undefined && (
                 <FancyAnimation
                   normalRender={() => (
-                    <div className={`task-progress-bar--fill ${task.error ? 'task-progress-bar--error' : ''}`} style={{width: (finished ? 100 : progress * 100) + '%'}}>
+                    <div className={`task-progress-bar--fill ${task.error ? 'task-progress-bar--error' : ''}`} style={{ width: (finished ? 100 : progress * 100) + '%' }}>
                       {task.finished ? (
                         'Finished'
                       ) : (
@@ -33,7 +33,7 @@ function taskBar(props: TaskBarProps) {
                     </div>
                   )}
                   fancyRender={() => (
-                    <div className={`task-progress-bar--fill task-progress-bar--fill-animated ${task.error ? 'task-progress-bar--error' : ''}`} style={{width: (finished ? 100 : progress * 100) + '%'}}>
+                    <div className={`task-progress-bar--fill task-progress-bar--fill-animated ${task.error ? 'task-progress-bar--error' : ''}`} style={{ width: (finished ? 100 : progress * 100) + '%' }}>
                       {task.finished ? (
                         'Finished'
                       ) : (
@@ -70,4 +70,4 @@ function taskBar(props: TaskBarProps) {
   );
 }
 
-export const TaskBar = withTasks(taskBar);
+export const TaskBar = withTasks(TaskBarInternal);

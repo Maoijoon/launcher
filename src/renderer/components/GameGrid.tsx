@@ -231,7 +231,7 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
                       onScroll={(params) => {
                         this.setState({
                           scrollTop: params.scrollTop
-                        })
+                        });
                       }}
                       onSectionRendered={(params) => this.onSectionRendered(params, columns, onSectionRendered)}
                       // Pass-through props (they have no direct effect on the grid)

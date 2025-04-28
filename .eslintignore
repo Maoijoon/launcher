@@ -1,7 +1,0 @@
-*.json
-*.js
-src/database/migration/*
-build/*
-typings/*
-gulpfile.*
-*webpack*.config.js

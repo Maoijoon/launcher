@@ -14,6 +14,7 @@ import { delayedThrottle } from '@shared/utils/throttle';
 import { uuid } from '@shared/utils/uuid';
 import { Menu, MenuItemConstructorOptions } from 'electron';
 import { GameLaunchOverride, LangContainer, Playlist } from 'flashpoint-launcher';
+import * as path from 'path';
 import * as React from 'react';
 import { ScrollIndices } from 'react-virtualized-reactv17';
 import { ConnectedLeftBrowseSidebar } from '../../containers/ConnectedLeftBrowseSidebar';
@@ -25,7 +26,6 @@ import { GameList } from '../GameList';
 import { InputElement } from '../InputField';
 import { ResizableSidebar, SidebarResizeEvent } from '../ResizableSidebar';
 import { Spinner } from '../Spinner';
-import path = require('path');
 
 type Pick<T, K extends keyof T> = { [P in K]: T[P]; };
 

@@ -7,7 +7,7 @@ import { getDefaultAdvancedFilter } from '@shared/search/util';
 import { formatString } from '@shared/utils/StringFormatter';
 import { AdvancedFilter, AdvancedFilterAndToggles, AdvancedFilterToggle, Tag } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized-reactv17';
 import { GameOrder } from './GameOrder';
@@ -29,7 +29,6 @@ export function SearchBar() {
   const dispatch = useDispatch();
   const strings = useContext(LangContext);
   const { main: mainState, tagCategories, search } = useAppSelector((state) => state);
-  const [shiftHeld, setShiftHeld] = useState(false);
 
   const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setSearchText({
@@ -89,7 +88,7 @@ export function SearchBar() {
       view: view.id,
       expanded: value
     }));
-  }
+  };
 
   const onInstalledChange = (value?: boolean) => {
     dispatch(setAdvancedFilter({
@@ -125,7 +124,7 @@ export function SearchBar() {
     return (value: string) => {
       console.log(`${key}: ${value} - whitelist`);
       const existingFilter = view.advancedFilter[key] as Record<string, AdvancedFilterToggle>;
-      let newValues = {
+      const newValues = {
         ...existingFilter
       };
       if (value in newValues) {
@@ -152,7 +151,7 @@ export function SearchBar() {
     return (value: string) => {
       console.log(`${key}: ${value} - blacklist`);
       const existingFilter = view.advancedFilter[key] as Record<string, AdvancedFilterToggle>;
-      let newValues = {
+      const newValues = {
         ...existingFilter
       };
       if (value in newValues) {
@@ -200,7 +199,7 @@ export function SearchBar() {
         }
       }));
     };
-  }
+  };
 
   const onWhitelistLibrary = onWhitelistFactory('library');
   const onBlacklistLibrary = onBlacklistFactory('library');
@@ -211,12 +210,12 @@ export function SearchBar() {
   const onBlacklistPlayMode = onBlacklistFactory('playMode');
   const onClearPlayMode = onClearFactory('playMode');
   const onSetAndTogglePlayMode = onSetAndToggleFactory('playMode');
-  
+
   const onWhitelistDeveloper = onWhitelistFactory('developer');
   const onBlacklistDeveloper = onBlacklistFactory('developer');
   const onClearDeveloper = onClearFactory('developer');
   const onSetAndToggleDeveloper = onSetAndToggleFactory('developer');
-  
+
   const onWhitelistPublisher = onWhitelistFactory('publisher');
   const onBlacklistPublisher = onBlacklistFactory('publisher');
   const onClearPublisher = onClearFactory('publisher');
@@ -270,7 +269,7 @@ export function SearchBar() {
           value: tag.name,
           orderVal: `${categoryId} ${tag.name} ${tag.aliases.join((' '))}`,
           tag: tag,
-        }
+        };
       });
     } else {
       return [];
@@ -282,7 +281,7 @@ export function SearchBar() {
       value: missing,
       orderVal: `zzzzzzz${missing}`,
     };
-  }
+  };
 
   const genTagItem = (missing: string): TagSelectItem => {
     return {
@@ -297,7 +296,7 @@ export function SearchBar() {
       orderVal: `zzzzzzz${missing}`,
       value: missing,
     };
-  }
+  };
 
   const platformLabelRenderer = (item: SearchableSelectItem) => {
     const platformIcon = getPlatformIconURL(item.value, mainState.logoVersion);
@@ -376,11 +375,11 @@ export function SearchBar() {
             className='search-bar-text-input'
             value={view.text}
             onChange={onTextChange} />
-            <div 
-              className="search-bar-text-input-icon"
-              onClick={onClearSearch}>
-              <OpenIcon icon='circle-x'/>
-            </div>
+          <div
+            className="search-bar-text-input-icon"
+            onClick={onClearSearch}>
+            <OpenIcon icon='circle-x'/>
+          </div>
         </div>
         <GameOrder
           orderBy={view.orderBy}
@@ -665,7 +664,7 @@ type SearchableSelectDropdownProps<T extends SearchableSelectItem> = {
   onSetAndToggle: (value: boolean) => void;
 }
 
-const reservedKeys = ["Shift", "Control", "Escape", "Alt", "AltGraph", "Super", "Hyper"];
+const reservedKeys = ['Shift', 'Control', 'Escape', 'Alt', 'AltGraph', 'Super', 'Hyper'];
 
 function SearchableSelectDropdown<T extends SearchableSelectItem>(props: SearchableSelectDropdownProps<T>) {
   const strings = useContext(LangContext);
@@ -689,7 +688,7 @@ function SearchableSelectDropdown<T extends SearchableSelectItem>(props: Searcha
         return -1;
       }
       return a.value.toLowerCase().localeCompare(b.value.toLowerCase());
-    })
+    });
 
     return [
       ...selectedItems,
@@ -745,7 +744,7 @@ function SearchableSelectDropdown<T extends SearchableSelectItem>(props: Searcha
   }, [items]);
 
   const handleItemClick = (itemValue: string, index: number) => {
-    onWhitelist(itemValue); 
+    onWhitelist(itemValue);
     // Always make sure the input is focused
     inputRef.current?.focus();
     // Update the selected index
@@ -754,7 +753,7 @@ function SearchableSelectDropdown<T extends SearchableSelectItem>(props: Searcha
 
   const handleItemContextMenu = (event: React.MouseEvent, itemValue: string, index: number) => {
     event.stopPropagation(); // Prevent onClear getting hit above
-    onBlacklist(itemValue); 
+    onBlacklist(itemValue);
     // Always make sure the input is focused
     inputRef.current?.focus();
     // Update the selected index

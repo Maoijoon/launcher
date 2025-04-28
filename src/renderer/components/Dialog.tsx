@@ -36,7 +36,7 @@ export function Dialog(props: DialogProps) {
         <div className={`dialog-message ${dialog.largeMessage ? 'dialog-message--large' : ''}`}>{dialog.message}</div>
       );
     }
-  }, [dialog.message, dialog.mdx]);
+  }, [dialog.message, dialog.largeMessage, dialog.mdx]);
 
   const alignment = dialog.textAlign || 'center';
 

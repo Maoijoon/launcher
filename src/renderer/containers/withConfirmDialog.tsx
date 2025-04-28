@@ -17,7 +17,6 @@ export type WithConfirmDialogProps = {
 };
 
 export function withConfirmDialog<P>(Component: React.ComponentType<P>) {
-  // eslint-disable-next-line react/display-name
   return class extends React.Component<Subtract<P, WithConfirmDialogProps>, WithConfirmDialogState> {
     state: WithConfirmDialogState = {
       open: false,

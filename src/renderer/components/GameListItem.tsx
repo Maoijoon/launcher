@@ -66,10 +66,10 @@ export function GameListItem(props: GameListItemProps) {
             <div
               className='game-list-item__icon'
               style={{ backgroundImage: `url("${extremeIconPath}")` }} />
-            ) : (tagGroupIconBase64 ? (
-              <div
-                className='game-list-item__icon'
-                style={{ backgroundImage: `url("${tagGroupIconBase64}")` }} />
+          ) : (tagGroupIconBase64 ? (
+            <div
+              className='game-list-item__icon'
+              style={{ backgroundImage: `url("${tagGroupIconBase64}")` }} />
           ) : (
             <div className='game-list-item__icon' />
           )))

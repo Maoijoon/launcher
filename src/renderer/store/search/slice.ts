@@ -1,15 +1,13 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { deepCopy } from '@shared/Util';
-import { AdvancedFilter, Game, GameOrderBy, GameOrderReverse, Playlist, StoredView, Tag, ViewGame } from 'flashpoint-launcher';
 import {
   ElementPosition
 } from '@fparchive/flashpoint-archive';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BackIn, PageKeyset, SearchQuery } from '@shared/back/types';
 import { VIEW_PAGE_SIZE } from '@shared/constants';
-import { getDefaultAdvancedFilter, getDefaultGameSearch } from '@shared/search/util';
 import { updatePreferencesData } from '@shared/preferences/util';
-import { number } from 'zod';
-import { stat } from 'fs';
+import { getDefaultAdvancedFilter, getDefaultGameSearch } from '@shared/search/util';
+import { deepCopy } from '@shared/Util';
+import { AdvancedFilter, Game, GameOrderBy, GameOrderReverse, Playlist, StoredView, Tag, ViewGame } from 'flashpoint-launcher';
 import { RootState } from '../store';
 
 export const GENERAL_VIEW_ID = '!general!';
@@ -245,7 +243,7 @@ export const requestKeyset = createAsyncThunk(
 export const forceSearch = createAsyncThunk(
   'search/forceSearch',
   async (payload: ForceSearchAction, { getState, dispatch }) => {
-    const { search, main } = getState() as RootState;
+    const { search } = getState() as RootState;
     const view = search.views[payload.view];
     console.log('forced search');
 

@@ -83,7 +83,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         }
       }
     }
-  }
+  };
 
   onRenameView = async (view: string) => {
     let warning: string | undefined;

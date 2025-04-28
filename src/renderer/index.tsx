@@ -1,9 +1,11 @@
+import * as remote from '@electron/remote';
+import store, { history } from '@renderer/store/store';
 import { BackIn } from '@shared/back/types';
+import { CustomIPC } from '@shared/interfaces';
 import { LogLevel } from '@shared/Log/interface';
 import { ConnectedRouter } from 'connected-react-router';
-import { createMemoryHistory } from 'history';
+import { MessageBoxSyncOptions, ipcRenderer } from 'electron';
 import * as ReactDOM from 'react-dom';
-import * as remote from '@electron/remote';
 import { ShortcutProvider } from 'react-keybind';
 import { Provider } from 'react-redux';
 import ConnectedApp from './containers/ConnectedApp';
@@ -12,9 +14,6 @@ import { CurationContext } from './context/CurationContext';
 import { PreferencesContextProvider } from './context/PreferencesContext';
 import { ProgressContext } from './context/ProgressContext';
 import { logFactory } from './util/logging';
-import { MessageBoxSyncOptions, ipcRenderer } from 'electron';
-import { CustomIPC } from '@shared/interfaces';
-import store, { history } from '@renderer/store/store';
 
 (async () => {
   // Replace alert function with a dialog

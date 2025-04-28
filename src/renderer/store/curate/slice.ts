@@ -10,7 +10,6 @@ import {
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BackIn } from '@shared/back/types';
 import { AddAppCuration, PlatformAppPathSuggestions } from '@shared/curate/types';
-import uuid = require('uuid');
 import { updatePreferencesData } from '@shared/preferences/util';
 
 export type CurateGroup = {

@@ -5,7 +5,6 @@ import { GameComponentProps } from 'flashpoint-launcher-renderer';
 import { GameComponentInputField } from './DisplayComponent';
 import { DropdownInputField, DropdownInputFieldMapped } from './DropdownInputField';
 import { RightBrowseSidebarAddApp } from './RightBrowseSidebarAddApp';
-import uuid = require('uuid');
 import { OpenIcon } from './OpenIcon';
 import { mapRuffleSupportString } from '@shared/utils/misc';
 import { TagInputField } from './TagInputField';
@@ -13,6 +12,7 @@ import { useState } from 'react';
 import { InputElement } from './InputField';
 import { BackIn } from '@shared/back/types';
 import { getPlatformIconURL } from '@renderer/Util';
+import { uuid } from '@shared/utils/uuid';
 
 export function GameComponentAlternateTitles(props: GameComponentProps) {
   const { lang, game, updateGame } = props;

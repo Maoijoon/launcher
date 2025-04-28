@@ -33,7 +33,7 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
   const [tagSuggestions, setTagSuggestions] = React.useState<TagSuggestion[]>([]);
   const [parsedTagsList, setParsedTagsList] = React.useState<Tag[]>(buildPlaceholderTags(props.tagFilterGroup.tags));
 
-  var imgTagFilterIconInput: HTMLInputElement;
+  let imgTagFilterIconInput: HTMLInputElement;
 
   // const tags = React.useMemo(() => tagsFactory(props.tagFilterGroup.tags, props.onRemoveTag), [props.tagFilterGroup.tags, props.onRemoveTag]);
   // const categories = React.useMemo(() => categoriesFactory(props.tagFilterGroup.categories, props.onRemoveCategory), [props.tagFilterGroup.categories, props.onRemoveCategory]);
@@ -46,7 +46,7 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
     .then((parsedTags) => {
       setParsedTagsList(parsedTags);
     });
-  }, []);
+  });
 
   const onAddTag = React.useCallback(async (name: string) => {
     const tag = await window.Shared.back.request(BackIn.GET_TAG, name) || buildPlaceholderTags([name])[0];
@@ -155,13 +155,13 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
                   title={strings.browse.tagFilterIcon}
                   style={{ backgroundImage: `url("${props.tagFilterGroup.iconBase64}")` }} />
                 <SimpleButton
-                value={formatString(strings.misc.removeBlank, strings.browse.thumbnail)}
-                onClick={() => props.onChangeIconBase64('')} />
+                  value={formatString(strings.misc.removeBlank, strings.browse.thumbnail)}
+                  onClick={() => props.onChangeIconBase64('')} />
               </>
             ) : (
               <SimpleButton
-              value={formatString(strings.misc.addBlank, strings.browse.thumbnail)}
-              onClick={() => imgTagFilterIconInput && imgTagFilterIconInput.click()} />
+                value={formatString(strings.misc.addBlank, strings.browse.thumbnail)}
+                onClick={() => imgTagFilterIconInput && imgTagFilterIconInput.click()} />
             )
           }
           <input
@@ -169,11 +169,11 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
             ref={(ref) => imgTagFilterIconInput = (ref as HTMLInputElement)}
             accept='image/png'
             onChange={(event) => {
-              let reader = new FileReader();
+              const reader = new FileReader();
               reader.readAsDataURL(event.target.files![0]);
               reader.onload = () => {
-                props.onChangeIconBase64(reader.result?.toString()!)};
-                event.target.value = '';
+                props.onChangeIconBase64(reader.result ? reader.result.toString() : '');};
+              event.target.value = '';
             }}
             type='file'/>
         </div>

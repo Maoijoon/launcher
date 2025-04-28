@@ -59,13 +59,13 @@ export class TagsPage extends React.Component<TagsPageProps, TagsPageState> {
       data.sort((a, b) => {
         const aCatOrder = a.category ? categoryOrder.indexOf(a.category) : 99999;
         const bCatOrder = b.category ? categoryOrder.indexOf(b.category) : 99999;
-        
+
         if (aCatOrder === bCatOrder) {
           return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
         } else {
           return aCatOrder - bCatOrder;
         }
-      })
+      });
       if (data) { this.onTagsChange(data); }
     });
   }

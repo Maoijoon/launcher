@@ -50,7 +50,7 @@ export class GameDataBrowser extends React.Component<GameDataBrowserProps, GameD
     const strings = this.context;
     const path = window.Shared.showOpenDialogSync({
       message: strings.dialog.selectDataPackToImport,
-      filters: [{ extensions: ['zip'], name: 'Data Pack'}]
+      filters: [{ extensions: ['zip'], name: 'Data Pack' }]
     });
     if (path && path.length > 0) {
       // Send path to backend to import
@@ -106,7 +106,7 @@ export class GameDataBrowser extends React.Component<GameDataBrowserProps, GameD
       const newData = [...this.state.gameData];
       const idx = newData.findIndex(pd => pd.id === gameData.id);
       if (idx > -1) {
-        newData[idx] = {...newData[idx], ...gameData, title: newData[idx].title };
+        newData[idx] = { ...newData[idx], ...gameData, title: newData[idx].title };
         this.setState({ gameData: newData });
       }
     }

@@ -66,7 +66,7 @@ import { FileServer, serveFile } from './util/FileServer';
 import { FolderWatcher } from './util/FolderWatcher';
 import { LogFile } from './util/LogFile';
 import { logFactory } from './util/logging';
-import { createContainer, exit, getMacPATH, runService } from './util/misc';
+import { createContainer, exit, getMacPATH, promiseSleep, runService } from './util/misc';
 import { uuid } from './util/uuid';
 import { onDidInstallGameData, onDidRemoveGame, onDidRemovePlaylistGame, onDidUninstallGameData, onDidUpdateGame, onDidUpdatePlaylist, onDidUpdatePlaylistGame, onServiceChange, onWillImportCuration, onWillUninstallGameData } from './util/events';
 import { dispose } from './util/lifecycle';
@@ -646,6 +646,8 @@ async function prepForInit(message: any): Promise<void> {
   // Set up general Main message handler now
   process.on('message', onProcessMessage);
   state.readyForInit = true;
+
+  await promiseSleep(3000);
 
   // Respond
   send({ port: state.socketServer.port, config: state.config, prefs: state.preferences }, () => {

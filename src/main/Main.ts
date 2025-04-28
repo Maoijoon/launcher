@@ -480,7 +480,7 @@ export function main(init: Init): void {
     // Remove the menu bar
     window.setMenu(null);
     // and load the index.html of the app.
-    window.loadFile(path.join(__dirname, '../window/index.html'));
+    window.loadFile(path.join(__dirname, '../window/renderer.html'));
     // Open the DevTools. Don't open if using a remote debugger (like vscode)
     if (Util.isDev && !process.env.REMOTE_DEBUG) {
       window.webContents.openDevTools();

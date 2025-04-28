@@ -95,7 +95,7 @@ export class TagCategoriesPage extends React.Component<TagCategoriesPageProps, T
 
   onEditCategory = (category: Partial<TagCategory>) => {
     if (this.state.currentCategory) {
-      const newCategory = {...deepCopy(this.state.currentCategory), ...category};
+      const newCategory = { ...deepCopy(this.state.currentCategory), ...category };
       this.setState({ currentCategory: newCategory });
     }
   };

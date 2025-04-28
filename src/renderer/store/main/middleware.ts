@@ -1,11 +1,10 @@
 import { isAnyOf, PayloadAction } from '@reduxjs/toolkit';
 import { startAppListening } from '@renderer/store/listenerMiddleware';
-import { BackIn } from '@shared/back/types';
-import { removePlaylistGame, RemovePlaylistGameAction, resolveDialog, ResolveDialogActionData } from './slice';
-import store, { history } from '../store';
-import { selectGame, selectPlaylist } from '../search/slice';
-import { useView } from '@renderer/hooks/search';
 import { getViewName } from '@renderer/Util';
+import { BackIn } from '@shared/back/types';
+import { selectGame, selectPlaylist } from '../search/slice';
+import store, { history } from '../store';
+import { removePlaylistGame, RemovePlaylistGameAction, resolveDialog, ResolveDialogActionData } from './slice';
 
 export function addMainMiddleware() {
   // Send dialog state to event handlers after reducer has finished
