@@ -80,7 +80,7 @@ export type CurateBoxDropdownInputRowProps = CurateBoxInputRowProps & {
 export function CurateBoxDropdownInputRow(props: CurateBoxDropdownInputRowProps) {
   const dispatch = useDispatch();
   const { curationFolder, property } = props;
-  const onChange = React.useCallback((event: InputElementOnChangeEvent) => {
+  const onChange = (event: InputElementOnChangeEvent) => {
     const item = props.items.find(i => i.value === event.currentTarget.value);
     if (curationFolder !== undefined && (item || props.allowNonMatching)) {
       dispatch(editCurationMeta({
@@ -89,7 +89,7 @@ export function CurateBoxDropdownInputRow(props: CurateBoxDropdownInputRowProps)
         value: item ? item.key : event.currentTarget.value,
       }));
     }
-  }, [dispatch, curationFolder]);
+  };
   const onItemSelect = useTransformOnItemSelect(onChange);
 
   return (
@@ -122,7 +122,7 @@ export type CurateBoxTagDropdownInputRowProps = CurateBoxInputRowProps & {
 export function CurateBoxTagDropdownInputRow(props: CurateBoxTagDropdownInputRowProps) {
   const strings = React.useContext(LangContext);
 
-  const onSubmitTag = React.useCallback((text: string) => {
+  const onSubmitTag = (text: string) => {
     const tags = text.split(';');
     tags.map(t => {
       props.getTagFromName(t)
@@ -132,16 +132,16 @@ export function CurateBoxTagDropdownInputRow(props: CurateBoxTagDropdownInputRow
         }
       });
     });
-  }, [props.onAddTag]);
+  };
 
-  const onTagSuggestionSelect = React.useCallback((sug: TagSuggestion) => {
+  const onTagSuggestionSelect = (sug: TagSuggestion) => {
     props.getTagFromName(sug.name)
     .then((tag) => {
       if (tag) {
         props.onAddTag(tag);
       }
     });
-  }, [props.onAddTag]);
+  };
 
   return (
     <CurateBoxRow title={props.title}>
@@ -169,7 +169,7 @@ type InputElementOnChangeEvent = {
 }
 
 function useOnInputChange(property: keyof CurationMeta, folder: string | undefined, dispatch: Dispatch) {
-  return React.useCallback((event: InputElementOnChangeEvent) => {
+  return (event: InputElementOnChangeEvent) => {
     if (folder !== undefined) {
       dispatch(editCurationMeta({
         folder,
@@ -177,7 +177,7 @@ function useOnInputChange(property: keyof CurationMeta, folder: string | undefin
         value: event.currentTarget.value,
       }));
     }
-  }, [dispatch, folder]);
+  };
 }
 
 function useTransformOnItemSelect(callback: (event: InputElementOnChangeEvent) => void) {

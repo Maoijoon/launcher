@@ -22,33 +22,23 @@ export type TagItemContainerProps = HTMLDivProps & {
  * A DIV element with additional props that listens for "game item" events that bubbles up.
  * This is more efficient than listening for events on each "game item" individually.
  */
-export class TagItemContainer extends React.Component<TagItemContainerProps> {
-  render() {
-    return (
-      <div
-        { ...filterDivProps(this.props) }
-        ref={this.props.realRef}
-        onClick={this.onClick}>
-        {this.props.children}
-      </div>
-    );
-  }
 
-  onClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (this.props.onClick) { this.props.onClick(event); }
-    if (this.props.onTagSelect) {
-      this.props.onTagSelect(event, this.findTagId(event.target));
+export function TagItemContainer(props: TagItemContainerProps) {
+  const onClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (props.onClick) { props.onClick(event); }
+    if (props.onTagSelect) {
+      props.onTagSelect(event, props.findTagId(event.target));
     }
   };
 
-  /**
-   * Find a tag ID given an event target
-   *
-   * @param target Event target
-   */
-  findTagId(target: EventTarget): number | undefined {
-    return this.props.findTagId(target);
-  }
+  return (
+    <div
+      { ...filterDivProps(props) }
+      ref={props.realRef}
+      onClick={onClick}>
+      {props.children}
+    </div>
+  );
 }
 
 // Create a shallow copy of the props object, but without all non-div element props.

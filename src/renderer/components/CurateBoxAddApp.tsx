@@ -1,15 +1,14 @@
+import { editAddApp, removeAddApp } from '@renderer/store/curate/slice';
 import { BackIn } from '@shared/back/types';
 import { AddAppCuration, AddAppCurationMeta } from '@shared/curate/types';
+import { Platform } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import { Dispatch } from 'redux';
 import { LangContext } from '../util/lang';
 import { CurateBoxRow } from './CurateBoxRow';
 import { InputField } from './InputField';
 import { SimpleButton } from './SimpleButton';
-import { Platform } from 'flashpoint-launcher';
-import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
-import { editAddApp, removeAddApp } from '@renderer/store/curate/slice';
 
 export type CurateBoxAddAppProps = {
   /** Folder of the curation the displayed additional application belongs to. */
@@ -54,14 +53,14 @@ export function CurateBoxAddApp(props: CurateBoxAddAppProps) {
       break;
   }
   // Callback for the "remove" button
-  const onRemove = useCallback(() => {
+  const onRemove = () => {
     dispatch(removeAddApp({
       folder,
       key
     }));
-  }, [props.folder, props.addApp.key, dispatch]);
+  };
   // Callback for the "run" button
-  const onRun = useCallback(() => {
+  const onRun = () => {
     return window.Shared.back.request(BackIn.LAUNCH_CURATION_ADDAPP, {
       folder: props.folder,
       addApp: props.addApp,
@@ -69,7 +68,7 @@ export function CurateBoxAddApp(props: CurateBoxAddAppProps) {
       symlinkCurationContent: props.symlinkCurationContent,
       override: null,
     });
-  }, [props.addApp && props.folder, props.symlinkCurationContent, props.platforms]);
+  };
   // Render
   return (
     <>
@@ -138,7 +137,7 @@ type InputElementOnChangeEvent = {
  * @param dispatch Curate action dispatcher.
  */
 function useOnInputChange(property: keyof AddAppCurationMeta, key: string, folder: string, dispatch: Dispatch<any>) {
-  return useCallback((event: InputElementOnChangeEvent) => {
+  return (event: InputElementOnChangeEvent) => {
     if (key !== undefined) {
       dispatch(editAddApp({
         folder,
@@ -147,5 +146,5 @@ function useOnInputChange(property: keyof AddAppCurationMeta, key: string, folde
         value: event.currentTarget.value
       }));
     }
-  }, [dispatch, key]);
+  };
 }

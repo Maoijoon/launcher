@@ -11,45 +11,37 @@ type ThrottleRef = {
 }
 
 export function useThrottle(time: number): ThrottleRef['fn'] {
-  const ref = React.useRef<ThrottleRef>(undefined as any);
+  const ref = React.useRef<ThrottleRef>({
+    timeout: undefined,
+    callback: () => {},
+    fn: (callback: AnyFunction) => {
+      if (ref.current.timeout !== undefined) { return; }
+      callback();
 
-  if (!ref.current) {
-    ref.current = {
-      timeout: undefined,
-      callback: () => {},
-      fn: (callback: AnyFunction) => {
-        if (ref.current.timeout !== undefined) { return; }
-        callback();
-
-        ref.current.timeout = setTimeout(function() {
-          ref.current.timeout = undefined;
-        }, time);
-      },
-    };
-  }
+      ref.current.timeout = setTimeout(function() {
+        ref.current.timeout = undefined;
+      }, time);
+    },
+  });
 
   return ref.current.fn;
 }
 
 export function useDelayedThrottle(time: number): ThrottleRef['fn'] {
-  const ref = React.useRef<ThrottleRef>(undefined as any);
+  const ref = React.useRef<ThrottleRef>({
+    timeout: undefined,
+    callback: () => {},
+    fn: (callback: AnyFunction) => {
+      ref.current.callback = callback;
 
-  if (!ref.current) {
-    ref.current = {
-      timeout: undefined,
-      callback: () => {},
-      fn: (callback: AnyFunction) => {
-        ref.current.callback = callback;
+      if (ref.current.timeout !== undefined) { return; }
 
-        if (ref.current.timeout !== undefined) { return; }
-
-        ref.current.timeout = setTimeout(function() {
-          ref.current.timeout = undefined;
-          ref.current.callback();
-        }, time);
-      },
-    };
-  }
+      ref.current.timeout = setTimeout(function() {
+        ref.current.timeout = undefined;
+        ref.current.callback();
+      }, time);
+    },
+  });
 
   return ref.current.fn;
 }

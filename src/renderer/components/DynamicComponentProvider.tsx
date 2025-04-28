@@ -68,6 +68,7 @@ export function DynamicComponentProvider({ fileList, children }: DynamicComponen
       setLoadedFiles(prev => [...prev, ...newFiles]);
       loadFiles(newFiles);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileList]);
 
   return (

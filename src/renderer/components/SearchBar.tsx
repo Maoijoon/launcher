@@ -591,7 +591,7 @@ function SearchableSelect<T extends SearchableSelectItem>(props: SearchableSelec
     }
   };
 
-  const orderedItems = useMemo(() => {
+  const getOrderedItems = () => {
     const newItems = [...items];
     const missingItems = { ...selected };
     for (const item of newItems) {
@@ -603,7 +603,9 @@ function SearchableSelect<T extends SearchableSelectItem>(props: SearchableSelec
       newItems.push(props.generateItem(missingItem));
     }
     return newItems.sort((a, b) => a.orderVal.localeCompare(b.orderVal));
-  }, [items, selected]);
+  };
+
+  const orderedItems = getOrderedItems();
 
   React.useEffect(() => {
     // Add event listener to handle clicks outside the dropdown
@@ -613,7 +615,7 @@ function SearchableSelect<T extends SearchableSelectItem>(props: SearchableSelec
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  });
 
   return (
     <div
@@ -677,7 +679,7 @@ function SearchableSelectDropdown<T extends SearchableSelectItem>(props: Searcha
 
   // Split the items into 2 halves - Selected and not selected, then merge
 
-  const filteredItems = React.useMemo(() => {
+  const getFilteredItems = () => {
     const lowerSearch = search.toLowerCase().replace(' ', '');
     const selectedItems = storedItems.filter((item) => item.value in selected);
     selectedItems.sort((a, b) => {
@@ -694,7 +696,8 @@ function SearchableSelectDropdown<T extends SearchableSelectItem>(props: Searcha
       ...selectedItems,
       ...storedItems.filter((item) => !(item.value in selected) && item.orderVal.toLowerCase().includes(lowerSearch)),
     ];
-  }, [search, storedItems]);
+  };
+  const filteredItems = getFilteredItems();
 
   // Handle arrow key navigation when the input field is focused
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -741,7 +744,7 @@ function SearchableSelectDropdown<T extends SearchableSelectItem>(props: Searcha
     if (Object.keys(selected).length === 0) {
       setStoredItems(items);
     }
-  }, [items]);
+  }, [items, selected]);
 
   const handleItemClick = (itemValue: string, index: number) => {
     onWhitelist(itemValue);

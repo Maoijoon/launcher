@@ -40,18 +40,19 @@ export type GameGridItemProps = Partial<GridCellProps> & {
 export function GameGridItem(props: GameGridItemProps) {
   const [isHovered, setIsHovered] = React.useState(false);
   const [showScreenshot, setShowScreenshot] = React.useState(false);
+  const { screenshotPreviewDelay } = props;
 
   React.useEffect(() => {
     let timeoutId: any; // It's a timeout
     if (isHovered) {
       timeoutId = setTimeout(() => {
         setShowScreenshot(true);
-      }, props.screenshotPreviewDelay); // Delay in milliseconds
+      }, screenshotPreviewDelay); // Delay in milliseconds
     } else {
       setShowScreenshot(false);
     }
     return () => clearTimeout(timeoutId); // Cleanup timeout on component unmount or if hover state changes
-  }, [isHovered]);
+  }, [isHovered, screenshotPreviewDelay]);
 
   const { rowIndex, id, title, platforms, thumbnail, screenshot, extreme, tagGroupIconBase64, isDraggable, isSelected, isDragged, extremeIconPath, style, onDrop } = props;
   // Get the platform icon path
@@ -65,65 +66,61 @@ export function GameGridItem(props: GameGridItemProps) {
       willShowScreenshot = true;
     }
   }
-  const platformIcons = React.useMemo(() =>
-    platforms.slice(0, 5).map(p => getPlatformIconURL(p, props.logoVersion))
-  , [platforms, props.logoVersion]);
+  const platformIcons = platforms.slice(0, 5).map(p => getPlatformIconURL(p, props.logoVersion));
   // Pick class names
-  const className = React.useMemo(() => {
+  const className = () => {
     let className = 'game-grid-item';
     if (isSelected) { className += ' game-grid-item--selected'; }
     if (isDragged)  { className += ' game-grid-item--dragged';  }
     return className;
-  }, [isSelected, isDragged]);
+  };
+
+  const attributes: any = {};
+  attributes[GameGridItem.idAttribute] = id;
+  attributes[GameGridItem.indexAttribute] = rowIndex;
+
   // Memoize render
-  return React.useMemo(() => {
-    // Set element attributes
-    const attributes: any = {};
-    attributes[GameGridItem.idAttribute] = id;
-    attributes[GameGridItem.indexAttribute] = rowIndex;
-    // Render
-    return (
-      <li
-        style={style}
-        className={className}
-        draggable={isDraggable}
-        onDrop={onDrop}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        { ...attributes }>
-        <div className='game-grid-item__thumb'>
-          <div
-            className='game-grid-item__thumb__image'
-            style={{ backgroundImage: `url('${ willShowScreenshot ? screenshot : thumbnail }')` }}>
-            {(extreme) ? (
-              <div className='game-grid-item__thumb__icons--upper'>
-                <div
-                  className='game-grid-item__thumb__icons__icon'
-                  style={{ backgroundImage: `url('${extremeIconPath}')` }} />
-              </div>
-            ) : (tagGroupIconBase64 ? (
-              <div className='game-grid-item__thumb__icons--upper'>
-                <div
-                  className='game-grid-item__thumb__icons__icon'
-                  style={{ backgroundImage: `url("${tagGroupIconBase64}")` }} />
-              </div>
-            ) : undefined )}
-            <div className='game-grid-item__thumb__icons'>
-              {platformIcons.map(p => (
-                <div
-                  key={p}
-                  className='game-grid-item__thumb__icons__icon'
-                  style={{ backgroundImage: `url('${p}')` }} />
-              ))}
+  return (
+    <li
+      style={style}
+      className={className}
+      draggable={isDraggable}
+      onDrop={onDrop}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      { ...attributes }>
+      <div className='game-grid-item__thumb'>
+        <div
+          className='game-grid-item__thumb__image'
+          style={{ backgroundImage: `url('${ willShowScreenshot ? screenshot : thumbnail }')` }}>
+          {(extreme) ? (
+            <div className='game-grid-item__thumb__icons--upper'>
+              <div
+                className='game-grid-item__thumb__icons__icon'
+                style={{ backgroundImage: `url('${extremeIconPath}')` }} />
             </div>
+          ) : (tagGroupIconBase64 ? (
+            <div className='game-grid-item__thumb__icons--upper'>
+              <div
+                className='game-grid-item__thumb__icons__icon'
+                style={{ backgroundImage: `url("${tagGroupIconBase64}")` }} />
+            </div>
+          ) : undefined )}
+          <div className='game-grid-item__thumb__icons'>
+            {platformIcons.map(p => (
+              <div
+                key={p}
+                className='game-grid-item__thumb__icons__icon'
+                style={{ backgroundImage: `url('${p}')` }} />
+            ))}
           </div>
         </div>
-        <div className='game-grid-item__title' title={title}>
-          <p className='game-grid-item__title__text'>{title}</p>
-        </div>
-      </li>
-    );
-  }, [style, className, isDraggable, id, title, platformIcons, thumbnail, screenshot, showScreenshot]);
+      </div>
+      <div className='game-grid-item__title' title={title}>
+        <p className='game-grid-item__title__text'>{title}</p>
+      </div>
+    </li>
+  );
 }
 
 export namespace GameGridItem {

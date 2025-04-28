@@ -66,7 +66,7 @@ export function CuratePage(props: CuratePageProps) {
     }
   };
 
-  const onDupeCurations = React.useCallback(() => {
+  const onDupeCurations = () => {
     const selected = curate.selected;
     for (const folder of selected) {
       dispatch(curateActions.setLock({
@@ -86,13 +86,13 @@ export function CuratePage(props: CuratePageProps) {
         }));
       }
     });
-  }, [curate.selected]);
+  };
 
-  const onScanForNewCurations = React.useCallback(() => {
+  const onScanForNewCurations = () => {
     window.Shared.back.send(BackIn.CURATE_SCAN_NEW_CURATIONS);
-  }, []);
+  };
 
-  const onLoadCuration = React.useCallback(() => {
+  const onLoadCuration = () => {
     // Generate task
     ipcRenderer.invoke(CustomIPC.SHOW_OPEN_DIALOG, {
       title: strings.dialog.selectCurationArchive,
@@ -105,14 +105,14 @@ export function CuratePage(props: CuratePageProps) {
         window.Shared.back.send(BackIn.CURATE_LOAD_ARCHIVES, filePaths, newTask.id);
       }
     });
-  }, []);
+  };
 
-  const onNewCuration = React.useCallback((meta?: EditCurationMeta) => {
+  const onNewCuration = (meta?: EditCurationMeta) => {
     dispatch(curateActions.createCuration({
       folder: uuid(),
       meta
     }));
-  }, []);
+  };
 
   // Keybinds
 
@@ -291,7 +291,7 @@ export function CuratePage(props: CuratePageProps) {
     };
   }, [curation, props.preferencesData.symlinkCurationContent, props.preferencesData.shortcuts.curate.run, props.preferencesData.shortcuts.curate.runMad4fp]);
 
-  const onTagTextChange = React.useCallback((tagText: string) => {
+  const onTagTextChange = (tagText: string) => {
     const splitTags = tagText.split(';');
     const lastTag = (splitTags.length > 0 ? splitTags.pop() || '' : '').trim();
     setTagText(tagText);
@@ -301,9 +301,9 @@ export function CuratePage(props: CuratePageProps) {
       suggsDebounce.invalidate();
       setTagSuggestions([]);
     }
-  }, [setTagText, setTagSuggestions]);
+  };
 
-  const onPlatformTextChange = React.useCallback((platformText: string) => {
+  const onPlatformTextChange = (platformText: string) => {
     const splitPlatforms = platformText.split(';');
     const lastPlatform = (splitPlatforms.length > 0 ? splitPlatforms.pop() || '' : '').trim();
     if (platformText !== '') {
@@ -318,19 +318,19 @@ export function CuratePage(props: CuratePageProps) {
       setPlatformSuggestions([]);
     }
     setPlatformText(platformText);
-  }, [setPlatformText, setPlatformSuggestions]);
+  };
 
-  const onOpenCurationsFolder = React.useCallback(async () => {
+  const onOpenCurationsFolder = async () => {
     await remote.shell.openExternal(path.join(window.Shared.config.fullFlashpointPath, 'Curations'));
-  }, []);
+  };
 
-  const onOpenCurationFolder = React.useCallback(async () => {
+  const onOpenCurationFolder = async () => {
     if (curation) {
       await remote.shell.openExternal(path.join(window.Shared.config.fullFlashpointPath, 'Curations', 'Working', curation.folder));
     }
-  }, [curation]);
+  };
 
-  const onImportCuration = React.useCallback(async () => {
+  const onImportCuration = async () => {
     if (curate.selected.length > 0) {
       // Generate task
       const newTask = newCurateTask(`Importing ${curate.selected.length} Curations`, 'Importing...', props.addTask);
@@ -338,17 +338,17 @@ export function CuratePage(props: CuratePageProps) {
         taskId: newTask.id
       }));
     }
-  }, [curate.selected]);
+  };
 
-  const onRegenerateUUID = React.useCallback(async () => {
+  const onRegenerateUUID = async () => {
     if (curation) {
       dispatch(curateActions.regenUuid({
         folder: curation.folder
       }));
     }
-  }, [curation, dispatch]);
+  };
 
-  const onExportDataPacks = React.useCallback(async () => {
+  const onExportDataPacks = async () => {
     if (curate.selected.length > 0) {
       // Generate task
       const newTask = newCurateTask(`Exporting Data Packs for ${curate.selected.length} Curations`, 'Exporting...', props.addTask);
@@ -356,9 +356,9 @@ export function CuratePage(props: CuratePageProps) {
         taskId: newTask.id
       }));
     }
-  }, [curate.selected, dispatch]);
+  };
 
-  const onExportCurations = React.useCallback(async () => {
+  const onExportCurations = async () => {
     if (curate.selected.length > 0) {
       // Generate task
       const newTask = newCurateTask(`Exporting ${curate.selected.length} Curations`, 'Exporting...', props.addTask);
@@ -366,18 +366,18 @@ export function CuratePage(props: CuratePageProps) {
         taskId: newTask.id
       }));
     }
-  }, [curate.selected]);
+  };
 
-  const onDeleteCurations = React.useCallback(async () => {
+  const onDeleteCurations = async () => {
     if (curate.selected.length > 0) {
       const task = newCurateTask(`Deleting ${curate.selected.length} Curations`, 'Deleting...', props.addTask);
       dispatch(curateActions.deleteCurations({
         taskId: task.id
       }));
     }
-  }, [curate.selected]);
+  };
 
-  const onRunCurationOverride = React.useCallback(async (override: GameLaunchOverride) => {
+  const onRunCurationOverride = async (override: GameLaunchOverride) => {
     if (curation) {
       window.Shared.back.send(BackIn.LAUNCH_CURATION, {
         curation,
@@ -386,9 +386,9 @@ export function CuratePage(props: CuratePageProps) {
         override,
       });
     }
-  }, [curation]);
+  };
 
-  const onRunCuration = React.useCallback(async () => {
+  const onRunCuration = async () => {
     if (curation) {
       window.Shared.back.send(BackIn.LAUNCH_CURATION, {
         curation,
@@ -397,9 +397,9 @@ export function CuratePage(props: CuratePageProps) {
         override: null,
       });
     }
-  }, [curation]);
+  };
 
-  const onRunMAD4FPCuration = React.useCallback(async () => {
+  const onRunMAD4FPCuration = async () => {
     if (curation) {
       window.Shared.back.send(BackIn.LAUNCH_CURATION, {
         curation,
@@ -408,7 +408,7 @@ export function CuratePage(props: CuratePageProps) {
         override: null,
       });
     }
-  }, [curation]);
+  };
 
   const warningCount = React.useMemo(() => curation ? curation.warnings.writtenWarnings.length : 0, [curation]);
   const disabled = !curation;
@@ -418,53 +418,49 @@ export function CuratePage(props: CuratePageProps) {
   };
 
   // Gen extension buttons
-  const extButtons = React.useMemo(() =>
-    props.extContextButtons.map((c, index) => {
-      const ext = props.main.extensions.find(e => e.id === c.extId);
-      const buttons = c.value.filter(c => c.context === 'curation').map((contextButton, index) => (
-        <SimpleButton
+  const extButtons = props.extContextButtons.map((c, index) => {
+    const ext = props.main.extensions.find(e => e.id === c.extId);
+    const buttons = c.value.filter(c => c.context === 'curation').map((contextButton, index) => (
+      <SimpleButton
+        key={index}
+        className='curate-page__right--button'
+        disabled={disabled && !contextButton.runWithNoCuration}
+        onClick={() => runExtCommand(contextButton.command)}
+        value={contextButton.name} />
+    ));
+    if (buttons.length > 0) {
+      return (
+        <div
+          className='curate-page__right--section'
+          key={index}>
+          <div className='curate-page__right--header'>{ext ? ext.displayName || ext.name : c.extId}</div>
+          {buttons}
+        </div>
+      );
+    }
+  });
+
+  const curationTemplateButtons = props.extCurationTemplates.map(c => {
+    return c.value.map((template, index) => {
+      return (
+        <label
+          className='curate-page__right-dropdown-content simple-dropdown-button'
           key={index}
-          className='curate-page__right--button'
-          disabled={disabled && !contextButton.runWithNoCuration}
-          onClick={() => runExtCommand(contextButton.command)}
-          value={contextButton.name} />
-      ));
-      if (buttons.length > 0) {
-        return (
+          onClick={() => {
+            onNewCuration(template.meta);
+          }}>
           <div
-            className='curate-page__right--section'
-            key={index}>
-            <div className='curate-page__right--header'>{ext ? ext.displayName || ext.name : c.extId}</div>
-            {buttons}
+            className='curate-page__right-dropdown-content-icon'
+            style={{ backgroundImage: `url('${getPlatformIconURL(template.logo, props.main.logoVersion)}')` }} />
+          <div>
+            {template.name}
           </div>
-        );
-      }
-    }), [disabled, props.extContextButtons, curate]);
-
-  const curationTemplateButtons = React.useMemo(() => {
-    const arrays = props.extCurationTemplates.map(c => {
-      return c.value.map((template, index) => {
-        return (
-          <label
-            className='curate-page__right-dropdown-content simple-dropdown-button'
-            key={index}
-            onClick={() => {
-              onNewCuration(template.meta);
-            }}>
-            <div
-              className='curate-page__right-dropdown-content-icon'
-              style={{ backgroundImage: `url('${getPlatformIconURL(template.logo, props.main.logoVersion)}')` }} />
-            <div>
-              {template.name}
-            </div>
-          </label>
-        );
-      });
+        </label>
+      );
     });
-    return arrays.reduce((prev, cur) => prev.concat(cur), []);
-  }, [props.extCurationTemplates]);
+  }).reduce((prev, cur) => prev.concat(cur), []);
 
-  const onLoadCurationDrop = React.useCallback(async (event: React.DragEvent) => {
+  const onLoadCurationDrop = async (event: React.DragEvent) => {
     const files = event.dataTransfer.files;
     const newTask = newCurateTask(`Loading ${files.length} Archives`, 'Loading...', props.addTask);
 
@@ -491,57 +487,47 @@ export function CuratePage(props: CuratePageProps) {
       status: '',
       finished: true
     }));
-  }, []);
+  };
 
-  const leftSidebar = React.useMemo(() => (
-    <CuratePageLeftSidebar
-      logoVersion={props.main.logoVersion}
-      onCurationDrop={onLoadCurationDrop}/>
-  ), [curate, props.main.logoVersion]);
+  const leftSidebar = <CuratePageLeftSidebar
+    logoVersion={props.main.logoVersion}
+    onCurationDrop={onLoadCurationDrop}/>;
 
-  const keybindsRender = React.useMemo(() => {
-    return (
-      <div className='curate-page-keybinds-box'>
-        <h3>{strings.curate.shortcuts}</h3>
-        <table>
-          <tbody>
-            {props.shortcut && props.shortcut.shortcuts.filter(s => s.title.startsWith('curate:')).map((binding, idx) => (
-              <tr key={idx} className='curate-page-keybinds-box-row'>
-                <td>
-                  {filterKeysByOS(binding.keys).map((combo, idx) => {
-                    return (
-                      <div key={binding.title + idx} className='curate-page-keybinds-box-combo'>
-                        {combo}
-                      </div>
-                    );
-                  })}
-                </td>
-                <td>{binding.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }, [props.shortcut]);
+  const keybindsRender = (
+    <div className='curate-page-keybinds-box'>
+      <h3>{strings.curate.shortcuts}</h3>
+      <table>
+        <tbody>
+          {props.shortcut && props.shortcut.shortcuts.filter(s => s.title.startsWith('curate:')).map((binding, idx) => (
+            <tr key={idx} className='curate-page-keybinds-box-row'>
+              <td>
+                {filterKeysByOS(binding.keys).map((combo, idx) => {
+                  return (
+                    <div key={binding.title + idx} className='curate-page-keybinds-box-combo'>
+                      {combo}
+                    </div>
+                  );
+                })}
+              </td>
+              <td>{binding.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
-  const dependantStrings = React.useMemo(() => {
-    if (curate.selected.length > 1) {
-      return {
-        import: strings.curate.importSelected,
-        export: strings.curate.exportSelected,
-        delete: strings.curate.deleteSelected,
-        exportDataPack: strings.curate.exportSelectedDataPacks
-      };
-    } else {
-      return {
-        import: strings.curate.import,
-        export: strings.curate.export,
-        delete: strings.curate.delete,
-        exportDataPack: strings.curate.exportDataPacks
-      };
-    }
-  }, [curate.selected]);
+  const dependantStrings = curate.selected.length > 1 ? {
+    import: strings.curate.importSelected,
+    export: strings.curate.exportSelected,
+    delete: strings.curate.deleteSelected,
+    exportDataPack: strings.curate.exportSelectedDataPacks
+  } : {
+    import: strings.curate.import,
+    export: strings.curate.export,
+    delete: strings.curate.delete,
+    exportDataPack: strings.curate.exportDataPacks
+  };
 
   console.log('ruffle: ' + curation?.game.ruffleSupport);
 

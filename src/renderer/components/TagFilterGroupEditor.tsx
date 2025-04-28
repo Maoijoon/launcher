@@ -14,8 +14,6 @@ export type TagFilterGroupEditorProps = {
   tagFilterGroup: TagFilterGroup;
   onAddTag: (tag: string) => void;
   onRemoveTag: (tag: string) => void;
-  onAddCategory: (category: string) => void;
-  onRemoveCategory: (category: string) => void;
   onChangeName: (name: string) => void;
   onChangeDescription: (description: string) => void;
   onToggleExtreme: (checked: boolean) => void;
@@ -48,7 +46,7 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
     });
   });
 
-  const onAddTag = React.useCallback(async (name: string) => {
+  const onAddTag = async (name: string) => {
     const tag = await window.Shared.back.request(BackIn.GET_TAG, name) || buildPlaceholderTags([name])[0];
     const idx = parsedTagsList.findIndex(t => t.name.toLowerCase() === tag.name.toLowerCase());
     if (idx > -1) {
@@ -59,9 +57,9 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
     newTagsList.push(tag);
     props.onAddTag(tag.name);
     setParsedTagsList(newTagsList);
-  }, [parsedTagsList, props.onAddTag]);
+  };
 
-  const onRemoveTag = React.useCallback((tag: Tag) => {
+  const onRemoveTag = (tag: Tag) => {
     const newTagsList = [...parsedTagsList];
     const idx = newTagsList.findIndex(t => t.name === tag.name);
     if (idx > -1) {
@@ -69,15 +67,15 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
       setParsedTagsList(newTagsList);
     }
     props.onRemoveTag(tag.name);
-  }, [parsedTagsList, props.onRemoveTag]);
+  };
 
-  const onTagSubmit = React.useCallback((tag: string) => {
+  const onTagSubmit = (tag: string) => {
     onAddTag(tag);
     setTagSuggestions([]);
     setEditTag('');
-  }, [onAddTag, props.onAddTag]);
+  };
 
-  const updateSuggestions = React.useCallback(async (tag: string) => {
+  const updateSuggestions = async (tag: string) => {
     setEditTag(tag);
     if (tag === '') {
       setTagSuggestions([]);
@@ -86,100 +84,98 @@ export function TagFilterGroupEditor(props: TagFilterGroupEditorProps) {
       const suggs = await window.Shared.back.request(BackIn.GET_TAG_SUGGESTIONS, tag, props.activeTagFilterGroups.concat([generateTagFilterGroup(existingTagsList)]));
       setTagSuggestions(suggs);
     }
-  }, [parsedTagsList]);
+  };
 
-  return React.useMemo(() => {
-    return (
-      <div className='tag-filter-editor__wrapper'>
-        <div className='tag-filter-editor__buttons'>
-          <div
-            className='browse-right-sidebar__title-row__buttons__save-button'
-            title={strings.config.saveAndClose}
-            onClick={props.closeEditor}>
-            <OpenIcon icon='check' />
-          </div>
+  return (
+    <div className='tag-filter-editor__wrapper'>
+      <div className='tag-filter-editor__buttons'>
+        <div
+          className='browse-right-sidebar__title-row__buttons__save-button'
+          title={strings.config.saveAndClose}
+          onClick={props.closeEditor}>
+          <OpenIcon icon='check' />
         </div>
-        <div className='tag-filter-editor__header'>
-          {strings.config.tagFilterGroupEditor}
-        </div>
-        { props.showExtreme && (
-          <>
-            <div className='tag-filter-editor__content-header'>
-              {strings.browse.extreme}
-            </div>
-            <CheckBox
-              onToggle={props.onToggleExtreme}
-              checked={props.tagFilterGroup.extreme} />
-          </>
-        )}
-        <div className='tag-filter-editor__content-header'>
-          {strings.tags.name}
-        </div>
-        <InputField
-          editable={true}
-          onChange={(event) => props.onChangeName(event.target.value)}
-          text={props.tagFilterGroup.name}/>
-        <div className='tag-filter-editor__content-header'>
-          {strings.tags.description}
-        </div>
-        <InputField
-          editable={true}
-          onChange={(event) => props.onChangeDescription(event.target.value)}
-          text={props.tagFilterGroup.description}/>
-        <div className='tag-filter-editor__content'>
-          <div className='tag-filter-editor__content-section'>
-            <div className='tag-filter-editor__content-header'>
-              {strings.browse.tags}
-            </div>
-            <TagInputField
-              tags={parsedTagsList.sort(tagSort)}
-              editable={true}
-              text={editTag}
-              suggestions={tagSuggestions}
-              categories={props.tagCategories}
-              onTagEditableSelect={(tag) => onRemoveTag(tag)}
-              onTagSuggestionSelect={(suggestion) => onTagSubmit(suggestion.name)}
-              onChange={(event) => updateSuggestions(event.target.value)}
-              onTagSubmit={(tag) => onTagSubmit(tag)} />
-          </div>
-        </div>
-        <div className='tag-filter-editor__content-header'>
-          {strings.tags.filterIcon}
-        </div>
-        <div className='tag-filter-editor__icon'>
-          {
-            props.tagFilterGroup.iconBase64 ? (
-              <>
-                <div
-                  className='config-page__tfg-extreme-logo'
-                  title={strings.browse.tagFilterIcon}
-                  style={{ backgroundImage: `url("${props.tagFilterGroup.iconBase64}")` }} />
-                <SimpleButton
-                  value={formatString(strings.misc.removeBlank, strings.browse.thumbnail)}
-                  onClick={() => props.onChangeIconBase64('')} />
-              </>
-            ) : (
-              <SimpleButton
-                value={formatString(strings.misc.addBlank, strings.browse.thumbnail)}
-                onClick={() => imgTagFilterIconInput && imgTagFilterIconInput.click()} />
-            )
-          }
-          <input
-            hidden={true}
-            ref={(ref) => imgTagFilterIconInput = (ref as HTMLInputElement)}
-            accept='image/png'
-            onChange={(event) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(event.target.files![0]);
-              reader.onload = () => {
-                props.onChangeIconBase64(reader.result ? reader.result.toString() : '');};
-              event.target.value = '';
-            }}
-            type='file'/>
-        </div>
-
       </div>
-    );}, [parsedTagsList, editTag, tagSuggestions, props.tagCategories, onAddTag, onRemoveTag, onTagSubmit, updateSuggestions]);
+      <div className='tag-filter-editor__header'>
+        {strings.config.tagFilterGroupEditor}
+      </div>
+      { props.showExtreme && (
+        <>
+          <div className='tag-filter-editor__content-header'>
+            {strings.browse.extreme}
+          </div>
+          <CheckBox
+            onToggle={props.onToggleExtreme}
+            checked={props.tagFilterGroup.extreme} />
+        </>
+      )}
+      <div className='tag-filter-editor__content-header'>
+        {strings.tags.name}
+      </div>
+      <InputField
+        editable={true}
+        onChange={(event) => props.onChangeName(event.target.value)}
+        text={props.tagFilterGroup.name}/>
+      <div className='tag-filter-editor__content-header'>
+        {strings.tags.description}
+      </div>
+      <InputField
+        editable={true}
+        onChange={(event) => props.onChangeDescription(event.target.value)}
+        text={props.tagFilterGroup.description}/>
+      <div className='tag-filter-editor__content'>
+        <div className='tag-filter-editor__content-section'>
+          <div className='tag-filter-editor__content-header'>
+            {strings.browse.tags}
+          </div>
+          <TagInputField
+            tags={parsedTagsList.sort(tagSort)}
+            editable={true}
+            text={editTag}
+            suggestions={tagSuggestions}
+            categories={props.tagCategories}
+            onTagEditableSelect={(tag) => onRemoveTag(tag)}
+            onTagSuggestionSelect={(suggestion) => onTagSubmit(suggestion.name)}
+            onChange={(event) => updateSuggestions(event.target.value)}
+            onTagSubmit={(tag) => onTagSubmit(tag)} />
+        </div>
+      </div>
+      <div className='tag-filter-editor__content-header'>
+        {strings.tags.filterIcon}
+      </div>
+      <div className='tag-filter-editor__icon'>
+        {
+          props.tagFilterGroup.iconBase64 ? (
+            <>
+              <div
+                className='config-page__tfg-extreme-logo'
+                title={strings.browse.tagFilterIcon}
+                style={{ backgroundImage: `url("${props.tagFilterGroup.iconBase64}")` }} />
+              <SimpleButton
+                value={formatString(strings.misc.removeBlank, strings.browse.thumbnail)}
+                onClick={() => props.onChangeIconBase64('')} />
+            </>
+          ) : (
+            <SimpleButton
+              value={formatString(strings.misc.addBlank, strings.browse.thumbnail)}
+              onClick={() => imgTagFilterIconInput && imgTagFilterIconInput.click()} />
+          )
+        }
+        <input
+          hidden={true}
+          ref={(ref) => imgTagFilterIconInput = (ref as HTMLInputElement)}
+          accept='image/png'
+          onChange={(event) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(event.target.files![0]);
+            reader.onload = () => {
+              props.onChangeIconBase64(reader.result ? reader.result.toString() : '');};
+            event.target.value = '';
+          }}
+          type='file'/>
+      </div>
+    </div>
+  );
 }
 
 function buildPlaceholderTags(tags: string[]): Tag[] {

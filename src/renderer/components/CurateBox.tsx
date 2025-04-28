@@ -61,32 +61,28 @@ export function CurateBox(props: CurateBoxProps) {
 
   const splitStatus = React.useMemo(() => props.curation.game.status ? props.curation.game.status.split(';').map(s => s.trim()).sort() : [], [props.curation.game.status]);
   const splitPlayMode = React.useMemo(() => props.curation.game.playMode ? props.curation.game.playMode.split(';').map(s => s.trim()).sort() : [], [props.curation.game.playMode]);
-
-  const sortedTags = React.useMemo(() => {
-    const tags = props.curation.game.tags;
-    if (tags) {
-      return [...tags].sort((a, b) => {
-        // Sort by category, then name secondarily
-        if (a.category !== b.category) {
-          const categoryA: TagCategory | undefined = props.tagCategories.find(c => c.name === a.category);
-          const categoryB: TagCategory | undefined = props.tagCategories.find(c => c.name === b.category);
-          if (!categoryA && !categoryB) {
-            return a.name.toLowerCase().localeCompare(b.name);
-          } else if (!categoryA) {
-            return -1;
-          } else if (!categoryB) {
-            return 1;
-          } else {
-            return categoryA.name.toLowerCase().localeCompare(categoryB.name.toLowerCase());
-          }
-        } else {
+  const tags = props.curation.game.tags;
+  let sortedTags: Tag[] = [];
+  if (tags) {
+    sortedTags = [...tags].sort((a, b) => {
+      // Sort by category, then name secondarily
+      if (a.category !== b.category) {
+        const categoryA: TagCategory | undefined = props.tagCategories.find(c => c.name === a.category);
+        const categoryB: TagCategory | undefined = props.tagCategories.find(c => c.name === b.category);
+        if (!categoryA && !categoryB) {
           return a.name.toLowerCase().localeCompare(b.name);
+        } else if (!categoryA) {
+          return -1;
+        } else if (!categoryB) {
+          return 1;
+        } else {
+          return categoryA.name.toLowerCase().localeCompare(categoryB.name.toLowerCase());
         }
-      });
-    } else {
-      return [];
-    }
-  }, [props.curation.game.tags]);
+      } else {
+        return a.name.toLowerCase().localeCompare(b.name);
+      }
+    });
+  }
 
   const onSetThumbnail  = useAddImageCallback(CurationImageEnum.THUMBNAIL, props.curation);
   const onSetScreenshot = useAddImageCallback(CurationImageEnum.SCREENSHOT, props.curation);
@@ -95,18 +91,14 @@ export function CurateBox(props: CurateBoxProps) {
   const onDropThumbnail  = useDropImageCallback('logo.png', props.curation, strings.dialog);
   const onDropScreenshot = useDropImageCallback('ss.png',   props.curation, strings.dialog);
 
-  const thumbnailPath  = React.useMemo(() => {
-    return props.curation.thumbnail.exists ? `${getCurationURL(props.curation.folder)}/logo.png?v` + props.curation.thumbnail.version : undefined;
-  }, [props.curation.thumbnail]);
-  const screenshotPath  = React.useMemo(() => {
-    return props.curation.screenshot.exists ? `${getCurationURL(props.curation.folder)}/ss.png?v` + props.curation.screenshot.version : undefined;
-  }, [props.curation.screenshot]);
+  const thumbnailPath = props.curation.thumbnail.exists ? `${getCurationURL(props.curation.folder)}/logo.png?v` + props.curation.thumbnail.version : undefined;
+  const screenshotPath = props.curation.screenshot.exists ? `${getCurationURL(props.curation.folder)}/ss.png?v` + props.curation.screenshot.version : undefined;
 
   const onNewAddApp  = useCreateAddAppCallback('normal',  props.curation.folder, dispatch);
   const onAddExtras  = useCreateAddAppCallback('extras',  props.curation.folder, dispatch);
   const onAddMessage = useCreateAddAppCallback('message', props.curation.folder, dispatch);
 
-  const onAddStatus = React.useCallback((value: string) => {
+  const onAddStatus = (value: string) => {
     const newSplits = [ ...splitStatus ];
     newSplits.push(value);
     dispatch(editCurationMeta({
@@ -114,9 +106,9 @@ export function CurateBox(props: CurateBoxProps) {
       property: 'status',
       value: Array.from(new Set(newSplits.sort())).join('; ')
     }));
-  }, [props.curation.folder, splitStatus, dispatch]);
+  };
 
-  const onRemoveStatus = React.useCallback((index: number) => {
+  const onRemoveStatus = (index: number) => {
     const newSplits = [ ...splitStatus ];
     newSplits.splice(index, 1);
     const newStatus = newSplits.join('; ');
@@ -125,9 +117,9 @@ export function CurateBox(props: CurateBoxProps) {
       property: 'status',
       value: newStatus
     }));
-  }, [props.curation.folder, props.curation.game.status, splitStatus, dispatch]);
+  };
 
-  const onAddPlayMode = React.useCallback((value: string) => {
+  const onAddPlayMode = (value: string) => {
     const newSplits = [ ...splitPlayMode ];
     newSplits.push(value);
     dispatch(editCurationMeta({
@@ -135,9 +127,9 @@ export function CurateBox(props: CurateBoxProps) {
       property: 'playMode',
       value: Array.from(new Set(newSplits.sort())).join('; ')
     }));
-  }, [props.curation.folder, props.curation.game.playMode, splitPlayMode, dispatch]);
+  };
 
-  const onRemovePlayMode = React.useCallback((index: number) => {
+  const onRemovePlayMode = (index: number) => {
     const newSplits = [ ...splitPlayMode ];
     newSplits.splice(index, 1);
     const newPlayMode = newSplits.join('; ');
@@ -146,17 +138,17 @@ export function CurateBox(props: CurateBoxProps) {
       property: 'playMode',
       value: newPlayMode
     }));
-  }, [props.curation.folder, props.curation.game.playMode, splitPlayMode, dispatch]);
+  };
 
-  const onTagChange = React.useCallback((event: React.ChangeEvent<InputElement>): void => {
+  const onTagChange = (event: React.ChangeEvent<InputElement>): void => {
     props.onTagTextChange(event.currentTarget.value);
-  }, [props.onTagTextChange]);
+  };
 
-  const onPlatformChange = React.useCallback((event: React.ChangeEvent<InputElement>): void => {
+  const onPlatformChange = (event: React.ChangeEvent<InputElement>): void => {
     props.onPlatformTextChange(event.currentTarget.value);
-  }, [props.onPlatformTextChange]);
+  };
 
-  const onTagKeyDown = React.useCallback((event: React.KeyboardEvent<InputElement>): void => {
+  const onTagKeyDown = (event: React.KeyboardEvent<InputElement>): void => {
     if (event.defaultPrevented) { return; }
 
     if (event.key === 'Enter') {
@@ -167,9 +159,9 @@ export function CurateBox(props: CurateBoxProps) {
         }
       }
     }
-  }, []);
+  };
 
-  const onPlatformKeyDown = React.useCallback((event: React.KeyboardEvent<InputElement>): void => {
+  const onPlatformKeyDown = (event: React.KeyboardEvent<InputElement>): void => {
     if (event.defaultPrevented) { return; }
 
     if (event.key === 'Enter') {
@@ -180,9 +172,9 @@ export function CurateBox(props: CurateBoxProps) {
         }
       }
     }
-  }, []);
+  };
 
-  const onAddTag = React.useCallback((tag: Tag) => {
+  const onAddTag = (tag: Tag) => {
     const tags = props.curation.game.tags || [];
     if (!tags.find(t => t.id === tag.id)) {
       dispatch(addTag({
@@ -191,9 +183,9 @@ export function CurateBox(props: CurateBoxProps) {
       }));
     }
     props.onTagTextChange('');
-  }, [props.curation.folder, props.curation.game.tags]);
+  };
 
-  const onAddPlatform = React.useCallback((platform: Platform) => {
+  const onAddPlatform = (platform: Platform) => {
     const platforms = props.curation.game.platforms || [];
     if (!platforms.find(p => p.id === platform.id)) {
       dispatch(addPlatform({
@@ -203,29 +195,29 @@ export function CurateBox(props: CurateBoxProps) {
       }));
     }
     props.onPlatformTextChange('');
-  }, [props.curation.folder, props.curation.game.platforms]);
+  };
 
-  const onRemoveTag = React.useCallback((tagId: number) => {
+  const onRemoveTag = (tagId: number) => {
     dispatch(removeTag({
       folder,
       tagId
     }));
-  }, [props.curation.folder, props.curation.game.tags]);
+  };
 
-  const onRemovePlatform = React.useCallback((platformId) => {
+  const onRemovePlatform = (platformId: number) => {
     dispatch(removePlatform({
       folder,
       platformId,
       platformAppPaths: props.platformAppPaths
     }));
-  }, [props.curation.folder, props.curation.game.platforms]);
+  };
 
-  const onToggleContentNodeView = React.useCallback((tree: string[]) => {
+  const onToggleContentNodeView = (tree: string[]) => {
     dispatch(toggleContentNodeView({
       folder,
       tree
     }));
-  }, [props.curation.folder, props.curation.contents]);
+  };
 
   const onContentTreeNodeMenuFactory = (node: ContentTreeNode, tree: string[]) => () => {
     const contextButtons: MenuItemConstructorOptions[] = [{
@@ -303,7 +295,7 @@ export function CurateBox(props: CurateBoxProps) {
     }
   }
 
-  const renderContentTree = React.useMemo(() => {
+  const renderContentTree = () => {
     // Extract first string from launch command via regex
     let launchPath: string | undefined = undefined;
     if (props.curation.game.launchCommand) {
@@ -342,9 +334,9 @@ export function CurateBox(props: CurateBoxProps) {
         {render}
       </div>
     );
-  }, [props.curation.contents, props.curation.game.launchCommand]);
+  };
 
-  const renderTagIcon = React.useCallback((tag: Tag) => {
+  const renderTagIcon = (tag: Tag) => {
     const category = props.tagCategories.find(c => c.name === tag.category);
     return (
       <OpenIcon
@@ -352,33 +344,33 @@ export function CurateBox(props: CurateBoxProps) {
         color={category ? category.color : '#FFFFFF'}
         icon='tag'/>
     );
-  }, []);
+  };
 
-  const renderPlatformIconSugg = React.useCallback((platformSugg: TagSuggestion) => {
+  const renderPlatformIconSugg = (platformSugg: TagSuggestion) => {
     const iconUrl = getPlatformIconURL(platformSugg.name, props.logoVersion);
     return (
       <div
         className='curate-tag__icon'
         style={{ backgroundImage: `url(${iconUrl})` }} />
     );
-  }, []);
+  };
 
-  const renderPlatformIcon = React.useCallback((platform: Platform) => {
+  const renderPlatformIcon = (platform: Platform) => {
     const iconUrl = getPlatformIconURL(platform.name, props.logoVersion);
     return (
       <div
         className='curate-tag__icon'
         style={{ backgroundImage: `url(${iconUrl})` }} />
     );
-  }, []);
+  };
 
-  const onChangePrimaryPlatform = React.useCallback((newPrimary: string) => {
+  const onChangePrimaryPlatform = (newPrimary: string) => {
     dispatch(setPrimaryPlatform({
       folder,
       value: newPrimary,
       platformAppPaths: props.platformAppPaths
     }));
-  }, [props.curation.folder]);
+  };
 
   const addAppBoxes = (
     <table className="curate-box-table">
@@ -676,7 +668,7 @@ export function CurateBox(props: CurateBoxProps) {
               {strings.curate.contentFiles + ': '}
             </div>
             <pre className='curate-box-files__body simple-scroll'>
-              {renderContentTree}
+              {renderContentTree()}
             </pre>
           </div>
           <hr />
@@ -707,7 +699,7 @@ export function CurateBox(props: CurateBoxProps) {
 }
 
 function useAddImageCallback(type: CurationImageEnum, curation: LoadedCuration | undefined): (data: ArrayBuffer) => void {
-  return React.useCallback(async (data: ArrayBuffer) => {
+  return async (data: ArrayBuffer) => {
     if (curation) {
       const suffix = type === CurationImageEnum.THUMBNAIL ? 'logo.png' : 'ss.png';
       const res = await axios.post(`${getCurationURL(curation.folder)}/${suffix}`, data);
@@ -715,7 +707,7 @@ function useAddImageCallback(type: CurationImageEnum, curation: LoadedCuration |
         alert(`ERROR: Server Returned ${res.status} - ${res.statusText}`);
       }
     }
-  }, [curation && curation.folder]);
+  };
 }
 
 /**
@@ -725,15 +717,15 @@ function useAddImageCallback(type: CurationImageEnum, curation: LoadedCuration |
  * @param curation Curation to delete it from.
  */
 function useRemoveImageCallback(type: CurationImageEnum, curation: LoadedCuration | undefined): () => Promise<void> {
-  return React.useCallback(async () => {
+  return async () => {
     if (curation) {
       return window.Shared.back.request(BackIn.CURATE_EDIT_REMOVE_IMAGE, curation.folder, type);
     }
-  }, [curation && curation.folder]);
+  };
 }
 
 function useDropImageCallback(filename: 'logo.png' | 'ss.png', curation: CurationState, strings: LangContainer['dialog']) {
-  return React.useCallback(async (event: React.DragEvent) => {
+  return async (event: React.DragEvent) => {
     const files = event.dataTransfer.files;
 
     if (curation && !curation.locked && files.length > 0) {
@@ -743,16 +735,16 @@ function useDropImageCallback(filename: 'logo.png' | 'ss.png', curation: Curatio
         alert(strings.mustBePngImage);
       }
     }
-  }, [curation && curation.folder, strings]);
+  };
 }
 
 function useCreateAddAppCallback(type: AddAppType, folder: string, dispatch: Dispatch) {
-  return React.useCallback(() => {
+  return () => {
     dispatch(createAddApp({
       folder,
       addAppType: type
     }));
-  }, [dispatch, folder]);
+  };
 }
 
 function createAppPathDropdownItems(platformAppPaths: PlatformAppPathSuggestions, currentPlatform?: string): DropdownItem[] {

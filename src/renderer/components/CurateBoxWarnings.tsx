@@ -1,7 +1,5 @@
-import { LangContainer } from '@shared/lang';
-import { CurationWarnings } from 'flashpoint-launcher';
+import { CurationWarnings, LangContainer } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useMemo } from 'react';
 import { LangContext } from '../util/lang';
 
 export type CurateBoxWarningsProps = {
@@ -16,18 +14,16 @@ export function CurateBoxWarnings(props: CurateBoxWarningsProps) {
   // Count the number of warnings
   const warningCount = props.warnings.writtenWarnings.length;
   // Converts warnings into a single string
-  const warningsStrings = useMemo(() => {
-    return warnings.writtenWarnings.map(s => `- ${strings[s as keyof LangContainer['curate']] || s}\n`);
-  }, [warnings]);
+  const warningsStrings = warnings.writtenWarnings.map(s => `- ${strings[s as keyof LangContainer['curate']] || s}\n`);
   // Render warnings
-  const warningElements = useMemo(() => (
+  const warningElements = () => (
     warningsStrings.length > 0 ? (
       <span
         className='curate-box-warnings__entry'>
         {`${warningsStrings.join('')}`}
       </span>
     ) : ( undefined )
-  ), [warningsStrings]);
+  );
   // Misc.
   const isEmpty = warningCount === 0;
   // Render

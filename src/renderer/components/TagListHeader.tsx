@@ -1,6 +1,5 @@
 import { LangContext } from '@renderer/util/lang';
 import * as React from 'react';
-import { useMemo } from 'react';
 
 export type TagListHeaderProps = Record<string, never>;
 
@@ -10,7 +9,7 @@ export type TagListHeaderProps = Record<string, never>;
  */
 export function TagListHeader() {
   const strings = React.useContext(LangContext);
-  return useMemo(() => (
+  return (
     <div className='tag-list-header'>
       <Column modifier='icon' hideDivider={true} />
       <div className='tag-list-header__right'>
@@ -20,7 +19,7 @@ export function TagListHeader() {
       </div>
       <div className='tag-list-header__scroll-fill' />
     </div>
-  ), []);
+  );
 }
 
 type ColumnProps = {

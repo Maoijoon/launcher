@@ -23,11 +23,11 @@ type CuratePageLeftSidebarComponentProps = OwnProps & WithMainStateProps;
 
 function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentProps) {
   const [isHovering, setIsHovering] = React.useState(false);
-  const [groupName, setGroupName] = React.useState('');
   const [draggedCuration, setDraggedCuration] = React.useState('');
   const [dragGroupTarget, setDragGroupTarget] = React.useState<string | undefined>(undefined);
   const curate = useAppSelector((state) => state.curate);
   const dispatch = useDispatch();
+  console.log('left list render items: ' + curate.curations.length);
 
   const [onListMouseDown, onListMouseUp] = useMouse<string>(() => ({
     chain_delay: 500,
@@ -66,18 +66,18 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
     if (isHovering) { setIsHovering(false); }
   };
 
-  const sortedCurations = React.useMemo(() => {
-    return [...curate.curations].sort((a, b) => {
-      const groupCompare = compare(a.group, b.group);
-      if (groupCompare == 0) {
-        return compare(a.game.title || ('zzzzzzzz' + a.folder), b.game.title || ('zzzzzzzz' + a.folder));
-      } else {
-        return groupCompare;
-      }
-    });
-  }, [curate.curations]);
+  const sortedCurations = [...curate.curations].sort((a, b) => {
+    const groupCompare = compare(a.group, b.group);
+    if (groupCompare == 0) {
+      return compare(a.game.title || ('zzzzzzzz' + a.folder), b.game.title || ('zzzzzzzz' + a.folder));
+    } else {
+      return groupCompare;
+    }
+  });
 
-  const renderCuration = React.useCallback((curation: CurationState) => {
+  console.log('left list render sorted items: ' + sortedCurations.length);
+
+  const renderCuration = (curation: CurationState) => {
     let className = '';
     const firstPlatform = (curation.game.platforms && curation.game.platforms.length > 0) ? curation.game.platforms[0].name : '';
     if (curate.selected.includes(curation.folder)) { className = 'curate-list-item--selected--secondary'; }
@@ -113,9 +113,9 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
         )}
       </div>
     );
-  }, [curate, draggedCuration, dragGroupTarget]);
+  };
 
-  const onCurationDragDrop = React.useCallback(() => {
+  const onCurationDragDrop = () => {
     if (draggedCuration !== '' && dragGroupTarget !== undefined) {
       dispatch(curateActions.changeGroup({
         folder: draggedCuration,
@@ -124,9 +124,9 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
     }
     setDraggedCuration('');
     setDragGroupTarget(undefined);
-  }, [draggedCuration, dragGroupTarget]);
+  };
 
-  const renderCurationGroup = React.useCallback((group: CurateGroup, elems: JSX.Element[]) => {
+  const renderCurationGroup = (group: CurateGroup, elems: JSX.Element[]) => {
     const collapsed = curate.collapsedGroups.includes(group.name);
     const pinned = curate.groups.findIndex(g => g.name === group.name) !== -1;
     return (
@@ -159,9 +159,9 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
         {!collapsed && elems}
       </div>
     );
-  }, [curate.collapsedGroups, curate.groups, dispatch, dragGroupTarget]);
+  };
 
-  const curationsRender = React.useMemo(() => {
+  const curationsRender = () => {
     if (sortedCurations.length === 0) {
       return [];
     }
@@ -203,9 +203,9 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
       }
       return compare(a[0], b[0]);
     }).reduce<JSX.Element[]>((prev, cur) => prev.concat([cur[1]]), []);
-  }, [curate, curate.groups, draggedCuration, dragGroupTarget]);
+  };
 
-  const createNewGroup = React.useCallback(() => {
+  const createNewGroup = () => {
     // Open new group dialog
     const dialog: DialogState = {
       largeMessage: true,
@@ -236,7 +236,7 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
         }
       }
     });
-  }, [dispatch, curate.groups, setGroupName, groupName]);
+  };
 
   return (
     <div
@@ -258,7 +258,7 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
           </div>
         </div>
       </div>
-      {curationsRender}
+      {curationsRender()}
     </div>
   );
 }

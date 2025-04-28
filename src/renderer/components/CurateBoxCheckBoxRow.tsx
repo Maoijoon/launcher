@@ -29,7 +29,7 @@ export function CurateBoxCheckBox(props: CurateBoxCheckBoxProps) {
 }
 
 function useOnCheckboxToggle(property: keyof CurationMeta, folder: string | undefined, dispatch: Dispatch) {
-  return React.useCallback((checked: boolean) => {
+  return (checked: boolean) => {
     if (folder !== undefined) {
       dispatch(editCurationMeta({
         folder,
@@ -37,5 +37,5 @@ function useOnCheckboxToggle(property: keyof CurationMeta, folder: string | unde
         value: checked,
       }));
     }
-  }, [dispatch, folder]);
+  };
 }

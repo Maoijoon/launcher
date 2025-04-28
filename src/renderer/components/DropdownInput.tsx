@@ -28,6 +28,7 @@ export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
 
   // Mount & Unmount
   React.useEffect(() => {
+    const currentRef = inputRef.current;
     const onGlobalMouseDown = (event: MouseEvent) => {
       if (expanded.ref.current && !event.defaultPrevented) {
         if (!checkIfAncestor(event.target as Element | null, rootRef.current)) {
@@ -50,7 +51,7 @@ export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
     return () => {
       document.removeEventListener('mousedown', onGlobalMouseDown);
       document.removeEventListener('keydown', onGlobalKeyDown);
-      updateRef(props.inputRef, inputRef.current || null);
+      updateRef(props.inputRef, currentRef || null);
     };
   });
 
@@ -58,20 +59,20 @@ export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
     updateRef(props.inputRef, inputRef.current || null);
   });
 
-  const onBlur = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
+  const onBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (event.relatedTarget && !checkIfAncestor(event.relatedTarget as any, rootRef.current)) {
       setExpanded(false);
     }
-  }, []);
+  };
 
-  const onInputChange = React.useCallback((event: React.ChangeEvent<InputElement>) => {
+  const onInputChange = (event: React.ChangeEvent<InputElement>) => {
     if (props.disabled) { return; }
 
     if (!expanded.ref.current) { setExpanded(true); }
     if (props.onChange) { props.onChange(event); }
-  }, [props.disabled, props.onChange]);
+  };
 
-  const onInputKeyDown = React.useCallback((event: React.KeyboardEvent<InputElement>): void => {
+  const onInputKeyDown = (event: React.KeyboardEvent<InputElement>): void => {
     if (props.disabled) { return; }
 
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -86,16 +87,15 @@ export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
     }
 
     if (props.onKeyDown) { props.onKeyDown(event); }
-  }, [props.disabled, props.onKeyDown]);
+  };
 
-
-  const onExpandButtonMouseDown = React.useCallback((): void => {
+  const onExpandButtonMouseDown = (): void => {
     if (props.disabled) { return; }
 
     setExpanded(!expanded.ref.current);
-  }, [props.disabled]);
+  };
 
-  const onListItemClick = React.useCallback((event: React.MouseEvent): void => {
+  const onListItemClick = (event: React.MouseEvent): void => {
     if (props.disabled) { return; }
 
     setExpanded(false);
@@ -107,9 +107,9 @@ export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
         props.onItemSelect(props.items[index], index);
       }
     }
-  }, [props.disabled, props.items, props.onItemSelect]);
+  };
 
-  const onListItemKeyDown = React.useCallback((event: React.KeyboardEvent): void => {
+  const onListItemKeyDown = (event: React.KeyboardEvent): void => {
     if (props.disabled) { return; }
 
     // Select the focused list item
@@ -140,11 +140,9 @@ export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
     } else {
       if (!expanded.ref.current) { setExpanded(true); }
     }
-  }, [props.disabled, props.items, props.onItemSelect]);
+  };
 
-  const renderedItems = React.useMemo(() => (
-    props.items ? props.items.map(props.render) : []
-  ), [props.items, props.render]);
+  const renderedItems = props.items ? props.items.map(props.render) : [];
 
   return (
     <div

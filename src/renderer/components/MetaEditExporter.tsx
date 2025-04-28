@@ -23,19 +23,19 @@ export function MetaEditExporter(props: MetaEditExporterProps) {
   const [properties, setProperties] = React.useState(initProperties);
   const portal = usePortal(document.body);
 
-  const onClickBackground = React.useCallback((event: React.MouseEvent) => {
+  const onClickBackground = (event: React.MouseEvent) => {
     if (event.target === event.currentTarget) {
       event.preventDefault();
       props.onCancel();
     }
-  }, [props.onCancel]);
+  };
 
-  const onClickConfirm = React.useCallback(() => {
+  const onClickConfirm = () => {
     props.onConfirm({
       id: props.gameId,
       properties,
     });
-  }, [props.onConfirm, props.gameId, properties]);
+  };
 
   // Render properties
   const keys = Object.keys(properties) as (keyof typeof properties)[];
