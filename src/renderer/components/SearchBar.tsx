@@ -81,7 +81,7 @@ export function SearchBar() {
     return () => {
       window.removeEventListener('keypress', onKeypress);
     };
-  }, []);
+  });
 
   const onToggleExpanded = (value: boolean) => {
     dispatch(setExpanded({

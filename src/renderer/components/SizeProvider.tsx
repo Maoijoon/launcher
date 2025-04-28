@@ -16,11 +16,11 @@ export function SizeProvider(props: SizeProviderProps) {
   // Update "--width"
   useEffect(() => {
     updateStyle(ref.current, '--width', props.width);
-  }, [ref.current, props.width]);
+  }, [props.width]);
   // Update "--height"
   useEffect(() => {
     updateStyle(ref.current, '--height', props.height);
-  }, [ref.current, props.height]);
+  }, [props.height]);
   // Render
   return (
     <div ref={ref}>

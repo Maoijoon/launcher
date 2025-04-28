@@ -2,7 +2,6 @@ import { WithPreferencesProps } from '@renderer/containers/withPreferences';
 import { useView } from '@renderer/hooks/search';
 import { searchActions } from '@renderer/store/search/slice';
 import { GameOrderBy, GameOrderDirection } from 'flashpoint-launcher';
-import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { OpenIcon } from './OpenIcon';
 
@@ -47,7 +46,7 @@ export function GameListHeader(props: GameListHeaderProps) {
     undefined :
     currentView.orderBy;
 
-  return useMemo(() => (
+  return (
     <div className='game-list-header'>
       { props.showExtremeIcon ? (
         <Column modifier='icon' hideDivider={true} />
@@ -88,7 +87,7 @@ export function GameListHeader(props: GameListHeaderProps) {
       </div>
       <div className='game-list-header__scroll-fill' />
     </div>
-  ), [currentView.orderReverse, currentView.orderBy, currentView.selectedPlaylist, currentView.advancedFilter.playlistOrder]);
+  );
 }
 
 type ColumnProps = {

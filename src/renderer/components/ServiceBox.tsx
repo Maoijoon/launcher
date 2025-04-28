@@ -25,7 +25,7 @@ export function ServiceBox(props: ServiceBoxProps) {
   const entries = window.Shared.log.entries;
   const logData = React.useMemo(() => {
     return stringifyServiceLogEntries(entries, service.name);
-  }, [entries, entries.length, service.name]);
+  }, [entries, service.name]);
   // Uptime
   const uptimeRef = React.useRef<HTMLDivElement>(null);
   useInterval(() => { // (Update the value of the timer at an interval)
@@ -151,7 +151,7 @@ function displayDetails(info: IBackProcessInfo): void {
 function useProcessActionCallback(action: ProcessAction, id: string): () => void {
   return React.useCallback(() => {
     window.Shared.back.send(BackIn.SERVICE_ACTION, action, id);
-  }, [id]);
+  }, [action, id]);
 }
 
 /**

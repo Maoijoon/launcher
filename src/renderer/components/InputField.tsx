@@ -176,14 +176,14 @@ export function InputFieldEntry(props: InputFieldEntryProps) {
         }}
         onChange={(e) => {
           setValue(e.currentTarget.value);
-          props.onChange && props.onChange(e);
+          if (props.onChange) { props.onChange(e); }
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             props.onEnter(value);
             setValue('');
           }
-          props.onKeyDown && props.onKeyDown(e);
+          if (props.onKeyDown) { props.onKeyDown(e); }
         }}/>
       { expanded && suggestionRender ?
         <div

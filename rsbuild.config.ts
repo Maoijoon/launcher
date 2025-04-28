@@ -2,6 +2,17 @@ import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginBabel } from '@rsbuild/plugin-babel';
 import { builtinModules } from 'node:module';
+import { Logger, LoggerEvent, CompilerPipelineValue } from 'babel-plugin-react-compiler';
+
+const stdoutLogger: Logger = {
+  logEvent: (filename: string | null, event: LoggerEvent) => {
+    console.error('LOG');
+  },
+
+  debugLogIRs: (value: CompilerPipelineValue) => {
+    console.error('LOG');
+  }
+};
 
 const externals = {
   'electron': 'commonjs electron'
@@ -12,7 +23,8 @@ for (const module of builtinModules) {
 
 const ReactCompilerConfig = {
   target: '17',
-  sources: (filename) => {
+  logger: stdoutLogger,
+  sources: (filename: string) => {
     return filename.indexOf('src/renderer/') !== -1;
   },
 };

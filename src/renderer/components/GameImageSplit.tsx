@@ -1,4 +1,3 @@
-import { LangContainer } from '@shared/lang';
 import { formatString } from '@shared/utils/StringFormatter';
 import * as React from 'react';
 import { LangContext } from '../util/lang';
@@ -6,6 +5,7 @@ import { ConfirmElement, ConfirmElementArgs } from './ConfirmElement';
 import { ImagePreview } from './ImagePreview';
 import { OpenIcon } from './OpenIcon';
 import { SimpleButton } from './SimpleButton';
+import { LangContainer } from 'flashpoint-launcher';
 
 type GameImageSplitProps = {
   /** Localized name of image (for button). */

@@ -68,7 +68,6 @@ export function DynamicComponentProvider({ fileList, children }: DynamicComponen
       setLoadedFiles(prev => [...prev, ...newFiles]);
       loadFiles(newFiles);
     }
-
   }, [fileList]);
 
   return (

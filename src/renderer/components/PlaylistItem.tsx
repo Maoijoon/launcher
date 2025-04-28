@@ -1,6 +1,5 @@
 import { Playlist } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
 import { LangContext } from '../util/lang';
 import { InputElement, InputField } from './InputField';
 import { OpenIcon } from './OpenIcon';
@@ -25,46 +24,44 @@ export function PlaylistItem(props: PlaylistItemProps) {
 
   const [dragOver, setDragOver] = React.useState(false);
 
-  const onContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const onContextMenu = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (props.onContextMenu) { props.onContextMenu(event, props.playlist.id); }
-  }, [props.onContextMenu]);
+  };
 
-  const onDrop = useCallback((event: React.DragEvent) => {
+  const onDrop = (event: React.DragEvent) => {
     if (dragOver) { setDragOver(false); }
     props.onDrop(event, props.playlist.id);
-  }, [dragOver, props.onDrop]);
+  };
 
-  const onDragOver = useCallback((event: React.DragEvent): void => {
+  const onDragOver = (event: React.DragEvent): void => {
     props.onDragOver(event);
-  }, [props.onDragOver, props.playlist]);
+  };
 
-  const onDragEnter = useCallback((event: React.DragEvent): void => {
+  const onDragEnter = (event: React.DragEvent): void => {
     if (!dragOver && !findParent(event.currentTarget, event.relatedTarget as Element)) {
       setDragOver(true);
       event.stopPropagation();
     }
-  }, [dragOver]);
+  };
 
-  const onDragLeave = useCallback((event: React.DragEvent): void => {
+  const onDragLeave = (event: React.DragEvent): void => {
     if (dragOver && !findParent(event.currentTarget, event.relatedTarget as Element)) {
       setDragOver(false);
       event.stopPropagation();
     }
-  }, [dragOver]);
+  };
 
-  const onHeadClick = useCallback(() => {
+  const onHeadClick = () => {
     props.onHeadClick(props.playlist.id, props.selected);
-  }, [props.playlist.id, props.selected]);
+  };
 
-  const onIconClick = useCallback(() => {
+  const onIconClick = () => {
     if (props.selected) { props.onSetIcon(); }
-  }, [props.onSetIcon, props.selected]);
+  };
 
-  const icon = useMemo(() => {
-    return props.editing
-      ? `url("${props.playlist.icon}")`
-      : props.playlistIconCache[props.playlist.id];
-  }, [props.editing, props.playlist.id, props.playlist.icon, props.playlistIconCache]);
+  const icon = props.editing
+    ? `url("${props.playlist.icon}")`
+    : props.playlistIconCache[props.playlist.id];
 
   let className = 'playlist-list-item';
   if (props.selected) { className += ' playlist-list-item--selected'; }

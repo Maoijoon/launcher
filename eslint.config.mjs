@@ -50,6 +50,7 @@ export default tseslint.config(
             "@typescript-eslint/no-namespace": "off",
             "@typescript-eslint/no-unused-vars": ["error", {
                 "vars": "all",
+                "caughtErrors": "none",
                 "args": "none"
             }],
             "@typescript-eslint/no-use-before-define": "off",

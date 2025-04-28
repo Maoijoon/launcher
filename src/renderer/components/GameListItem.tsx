@@ -35,9 +35,7 @@ export function GameListItem(props: GameListItemProps) {
   const { id, title, platform, tags, developer, publisher, extreme, tagGroupIconBase64, isDraggable, isSelected, isDragged, extremeIconPath, showExtremeIcon, index, style, onDrop,
     onDragOver } = props;
   // Get the platform icon path
-  const platformIcon = React.useMemo(() => (
-    getPlatformIconURL(platform, props.logoVersion)
-  ), [platform]);
+  const platformIcon = getPlatformIconURL(platform, props.logoVersion);
   // Pick class names
   const className = React.useMemo(() => {
     let className = 'game-list-item';
@@ -46,22 +44,20 @@ export function GameListItem(props: GameListItemProps) {
     if (isDragged)       { className += ' game-list-item--dragged';  }
     return className;
   }, [index, isSelected, isDragged]);
-  // Memoize render
-  return React.useMemo(() => {
     // Set element attributes
-    const attributes: any = {};
-    attributes[GameListItem.idAttribute] = id;
-    attributes[GameListItem.indexAttribute] = index;
-    // Render
-    return (
-      <li
-        style={style}
-        className={className}
-        draggable={isDraggable}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        { ...attributes }>
-        { showExtremeIcon &&
+  const attributes: any = {};
+  attributes[GameListItem.idAttribute] = id;
+  attributes[GameListItem.indexAttribute] = index;
+  // Render
+  return (
+    <li
+      style={style}
+      className={className}
+      draggable={isDraggable}
+      onDrop={onDrop}
+      onDragOver={onDragOver}
+      { ...attributes }>
+      { showExtremeIcon &&
           (extreme ? (
             <div
               className='game-list-item__icon'
@@ -73,35 +69,34 @@ export function GameListItem(props: GameListItemProps) {
           ) : (
             <div className='game-list-item__icon' />
           )))
-        }
+      }
+      <div
+        className='game-list-item__icon'
+        style={{ backgroundImage: `url("${platformIcon}")` }} />
+      <div className='game-list-item__right'>
         <div
-          className='game-list-item__icon'
-          style={{ backgroundImage: `url("${platformIcon}")` }} />
-        <div className='game-list-item__right'>
-          <div
-            className='game-list-item__field game-list-item__field--title'
-            title={title}>
-            {title}
-          </div>
-          <div
-            className='game-list-item__field game-list-item__field--developer'
-            title={developer}>
-            {developer}
-          </div>
-          <div
-            className='game-list-item__field game-list-item__field--publisher'
-            title={publisher}>
-            {publisher}
-          </div>
-          <div
-            className='game-list-item__field game-list-item__field--tagsStr'
-            title={tags.join('; ')}>
-            {tags.join('; ')}
-          </div>
+          className='game-list-item__field game-list-item__field--title'
+          title={title}>
+          {title}
         </div>
-      </li>
-    );
-  }, [style, className, isDraggable, id, tags, title, platformIcon, onDrop, onDragOver]);
+        <div
+          className='game-list-item__field game-list-item__field--developer'
+          title={developer}>
+          {developer}
+        </div>
+        <div
+          className='game-list-item__field game-list-item__field--publisher'
+          title={publisher}>
+          {publisher}
+        </div>
+        <div
+          className='game-list-item__field game-list-item__field--tagsStr'
+          title={tags.join('; ')}>
+          {tags.join('; ')}
+        </div>
+      </div>
+    </li>
+  );
 }
 
 export namespace GameListItem {

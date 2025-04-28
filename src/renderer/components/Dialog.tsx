@@ -1,16 +1,15 @@
-import { cancelDialog, resolveDialog, updateDialogField } from '@renderer/store/main/slice';
-import { DialogField, DialogState } from 'flashpoint-launcher';
-import { SimpleButton } from './SimpleButton';
-import { useMemo } from 'react';
 import { compileSync, runSync } from '@mdx-js/mdx';
+import { ProgressData } from '@renderer/context/ProgressContext';
+import { cancelDialog, resolveDialog, updateDialogField } from '@renderer/store/main/slice';
+import { getFileServerURL } from '@shared/Util';
+import { DialogField, DialogState } from 'flashpoint-launcher';
+import { ErrorBoundary } from 'react-error-boundary';
 import * as runtime from 'react/jsx-runtime';
 import { FloatingContainer } from './FloatingContainer';
+import { InputField } from './InputField';
 import { OpenIcon } from './OpenIcon';
 import { ProgressBar } from './ProgressComponents';
-import { ProgressData } from '@renderer/context/ProgressContext';
-import { InputField } from './InputField';
-import { getFileServerURL } from '@shared/Util';
-import { ErrorBoundary } from 'react-error-boundary';
+import { SimpleButton } from './SimpleButton';
 
 export type DialogProps = {
   dialog: DialogState,
@@ -19,24 +18,26 @@ export type DialogProps = {
   updateField: typeof updateDialogField
 }
 
+function renderMessage(dialog: DialogState) {
+  if (dialog.mdx) {
+    const baseUrl = getFileServerURL();
+    const code = String(compileSync(dialog.message, {
+      outputFormat: 'function-body',
+    }));
+    const { default: Content } = runSync(code, { ...runtime, baseUrl } as any);
+    return <ErrorBoundary fallbackRender={({ error }) => <>{`Error rendering dialog: ${error}`}</>}>
+      <Content />
+    </ErrorBoundary>;
+  } else {
+    return (
+      <div className={`dialog-message ${dialog.largeMessage ? 'dialog-message--large' : ''}`}>{dialog.message}</div>
+    );
+  }
+}
+
 export function Dialog(props: DialogProps) {
   const { dialog, closeDialog, finishDialog, updateField } = props;
-  const message = useMemo(() => {
-    if (dialog.mdx) {
-      const baseUrl = getFileServerURL();
-      const code = String(compileSync(dialog.message, {
-        outputFormat: 'function-body',
-      }));
-      const { default: Content } = runSync(code, { ...runtime, baseUrl } as any);
-      return <ErrorBoundary fallbackRender={({ error }) => <>{`Error rendering dialog: ${error}`}</>}>
-        <Content />
-      </ErrorBoundary>;
-    } else {
-      return (
-        <div className={`dialog-message ${dialog.largeMessage ? 'dialog-message--large' : ''}`}>{dialog.message}</div>
-      );
-    }
-  }, [dialog.message, dialog.largeMessage, dialog.mdx]);
+  const message = renderMessage(dialog);
 
   const alignment = dialog.textAlign || 'center';
 

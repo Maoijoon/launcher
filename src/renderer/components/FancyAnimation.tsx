@@ -8,7 +8,7 @@ type OwnProps = {
 
 type FancyAnimationProps = OwnProps & WithPreferencesProps;
 
-function _FancyAnimation(props: FancyAnimationProps) {
+function FancyAnimationInternal(props: FancyAnimationProps) {
   if (props.preferencesData.fancyAnimations) {
     if (typeof props.fancyRender == 'function') {
       return props.fancyRender();
@@ -24,4 +24,4 @@ function _FancyAnimation(props: FancyAnimationProps) {
   }
 }
 
-export const FancyAnimation = withPreferences(_FancyAnimation);
+export const FancyAnimation = withPreferences(FancyAnimationInternal);

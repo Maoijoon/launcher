@@ -35,7 +35,7 @@ export function GameConfigDialog(props: GameConfigDialogProps) {
   React.useEffect(() => {
     window.Shared.back.request(BackIn.GET_VALID_MIDDLEWARE, props.info.game)
     .then(setValidMiddleware);
-  }, []);
+  }, [setValidMiddleware, props.info.game]);
 
   const openEditor = async (config: GameConfig, idx: number) => {
     // Populate config schemas
@@ -63,7 +63,7 @@ export function GameConfigDialog(props: GameConfigDialogProps) {
     setEditorOpen(false);
   };
 
-  const newConfig = React.useCallback(() => {
+  const newConfig = () => {
     const config: GameConfigEdit = {
       id: null,
       gameId: props.info.game.id,
@@ -76,98 +76,94 @@ export function GameConfigDialog(props: GameConfigDialogProps) {
     setConfigCopy(config);
     setCopyIdx(props.info.configs.length);
     setEditorOpen(true);
-  }, [props.info.configs.length, props.info.game.id]);
+  };
 
   // Generate rows
-  const rows = React.useMemo(() => {
-    return props.info.configs.map((c, idx) => {
-      return (
-        <div className='game-config-dialog__config' key={idx}>
-          <div className='game-config-dialog__config-row'>
-            <div className='game-config-dialog__config-left'>
-              { c.gameId === 'template' && (
-                <div className='game-config-dialog__config-title-prefix'>
-                  {'(Template)'}
-                </div>
-              ) }
-              <div className='game-config-dialog__config-title'>
-                {c.name}
+  const rows = props.info.configs.map((c, idx) => {
+    return (
+      <div className='game-config-dialog__config' key={idx}>
+        <div className='game-config-dialog__config-row'>
+          <div className='game-config-dialog__config-left'>
+            { c.gameId === 'template' && (
+              <div className='game-config-dialog__config-title-prefix'>
+                {'(Template)'}
               </div>
-            </div>
-            <div className='game-config-dialog__config-right'>
-              <div className='game-config-dialog__config-source-label'>
-                {'Source:'}
-              </div>
-              <div className='game-config-dialog__config-source-value'>
-                {c.owner}
-              </div>
+            ) }
+            <div className='game-config-dialog__config-title'>
+              {c.name}
             </div>
           </div>
-          <div className='game-config-dialog__config-row'>
-            <div className='game-config-dialog__config-left'>
-              <div className='game-config-dialog__config-middlewares'>
-                <div className='game-config-dialog__config-middleware-label'>
-                  {'Middleware:'}
-                </div>
-                {c.middleware.map((m, idx) => (
-                  <div key={idx}>
-                    {`${m.name} (version: ${m.version})`}
-                  </div>
-                ))}
-              </div>
+          <div className='game-config-dialog__config-right'>
+            <div className='game-config-dialog__config-source-label'>
+              {'Source:'}
             </div>
-          </div>
-          <div className='game-config-dialog__config-row'>
-            <div className='game-config-dialog__config-left'>
-            </div>
-            <div className='game-config-dialog__config-right game-config-dialog__config-buttons'>
-              { c.gameId !== 'template' && (
-                <SimpleButton
-                  value='Make Template'
-                  onClick={() => {
-                    props.makeTemplateConfig(idx);
-                  }}/>
-              )}
-              <ConfirmElement
-                message={'Are you sure you want to delete this configuration?'}
-                onConfirm={() => {
-                  props.deleteConfig(idx);
-                }}
-                render={({ confirm }) => {
-                  return (
-                    <SimpleButton
-                      onClick={() => { confirm(); }}
-                      value='Delete'/>
-                  );
-                }} />
-              { c.owner === 'local' && (
-                <SimpleButton
-                  value={'Modify'}
-                  onClick={() => {
-                    openEditor(c, idx);
-                  }} />
-              )}
-              <SimpleButton
-                value={'Make Copy'}
-                onClick={() => {
-                  props.duplicateConfig(idx);
-                }} />
+            <div className='game-config-dialog__config-source-value'>
+              {c.owner}
             </div>
           </div>
         </div>
-      );
-    });
-  }, [props.info]);
-
-  const buttonRow = React.useMemo(() => {
-    return (
-      <div className='game-config-dialog__config-buttons game-config-dialog__config-new'>
-        <SimpleButton
-          onClick={newConfig}
-          value={'New Configuration'}/>
+        <div className='game-config-dialog__config-row'>
+          <div className='game-config-dialog__config-left'>
+            <div className='game-config-dialog__config-middlewares'>
+              <div className='game-config-dialog__config-middleware-label'>
+                {'Middleware:'}
+              </div>
+              {c.middleware.map((m, idx) => (
+                <div key={idx}>
+                  {`${m.name} (version: ${m.version})`}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className='game-config-dialog__config-row'>
+          <div className='game-config-dialog__config-left'>
+          </div>
+          <div className='game-config-dialog__config-right game-config-dialog__config-buttons'>
+            { c.gameId !== 'template' && (
+              <SimpleButton
+                value='Make Template'
+                onClick={() => {
+                  props.makeTemplateConfig(idx);
+                }}/>
+            )}
+            <ConfirmElement
+              message={'Are you sure you want to delete this configuration?'}
+              onConfirm={() => {
+                props.deleteConfig(idx);
+              }}
+              render={({ confirm }) => {
+                return (
+                  <SimpleButton
+                    onClick={() => { confirm(); }}
+                    value='Delete'/>
+                );
+              }} />
+            { c.owner === 'local' && (
+              <SimpleButton
+                value={'Modify'}
+                onClick={() => {
+                  openEditor(c, idx);
+                }} />
+            )}
+            <SimpleButton
+              value={'Make Copy'}
+              onClick={() => {
+                props.duplicateConfig(idx);
+              }} />
+          </div>
+        </div>
       </div>
     );
-  }, [newConfig]);
+  });
+
+  const buttonRow = (
+    <div className='game-config-dialog__config-buttons game-config-dialog__config-new'>
+      <SimpleButton
+        onClick={newConfig}
+        value={'New Configuration'}/>
+    </div>
+  );
 
   return (
     <FloatingContainer floatingClassName='game-config-dialog-container'>

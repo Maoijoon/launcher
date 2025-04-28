@@ -29,14 +29,14 @@ type ConfirmElementComponentProps<T = undefined> = {
 function ConfirmElementComponent<T = undefined>(props: ConfirmElementComponentProps<T>) {
   const { onConfirm, message, render, extra } = props;
   const strings = React.useContext(LangContext);
-  const confirm = React.useCallback(async () => {
+  const confirm = async () => {
     if (onConfirm) {
       const res = await props.openConfirmDialog(message, [strings.misc.yes, strings.misc.no], 1, 0);
       if (res === 0) {
         onConfirm();
       }
     }
-  }, [onConfirm]);
+  };
   // Render
   return render && render({
     confirm: confirm,

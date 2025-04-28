@@ -48,7 +48,9 @@ Install by running ``sudo apt install libgtk-3-0 libnss3``
 
 4. Run ``npm run start`` (at the root of the repository) to start the launcher. It is recommended to do this in a second command prompt / terminal.
 
-5. **Optional** - It is highly recommended to set the launcher's "Flashpoint folder". This is where the launcher will read and write most data to and from. You can set the "Flashpoint folder" path at the "Config" tab in the launcher. Make sure the background of the text field is green (this means the path is valid) and don't forget to hit "Save and Exit"!
+5. React components use the React Compiler. If creating new components please make sure they are compiled, see this extension for a handy IDE hint in Vscode. Existing components are fine to be skipped. https://marketplace.visualstudio.com/items?itemName=blazejkustra.react-compiler-marker
+
+6. **Optional** - It is highly recommended to set the launcher's "Flashpoint folder". This is where the launcher will read and write most data to and from. You can set the "Flashpoint folder" path at the "Config" tab in the launcher. Make sure the background of the text field is green (this means the path is valid) and don't forget to hit "Save and Exit"!
 
 Notes:
 

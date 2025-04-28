@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { CreditsDataProfile } from '../credits/types';
 
 export type CreditsIconProps = {
@@ -15,13 +15,13 @@ export type CreditsIconProps = {
 export function CreditsIcon(props: CreditsIconProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const onMouseEnter = useCallback((event: React.MouseEvent) => {
+  const onMouseEnter = (event: React.MouseEvent) => {
     if (props.onMouseEnter) { props.onMouseEnter(event, props.profile); }
-  }, [props.onMouseEnter, props.profile]);
+  };
 
-  const onMouseLeave = useCallback(() => {
+  const onMouseLeave = () => {
     if (props.onMouseLeave) { props.onMouseLeave(); }
-  }, [props.onMouseLeave]);
+  };
 
   // (Delay decoding the icon, this allows the browser to spread the work across multiple frames)
   useEffect(() => {

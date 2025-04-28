@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent */
 import { LangContext } from '@renderer/util/lang';
 import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
 import { LOGOS, SCREENSHOTS } from '@shared/constants';
@@ -37,41 +36,36 @@ type RandomGamesProps = {
 export function RandomGames(props: RandomGamesProps) {
   const strings = React.useContext(LangContext);
 
-  const onGameSelect = React.useCallback((event: React.MouseEvent, gameId: string | undefined) => {
+  const onGameSelect = (event: React.MouseEvent, gameId: string | undefined) => {
     props.onGameSelect(gameId);
-  }, [props.onGameSelect]);
+  };
 
-  const onLaunchGame = React.useCallback((event: React.MouseEvent, gameId: string) => {
+  const onLaunchGame = (event: React.MouseEvent, gameId: string) => {
     props.onLaunchGame(gameId);
-  }, [props.onLaunchGame]);
+  };
 
-  const onRerollPicks = React.useCallback(() => {
+  const onRerollPicks = () => {
     props.rollRandomGames();
-  }, [props.rollRandomGames]);
+  };
 
-  const gameItems = React.useMemo(() => {
-    /* Games is a long queue, only render front */
-    return (
-      props.games.slice(0, 6).map(game => (
-        <GameGridItem
-          key={game.id}
-          id={game.id}
-          title={game.title}
-          platforms={game.platforms.map(p => p.trim())}
-          extreme={game ? game.tags.findIndex(t => props.extremeTags.includes(t.trim())) !== -1 : false}
-          extremeIconPath={getExtremeIconURL(props.logoVersion)}
-          tagGroupIconBase64={props.tagGroupIcons.find(tg => tg.tagFilter.find(t => game?.tags.includes(t)))?.iconBase64 || ''}
-          thumbnail={getGameImageURL(LOGOS, game.id)}
-          screenshot={getGameImageURL(SCREENSHOTS, game.id)}
-          screenshotPreviewMode={props.screenshotPreviewMode}
-          screenshotPreviewDelay={props.screenshotPreviewDelay}
-          hideExtremeScreenshots={props.hideExtremeScreenshots}
-          logoVersion={props.logoVersion}
-          isSelected={props.selectedGameId === game.id}
-          isDragged={false} />
-      ))
-    );
-  }, [props.games, props.selectedGameId, props.logoVersion, props.extremeTags]);
+  const gameItems = props.games.slice(0, 6).map(game => (
+    <GameGridItem
+      key={game.id}
+      id={game.id}
+      title={game.title}
+      platforms={game.platforms.map(p => p.trim())}
+      extreme={game ? game.tags.findIndex(t => props.extremeTags.includes(t.trim())) !== -1 : false}
+      extremeIconPath={getExtremeIconURL(props.logoVersion)}
+      tagGroupIconBase64={props.tagGroupIcons.find(tg => tg.tagFilter.find(t => game?.tags.includes(t)))?.iconBase64 || ''}
+      thumbnail={getGameImageURL(LOGOS, game.id)}
+      screenshot={getGameImageURL(SCREENSHOTS, game.id)}
+      screenshotPreviewMode={props.screenshotPreviewMode}
+      screenshotPreviewDelay={props.screenshotPreviewDelay}
+      hideExtremeScreenshots={props.hideExtremeScreenshots}
+      logoVersion={props.logoVersion}
+      isSelected={props.selectedGameId === game.id}
+      isDragged={false} />
+  ));
 
   const onGameContextMenu = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, gameId: string) => {
     return props.onGameContextMenu(gameId);

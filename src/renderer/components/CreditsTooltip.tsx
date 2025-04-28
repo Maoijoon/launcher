@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { CreditsDataProfile, CreditsDataRole } from '../credits/types';
 
@@ -33,26 +32,24 @@ export function CreditsTooltip(props: CreditsTooltipProps) {
         setPosition(ref.current, event.clientX, event.clientY);
       }
     }
-  }, [ref.current, props.profile, props.profileX, props.profileY]);
+  }, [props.profile, props.profileX, props.profileY]);
 
   // Render profile
-  const profileElement = React.useMemo(() => (
-    props.profile ? (
-      <>
-        <p className='about-page__credits__tooltip__title'>{props.profile.title}</p>
-        { props.profile.note ? (
-          <p className='about-page__credits__tooltip__note'>{props.profile.note}</p>
-        ) : undefined }
-        <ul className='about-page__credits__tooltip__roles'>
-          { props.profile.roles.map((role, index) => (
-            <li key={index} style={{ color: getRoleColor(role, props.roles) }}>
-              <p>{role}</p>
-            </li>
-          )) }
-        </ul>
-      </>
-    ) : undefined
-  ), [props.profile]);
+  const profileElement = props.profile ? (
+    <>
+      <p className='about-page__credits__tooltip__title'>{props.profile.title}</p>
+      { props.profile.note ? (
+        <p className='about-page__credits__tooltip__note'>{props.profile.note}</p>
+      ) : undefined }
+      <ul className='about-page__credits__tooltip__roles'>
+        { props.profile.roles.map((role, index) => (
+          <li key={index} style={{ color: getRoleColor(role, props.roles) }}>
+            <p>{role}</p>
+          </li>
+        )) }
+      </ul>
+    </>
+  ) : undefined;
 
   // Render
   return (

@@ -1,6 +1,6 @@
 import { LangContext } from '@renderer/util/lang';
 import { MetaEditFlags } from '@shared/MetaEdit';
-import { LangContainer } from '@shared/lang';
+import { LangContainer } from 'flashpoint-launcher';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
