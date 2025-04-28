@@ -117,10 +117,20 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
 
   const onCurationDragDrop = () => {
     if (draggedCuration !== '' && dragGroupTarget !== undefined) {
-      dispatch(curateActions.changeGroup({
-        folder: draggedCuration,
-        group: dragGroupTarget
-      }));
+      if (curate.selected.includes(draggedCuration)) {
+        for (const folder of curate.selected) {
+          dispatch(curateActions.changeGroup({
+            folder: folder,
+            group: dragGroupTarget
+          }));
+        }
+      } else {
+        dispatch(curateActions.changeGroup({
+          folder: draggedCuration,
+          group: dragGroupTarget
+        }));
+      }
+
     }
     setDraggedCuration('');
     setDragGroupTarget(undefined);
