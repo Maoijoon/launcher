@@ -2,7 +2,7 @@ import * as React from 'react';
 
 type FloatingContainerProps = {
   floatingClassName?: string
-  children: JSX.Element | JSX.Element[];
+  children: React.JSX.Element | React.JSX.Element[];
   onClick?: () => void;
 } & React.HTMLProps<HTMLDivElement>;
 

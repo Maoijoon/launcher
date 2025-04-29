@@ -1,10 +1,51 @@
 import { DropdownItem, GameComponentProps } from 'flashpoint-launcher-renderer';
+import { IconType } from 'react-icons';
+import { FaBug, FaChalkboardTeacher, FaCog, FaCrown, FaDesktop, FaDollarSign, FaFilm, FaMicrophone, FaMusic, FaPaintBrush, FaPenAlt, FaPencilAlt, FaSun, FaTruck, FaVolumeUp } from 'react-icons/fa';
+
+const ROLE_ICONS: Record<string, IconType> = {
+  'Artist': FaPaintBrush,
+  'Author': FaPenAlt,
+  'Sound Effects': FaVolumeUp,
+  'Other': FaCog,
+  'Additional Code': FaDesktop,
+  'Miscellaneous': FaCog,
+  'Producer': FaChalkboardTeacher,
+  'Production': FaFilm,
+  'Voice Actor': FaMicrophone,
+  'Writer': FaPenAlt,
+  'Collab Organizer': FaChalkboardTeacher,
+  'Design': FaPencilAlt,
+  'Programming': FaDesktop,
+  'Animation': FaFilm,
+  'Additional Art': FaPaintBrush,
+  'Sponsor': FaDollarSign,
+  'Director': FaChalkboardTeacher,
+  'Music': FaMusic,
+  'Beta Tester': FaBug,
+  'Sound': FaVolumeUp,
+  'Storyboards': FaPenAlt,
+  'Additional Animation': FaFilm,
+  'Interface Design': FaPaintBrush,
+  'Original Creator': FaCrown,
+  'Distributor': FaTruck,
+  'Engine Design': FaDesktop,
+  'Character Design': FaPencilAlt,
+  'Gameplay Design': FaPencilAlt,
+  'Backgrounds': FaPaintBrush,
+  'Inspiration': FaSun,
+};
+
+type Credit = {
+  name: string;
+  roles?: string[];
+}
 
 type ExtData = {
   score?: number;
   rating?: string;
   views?: number;
   faves?: number;
+  credits?: Credit[];
 }
 
 const numFormat = new Intl.NumberFormat();
@@ -18,6 +59,44 @@ export function mapNgRatingString(rs: string) {
     default:
       return 'Broken Value';
   }
+}
+
+export function NgCredits(props: GameComponentProps) {
+  const extData: ExtData | undefined = props.game.extData?.nga;
+  const credits = extData?.credits || [];
+
+  return (
+    <div className='browse-right-sidebar__row'>
+      <p>Credits: </p>
+      { credits.map((credit, idx) => {
+        return (
+          <div className='nga-credit' key={idx}>
+            { credit.roles?.map((role, idx) => {
+              if (role in ROLE_ICONS) {
+                const Component = ROLE_ICONS[role];
+                return (
+                  <div
+                    key={idx}
+                    className='nga-credit-icon'
+                    title={role}>
+                    <Component />
+                  </div>
+                );
+              } else {
+                return (
+                  <div
+                    key={idx}>
+                    {role}
+                  </div>
+                );
+              }
+            })}
+            <div className='nga-credt-name'>{credit.name}</div>
+          </div>
+        );
+      }) }
+    </div>
+  );
 }
 
 export function NgRating(props: GameComponentProps) {
@@ -54,7 +133,7 @@ export function NgRating(props: GameComponentProps) {
   ) : (
     <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
       <p>NG Rating: </p>
-      { rating === '' ? (
+      {rating === '' ? (
         <p>None</p>
       ) : (
         <div className={`ng-rating-sidebar ng-image-rating_${rating.toLowerCase()}`}></div>
@@ -118,7 +197,7 @@ export function NgFaves(props: GameComponentProps) {
   return (
     <GameComponentInputField
       header='NG Favorites'
-      text={editable ? faves.toString(): numFormat.format(faves)}
+      text={editable ? faves.toString() : numFormat.format(faves)}
       placeholder='No Favorites'
       onChange={(value) => {
         // Strip leading zeroes

@@ -11,7 +11,7 @@ export type RefFunc<T> = (instance: T | null) => void;
 
 type DropdownInputProps<T> = InputFieldProps & {
   items?: T[];
-  render: (item: T, index: number) => JSX.Element | undefined;
+  render: (item: T, index: number) => React.JSX.Element | undefined;
   onItemSelect?: (item: T, index: number) => void;
   /** Note: The reference must be used in the first render and must never change! */
   inputRef?: RefFunc<InputElement> | React.RefObject<InputElement>;
@@ -19,7 +19,7 @@ type DropdownInputProps<T> = InputFieldProps & {
 
 export const DDI_INDEX = 'data-dropdown-index';
 
-export function DropdownInput<T>(props: DropdownInputProps<T>): JSX.Element {
+export function DropdownInput<T>(props: DropdownInputProps<T>): React.JSX.Element {
   const [expanded, setExpanded] = useStateRef<boolean>(false);
 
   const rootRef = React.useRef<HTMLDivElement>(null);

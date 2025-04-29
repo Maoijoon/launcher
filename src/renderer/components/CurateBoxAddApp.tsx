@@ -1,9 +1,9 @@
+import { useAppDispatch } from '@renderer/hooks/useAppSelector';
 import { editAddApp, removeAddApp } from '@renderer/store/curate/slice';
 import { BackIn } from '@shared/back/types';
 import { AddAppCuration, AddAppCurationMeta } from '@shared/curate/types';
 import { Platform } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
 import { LangContext } from '../util/lang';
 import { CurateBoxRow } from './CurateBoxRow';
@@ -29,7 +29,7 @@ export function CurateBoxAddApp(props: CurateBoxAddAppProps) {
   // Callbacks for the fields (onChange)
   const folder = props.folder;
   const key = props.addApp.key;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const onHeadingChange         = useOnInputChange('heading',         key, folder, dispatch);
   const onApplicationPathChange = useOnInputChange('applicationPath', key, folder, dispatch);
   const onLaunchCommandChange   = useOnInputChange('launchCommand',   key, folder, dispatch);

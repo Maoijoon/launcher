@@ -21,6 +21,7 @@ export type MetaUpdateState = {
 }
 
 export type RemovePlaylistGameAction = {
+  viewId: string;
   playlistId: string;
   gameId: string;
 }

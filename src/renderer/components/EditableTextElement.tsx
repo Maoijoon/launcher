@@ -30,7 +30,7 @@ export type EditableTextElementKeyArgs = {
 
 export type EditableTextElementProps<T> = {
   /** Function that renders the text element (render prop). */
-  children?: (args: EditableTextElementArgs<T>) => JSX.Element | undefined;
+  children?: (args: EditableTextElementArgs<T>) => React.JSX.Element | undefined;
   /** If the element is editable (if it can enter "edit mode"). */
   editable?: boolean;
   /** Called when editing is confirmed (when the user is done editing and attempts to "lock in" the edited text). */

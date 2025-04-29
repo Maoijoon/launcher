@@ -17,3 +17,13 @@
 .ng-image-rating_a {
   background-image: url("assets/rating_adult.png");
 }
+
+.nga-credit {
+  display: flex;
+  flex-direction: row;
+  margin-left: 1rem;
+}
+
+.nga-credit-icon {
+  margin: 0.1em 0.3em 0em 0em;
+}

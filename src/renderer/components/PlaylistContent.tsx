@@ -1,11 +1,10 @@
-import { LangContainer } from '@shared/lang';
+import { LangContainer, Playlist } from 'flashpoint-launcher';
 import * as React from 'react';
 import { LangContext } from '../util/lang';
+import { CheckBox } from './CheckBox';
 import { ConfirmElement, ConfirmElementArgs } from './ConfirmElement';
 import { InputElement, InputField } from './InputField';
 import { OpenIcon } from './OpenIcon';
-import { CheckBox } from './CheckBox';
-import { Playlist } from 'flashpoint-launcher';
 
 export type PlaylistItemContentProps = {
   editingDisabled: boolean;
@@ -136,7 +135,7 @@ export function PlaylistItemContent(props: PlaylistItemContentProps) {
   );
 }
 
-function renderDeleteButton({ confirm, extra }: ConfirmElementArgs<LangContainer['playlist']>): JSX.Element {
+function renderDeleteButton({ confirm, extra }: ConfirmElementArgs<LangContainer['playlist']>): React.JSX.Element {
   return (
     <div
       className='playlist-list-content__button playlist-list-content__button--warning'

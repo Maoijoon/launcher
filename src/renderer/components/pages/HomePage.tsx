@@ -142,7 +142,7 @@ export function HomePage(props: HomePageProps) {
     // TODO: Reimplement
   }, []);
 
-  const platformList: JSX.Element[] = [];
+  const platformList: React.JSX.Element[] = [];
   const views = Object.keys(search.views);
   let viewName = '';
   for (const view of views) {
@@ -442,7 +442,7 @@ export function HomePage(props: HomePageProps) {
   );
 }
 
-function QuickStartItem(props: { icon?: OpenIconType, className?: string, children?: React.ReactNode }): JSX.Element {
+function QuickStartItem(props: { icon?: OpenIconType, className?: string, children?: React.ReactNode }): React.JSX.Element {
   return (
     <li className={'home-page__box-item simple-center ' + (props.className||'')}>
       { props.icon ? (

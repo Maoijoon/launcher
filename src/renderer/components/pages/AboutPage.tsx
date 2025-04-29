@@ -51,7 +51,7 @@ class _AboutPage extends React.Component<_AboutPageProps, AboutPageState> {
     changelog.sort((a, b) => a[0].localeCompare(b[0]));
     changelog.reverse();
 
-    const changelogPreviews: JSX.Element[] = changelog.map(([date, data], idx) => {
+    const changelogPreviews: React.JSX.Element[] = changelog.map(([date, data], idx) => {
       return (
         <div
           key={idx}
@@ -246,7 +246,7 @@ class _AboutPage extends React.Component<_AboutPageProps, AboutPageState> {
   });
 }
 
-function link(title: string, url: string): JSX.Element {
+function link(title: string, url: string): React.JSX.Element {
   return (
     <a
       style={{ cursor: 'pointer', textDecorationLine: 'underline' }}

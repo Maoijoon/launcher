@@ -30,7 +30,7 @@ export function ConfigBoxSelect<T extends string | number>(props: ConfigBoxSelec
   );
 }
 
-const renderSelectItemsMemo = memoizeOne(<T extends string | number>(selectItems: SelectItem<T>[]): JSX.Element[] => {
+const renderSelectItemsMemo = memoizeOne(<T extends string | number>(selectItems: SelectItem<T>[]): React.JSX.Element[] => {
   return selectItems.map((item, idx)=> (
     <option
       key={idx}

@@ -2497,6 +2497,8 @@ declare module 'flashpoint-launcher-renderer' {
     fpfssEditMode: boolean;
     editable: boolean;
     suggestions: Partial<GamePropSuggestions>;
+    doSearch: (text: string) => void;
+    launchGame: (gameId: string) => void;
     launchAddApp: (addAppId: string) => void;
     updateGame: (game: Partial<Game>) => void;
     updatePlaylistNotes: (notes: string) => void;
@@ -2509,10 +2511,17 @@ declare module 'flashpoint-launcher-renderer' {
   }
 
   type GameComponentInputFieldProps = GameComponentProps & {
+    /** Header text of this field, shown to the left of the text */
     header: string;
+    /** Current text value */
     text: string;
+    /** Placeholder for when no text is given */
     placeholder: string;
+    /** Make a multiline text box */
     multiline?: boolean;
+    /** Called when the text is clicked */
+    onClick?: () => void;
+    /** Called whenever the text input changes (must update text value yourself, usually with updateGame) */
     onChange: (value: string) => void;
   };
 

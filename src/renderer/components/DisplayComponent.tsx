@@ -2,7 +2,7 @@ import { GameComponentDropdownSelectFieldProps, GameComponentInputFieldProps } f
 import { InputField } from './InputField';
 import { DropdownInputFieldMapped } from './DropdownInputField';
 
-export function GameComponentInputField({ header, multiline, text, placeholder, onChange, editable }: GameComponentInputFieldProps) {
+export function GameComponentInputField({ header, onClick, multiline, text, placeholder, onChange, editable }: GameComponentInputFieldProps) {
   return (
     <div className={`browse-right-sidebar__row ${!multiline ? 'browse-right-sidebar__row--one-line' : ''}`}>
       <p>{header}: </p>
@@ -13,7 +13,7 @@ export function GameComponentInputField({ header, multiline, text, placeholder, 
         className='browse-right-sidebar__searchable'
         editable={editable}
         multiline={multiline}
-        onClick={() => {}} />
+        onClick={onClick} />
     </div>
   );
 }

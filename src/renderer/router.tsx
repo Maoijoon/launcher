@@ -8,7 +8,7 @@ import { Menu } from 'electron';
 import { UpdateInfo } from 'electron-updater';
 import { GameLaunchOverride, Playlist, ViewGame } from 'flashpoint-launcher';
 import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Paths } from '@shared/Paths';
 import { AboutPage, AboutPageProps } from './components/pages/AboutPage';
 import { DeveloperPage, DeveloperPageProps } from './components/pages/DeveloperPage';
@@ -88,8 +88,6 @@ export class AppRouter extends React.Component<AppRouterProps> {
       logoVersion: this.props.logoVersion,
       updateFeedMarkdown: this.props.updateFeedMarkdown,
       selectedGameId: this.props.selectedGameId,
-      componentStatuses: this.props.componentStatuses,
-      openFlashpointManager: this.props.openFlashpointManager,
     };
     const browseProps: ConnectedBrowsePageProps = {
       sourceTable: 'browse-page',
@@ -139,66 +137,45 @@ export class AppRouter extends React.Component<AppRouterProps> {
       url: this.props.manualUrl
     };
     return (
-      <Switch>
-        <PropsRoute
-          exact
+      <Routes>
+        <Route
           path={Paths.LOADING}
-          component={LoadingPage} />
-        <PropsRoute
-          exact
+          element={<LoadingPage/>}/>
+        <Route
           path={Paths.HOME}
-          component={ConnectedHomePage}
-          { ...homeProps } />
-        <PropsRoute
+          element={<ConnectedHomePage {...homeProps}/>}/>
+        <Route
           path={Paths.BROWSE}
-          component={ConnectedBrowsePage}
-          { ...browseProps } />
-        <PropsRoute
+          element={<ConnectedBrowsePage {...browseProps}/>}/>
+        <Route
           path={Paths.TAGS}
-          component={ConnectedTagsPage} />
-        <PropsRoute
+          element={<ConnectedTagsPage/>}/>
+        <Route
           path={Paths.CATEGORIES}
-          component={ConnectedTagCategoriesPage} />
-        <PropsRoute
+          element={<ConnectedTagCategoriesPage/>}/>
+        <Route
           path={Paths.DOWNLOADS}
-          component={DownloadsPage} />
-        <PropsRoute
+          element={<DownloadsPage/>}/>
+        <Route
           path={Paths.LOGS}
-          component={ConnectedLogsPage} />
-        <PropsRoute
+          element={<ConnectedLogsPage/>}/>
+        <Route
           path={Paths.CONFIG}
-          component={ConnectedConfigPage}
-          { ...configProps } />
-        <PropsRoute
+          element={<ConnectedConfigPage {...configProps}/>}/>
+        <Route
           path={Paths.MANUAL}
-          component={IFramePage}
-          { ...iframePageProps } />
-        <PropsRoute
+          element={<IFramePage {...iframePageProps} />}/>
+        <Route
           path={Paths.ABOUT}
-          component={AboutPage}
-          { ...aboutProps } />
-        <PropsRoute
+          element={<AboutPage {...aboutProps}/>}/>
+        <Route
           path={Paths.CURATE}
-          component={ConnectedCuratePage}
-          { ...curateProps } />
-        <PropsRoute
+          element={<ConnectedCuratePage {...curateProps} />}/>
+        <Route
           path={Paths.DEVELOPER}
-          component={DeveloperPage}
-          { ...developerProps } />
-        <Route component={NotFoundPage} />
-      </Switch>
+          element={<DeveloperPage {...developerProps}/>}/>
+        <Route element={<NotFoundPage/>}/>
+      </Routes>
     );
   }
-}
-
-// Reusable way to pass properties down a router and to its component.
-const PropsRoute = ({ component, ...rest }: any) => (
-  <Route
-    { ...rest }
-    render={routeProps => renderMergedProps(component, routeProps, rest)} />
-);
-
-function renderMergedProps(component: any, ...rest: any[]) {
-  const finalProps = Object.assign({}, ...rest);
-  return React.createElement(component, finalProps);
 }

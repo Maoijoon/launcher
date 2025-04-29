@@ -1,8 +1,8 @@
 import { WithPreferencesProps } from '@renderer/containers/withPreferences';
 import { useView } from '@renderer/hooks/search';
+import { useAppDispatch } from '@renderer/hooks/useAppSelector';
 import { searchActions } from '@renderer/store/search/slice';
 import { GameOrderBy, GameOrderDirection } from 'flashpoint-launcher';
-import { useDispatch } from 'react-redux';
 import { OpenIcon } from './OpenIcon';
 
 export type GameListHeaderProps = WithPreferencesProps & {
@@ -12,7 +12,7 @@ export type GameListHeaderProps = WithPreferencesProps & {
 // Header on top of the GameList. It contains the resizable columns that decide how wide each column is.
 export function GameListHeader(props: GameListHeaderProps) {
   const currentView = useView();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onToggleSort = (key: GameOrderBy) => {
     if (currentView.orderBy === key) {

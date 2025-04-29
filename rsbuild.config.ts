@@ -2,17 +2,6 @@ import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginBabel } from '@rsbuild/plugin-babel';
 import { builtinModules } from 'node:module';
-import { Logger, LoggerEvent, CompilerPipelineValue } from 'babel-plugin-react-compiler';
-
-const stdoutLogger: Logger = {
-  logEvent: (filename: string | null, event: LoggerEvent) => {
-    console.error('LOG');
-  },
-
-  debugLogIRs: (value: CompilerPipelineValue) => {
-    console.error('LOG');
-  }
-};
 
 const externals = {
   'electron': 'commonjs electron'
@@ -20,14 +9,6 @@ const externals = {
 for (const module of builtinModules) {
   externals[module] = 'commonjs ' + module;
 }
-
-const ReactCompilerConfig = {
-  target: '17',
-  logger: stdoutLogger,
-  sources: (filename: string) => {
-    return filename.indexOf('src/renderer/') !== -1;
-  },
-};
 
 export default defineConfig({
   source: {
@@ -55,10 +36,7 @@ export default defineConfig({
     pluginBabel({
       include: /\.(?:jsx|tsx)$/,
       babelLoaderOptions(opts) {
-        opts.plugins?.unshift([
-          'babel-plugin-react-compiler',
-          ReactCompilerConfig,
-        ]);
+        opts.plugins?.unshift(['babel-plugin-react-compiler']);
       },
     }),
   ],

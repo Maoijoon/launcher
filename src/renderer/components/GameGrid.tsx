@@ -2,7 +2,7 @@ import { BackOut, BackOutTemplate } from '@shared/back/types';
 import { LOGOS, SCREENSHOTS, VIEW_PAGE_SIZE } from '@shared/constants';
 import { memoizeOne } from '@shared/memoize';
 import * as React from 'react';
-import { ArrowKeyStepper, AutoSizer, Grid, GridCellProps, ScrollIndices } from 'react-virtualized-reactv17';
+import { ArrowKeyStepper, AutoSizer, Grid, GridCellProps, ScrollIndices } from 'react-virtualized';
 import { UpdateView, ViewGameSet } from '../interfaces';
 import { findElementAncestor, gameDragDataType, getExtremeIconURL, getGameImageURL } from '../Util';
 import { GameGridItem } from './GameGridItem';
@@ -42,7 +42,7 @@ export type GameGridProps = {
   /** Tag Filter icons */
   tagGroupIcons: { tagFilter: TagFilter; iconBase64: string; }[];
   /** Function that renders the elements to show instead of the grid if there are no games (render prop). */
-  noRowsRenderer?: () => JSX.Element;
+  noRowsRenderer?: () => React.JSX.Element;
   /** Called when the user attempts to select a game. */
   onGameSelect: (gameId?: string, col?: number, row?: number) => void;
   /** Called when the user attempts to open a context menu (at a game). */
@@ -81,7 +81,7 @@ type GameGridState = {
 
 /** A grid of cells, where each cell displays a game. */
 export class GameGrid extends React.Component<GameGridProps, GameGridState> {
-  wrapperRef: React.RefObject<HTMLDivElement> = React.createRef();
+  wrapperRef: React.RefObject<HTMLDivElement | null> = React.createRef();
   /** Most recently reference passed to the "gridRef" callback prop. */
   prevWrapperRef: HTMLDivElement | null = null;
   /** Number of columns in the grid from the most recent render. */
@@ -94,7 +94,7 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
   currentGames: ViewGameSet | undefined;
   currentGamesCount = 0;
   // Used for the "view update hack"
-  grid: React.RefObject<Grid> = React.createRef();
+  grid: React.RefObject<Grid | null> = React.createRef();
 
   constructor(props: GameGridProps) {
     super(props);

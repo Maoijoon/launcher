@@ -149,7 +149,7 @@ export class LeftBrowseSidebar extends React.Component<LeftBrowseSidebarProps> {
       }
     };
 
-    const elements: JSX.Element[] = [];
+    const elements: React.JSX.Element[] = [];
     for (let i = 0; i < playlists.length; i++) {
       renderItem(playlists[i], false);
     }

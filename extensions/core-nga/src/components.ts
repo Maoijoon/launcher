@@ -1,10 +1,11 @@
-import { NgFaves, NgRating, NgScore, NgViews } from './components/components';
+import { NgCredits, NgFaves, NgRating, NgScore, NgViews } from './components/components';
 
 const components: Record<string, React.ComponentType<any>> = {
   'NgRating': NgRating,
   'NgScore': NgScore,
   'NgViews': NgViews,
   'NgFaves': NgFaves,
+  'NgCredits': NgCredits,
 };
 
 
@@ -15,6 +16,7 @@ const components: Record<string, React.ComponentType<any>> = {
     'NgViews',
     'NgScore',
     'NgFaves',
+    'NgCredits',
   ];
 
   // Insert below alt titles

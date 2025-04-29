@@ -5,7 +5,7 @@ import { FpfssUser } from '@shared/back/types';
 import { getLibraryItemTitle } from '@shared/library/util';
 import { MenuItemConstructorOptions } from 'electron';
 import * as React from 'react';
-import { Link, RouteComponentProps, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { WithPreferencesProps } from '../containers/withPreferences';
 import { Paths } from '@shared/Paths';
 import { joinLibraryRoute } from '../Util';
@@ -19,6 +19,7 @@ import { WithMainStateProps } from '@renderer/containers/withMainState';
 import { DialogField, DialogState } from 'flashpoint-launcher';
 import { uuid } from '@shared/utils/uuid';
 import { WithConfirmDialogProps } from '@renderer/containers/withConfirmDialog';
+import { WithNavigationProps } from '@renderer/containers/withNavigation';
 
 const viewDragType = 'text/plain';
 
@@ -33,7 +34,7 @@ type OwnProps = {
   logoutUser: () => void;
 };
 
-export type HeaderProps = OwnProps & RouteComponentProps & WithMainStateProps & WithConfirmDialogProps & WithPreferencesProps & WithTagCategoriesProps & WithSearchProps & WithViewProps;
+export type HeaderProps = OwnProps & WithMainStateProps & WithConfirmDialogProps & WithPreferencesProps & WithTagCategoriesProps & WithSearchProps & WithViewProps & WithNavigationProps;
 
 type HeaderState = Record<string, never>;
 
@@ -77,7 +78,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           });
           setTimeout(() => {
             const route = joinLibraryRoute(name);
-            this.props.history.push(route);
+            this.props.navigate(route);
           }, 50);
           return;
         }
@@ -128,14 +129,14 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           }, true);
           if (this.props.currentView.id === view) {
             // Move to LOADING page during change over
-            this.props.history.push(Paths.LOADING);
+            this.props.navigate(Paths.LOADING);
             // Let the search action do the data swap
             this.props.searchActions.renameView({
               old: view,
               new: name,
             });
             setTimeout(() => {
-              this.props.history.push(joinLibraryRoute(name));
+              this.props.navigate(joinLibraryRoute(name));
             }, 200);
           } else {
             this.props.searchActions.renameView({
@@ -171,7 +172,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
             areLibraries: false,
           });
           setTimeout(() => {
-            this.props.history.push(joinLibraryRoute(name));
+            this.props.navigate(joinLibraryRoute(name));
           }, 200);
         }
       }
@@ -216,7 +217,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     if (confirmation === 0) {
       if (this.props.currentView.id === view) {
         // Must move to the home tab first!
-        this.props.history.push(Paths.HOME);
+        this.props.navigate(Paths.HOME);
       }
       const customViews = this.props.preferencesData.customViews.filter(v => v !== view);
       const storedViews = this.props.preferencesData.storedViews.filter(v => v.view !== view);

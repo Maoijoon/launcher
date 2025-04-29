@@ -491,9 +491,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
             <TagFilterGroupEditor
               tagFilterGroup={this.state.editingTagFilterGroup}
               onAddTag={(tag) => this.onAddTagEditorTagEvent(this.state.editingTagFilterGroupIdx || -1, tag)}
-              onAddCategory={(category) => this.onAddTagEditorCategoryEvent(this.state.editingTagFilterGroupIdx || -1, category)}
               onRemoveTag={(tag) => this.onRemoveTagEditorTagEvent(this.state.editingTagFilterGroupIdx || -1, tag)}
-              onRemoveCategory={(category) => this.onRemoveTagEditorCategoryEvent(this.state.editingTagFilterGroupIdx || -1, category)}
               onChangeName={this.onChangeTagEditorNameEvent}
               onChangeDescription={this.onChangeTagEditorDescriptionEvent}
               onChangeIconBase64={this.onChangeTagEditorIconEvent}
@@ -743,7 +741,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
   });
 
   renderLogoSetMemo = memoizeOne((platforms: string[], logoVersion: number) => {
-    const allRows: JSX.Element[] = [];
+    const allRows: React.JSX.Element[] = [];
     const toRender = [...platforms, 'Extreme'];
     // Render 16 logos per row, vertically stacked
     for (let i = 0; i < toRender.length; i = i + 16) {
@@ -765,7 +763,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
     return allRows;
   });
 
-  renderExtensionsMemo = memoizeOne((extensions: IExtensionDescription[], strings: LangContainer['config'], fpfssConsents: Record<string, boolean | undefined>): JSX.Element[] => {
+  renderExtensionsMemo = memoizeOne((extensions: IExtensionDescription[], strings: LangContainer['config'], fpfssConsents: Record<string, boolean | undefined>): React.JSX.Element[] => {
     const allStrings = this.context;
     return extensions.map((ext) => {
       const fpfssConsent = fpfssConsents[ext.id];
@@ -837,7 +835,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
   });
 
   renderExtensionConfigs = memoizeOne((extConfigs: ExtensionContribution<'configuration'>[], extConfig: AppExtConfigData) => {
-    let sections: JSX.Element[] = [];
+    let sections: React.JSX.Element[] = [];
 
     extConfigs.forEach((contrib, idx) => {
       sections = sections.concat(contrib.value.map((config, configIdx) => {
@@ -858,7 +856,7 @@ export class ConfigPage extends React.Component<ConfigPageProps, ConfigPageState
             </div>
           );
         }
-      }).filter(p => !!p) as JSX.Element[]);
+      }).filter(p => !!p) as React.JSX.Element[]);
     });
 
     return sections;
@@ -1357,7 +1355,7 @@ function setExtConfigValue(key: string, value: any): void {
   return window.Shared.back.send(BackIn.SET_EXT_CONFIG_VALUE, key, value);
 }
 
-function renderExtConfigProp(key: string, prop: ExtConfigurationProp, value: any): JSX.Element | undefined {
+function renderExtConfigProp(key: string, prop: ExtConfigurationProp, value: any): React.JSX.Element | undefined {
   switch (prop.type) {
     case 'button': {
       return (

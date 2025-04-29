@@ -1,9 +1,8 @@
 import { isAnyOf, PayloadAction } from '@reduxjs/toolkit';
 import { startAppListening } from '@renderer/store/listenerMiddleware';
-import { getViewName } from '@renderer/Util';
 import { BackIn } from '@shared/back/types';
 import { selectGame, selectPlaylist } from '../search/slice';
-import store, { history } from '../store';
+import store from '../store';
 import { removePlaylistGame, RemovePlaylistGameAction, resolveDialog, ResolveDialogActionData } from './slice';
 
 export function addMainMiddleware() {
@@ -26,13 +25,12 @@ export function addMainMiddleware() {
       const { main } = listenerApi.getState();
       const playlist = main.playlists.find(p => p.id === action.payload.playlistId);
       if (playlist) {
-        const viewId = getViewName(history.location.pathname);
         store.dispatch(selectPlaylist({
-          view: viewId,
+          view: action.payload.viewId,
           playlist
         }));
         store.dispatch(selectGame({
-          view: viewId,
+          view: action.payload.viewId,
           game: undefined
         }));
       }

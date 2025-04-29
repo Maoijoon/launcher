@@ -2,7 +2,7 @@ import { withPreferences, WithPreferencesProps } from '@renderer/containers/with
 import { VIEW_PAGE_SIZE } from '@shared/constants';
 import { memoizeOne } from '@shared/memoize';
 import * as React from 'react';
-import { ArrowKeyStepper, AutoSizer, List, ListRowProps, ScrollIndices } from 'react-virtualized-reactv17';
+import { ArrowKeyStepper, AutoSizer, List, ListRowProps, ScrollIndices } from 'react-virtualized';
 import { UpdateView, ViewGameSet } from '../interfaces';
 import { findElementAncestor, gameDragDataType, getExtremeIconURL } from '../Util';
 import { GameItemContainer } from './GameItemContainer';
@@ -37,7 +37,7 @@ export type OwnProps = {
   /** Tag Filter icons */
   tagGroupIcons: { tagFilter: TagFilter; iconBase64: string; }[];
   /** Function that renders the elements to show instead of the grid if there are no games (render prop). */
-  noRowsRenderer?: () => JSX.Element;
+  noRowsRenderer?: () => React.JSX.Element;
   /** Called when the user attempts to select a game. */
   onGameSelect: (gameId?: string, row?: number) => void;
   /** Called when the user attempts to launch a game. */
@@ -73,11 +73,11 @@ export type GameListProps = OwnProps & WithPreferencesProps;
 
 /** A list of rows, where each rows displays a game. */
 class _GameList extends React.Component<GameListProps> {
-  private _wrapper: React.RefObject<HTMLDivElement> = React.createRef();
+  private _wrapper: React.RefObject<HTMLDivElement | null> = React.createRef();
   /** Currently displayed games. */
   currentGames: ViewGameSet | undefined = undefined;
   // Used for the "view update hack"
-  list: React.RefObject<List> = React.createRef();
+  list: React.RefObject<List | null> = React.createRef();
 
   componentDidMount(): void {
     this.updateCssVars();

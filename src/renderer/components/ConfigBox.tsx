@@ -6,7 +6,7 @@ export type ConfigBoxProps = {
   swapChildren?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   contentClassName?: string;
-  bottomChildren?: JSX.Element | JSX.Element[];
+  bottomChildren?: React.JSX.Element | React.JSX.Element[];
 }
 
 export function ConfigBoxInner(props: React.PropsWithChildren<ConfigBoxProps>) {

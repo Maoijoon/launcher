@@ -26,7 +26,6 @@ import { CurateBoxWarnings } from './CurateBoxWarnings';
 import { InputElement, InputField } from './InputField';
 import { OpenIcon } from './OpenIcon';
 import { SimpleButton } from './SimpleButton';
-import { useDispatch } from 'react-redux';
 import {
   AddAppType,
   addPlatform,
@@ -37,6 +36,7 @@ import {
   setPrimaryPlatform, toggleContentNodeView
 } from '@renderer/store/curate/slice';
 import { mapRuffleSupportString } from '@shared/utils/misc';
+import { useAppDispatch } from '@renderer/hooks/useAppSelector';
 
 export type CurateBoxProps = {
   curation: CurationState;
@@ -56,7 +56,7 @@ export type CurateBoxProps = {
 export function CurateBox(props: CurateBoxProps) {
   const strings = React.useContext(LangContext);
   const disabled = !!props.curation.locked;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const folder = props.curation.folder;
 
   const splitStatus = React.useMemo(() => props.curation.game.status ? props.curation.game.status.split(';').map(s => s.trim()).sort() : [], [props.curation.game.status]);
@@ -248,7 +248,7 @@ export function CurateBox(props: CurateBoxProps) {
     return menu;
   };
 
-  function renderContentNode(depth: number, node: ContentTreeNode, key: number, tree: string[] = [], launchPath?: string): JSX.Element | JSX.Element[] {
+  function renderContentNode(depth: number, node: ContentTreeNode, key: number, tree: string[] = [], launchPath?: string): React.JSX.Element | React.JSX.Element[] {
     const filePath = tree.join('/');
     const isLaunchPath = filePath === launchPath;
     const depthDivs = [];
@@ -258,7 +258,7 @@ export function CurateBox(props: CurateBoxProps) {
     switch (node.nodeType) {
       case 'directory': {
         const children = node.expanded ? node.children.map((node, index) => renderContentNode(depth + 1, node, index, tree.concat([node.name]), launchPath))
-        .reduce<JSX.Element[]>((prev, next) => Array.isArray(next) ? prev.concat(next) : [...prev, next], []) : [];
+        .reduce<React.JSX.Element[]>((prev, next) => Array.isArray(next) ? prev.concat(next) : [...prev, next], []) : [];
         return [
           (
             <div

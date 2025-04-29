@@ -1,18 +1,32 @@
 import { useView } from '@renderer/hooks/search';
-import { useAppSelector } from '@renderer/hooks/useAppSelector';
+import { useAppDispatch, useAppSelector } from '@renderer/hooks/useAppSelector';
+import { usePreferences } from '@renderer/hooks/usePreferences';
 import { forceSearch, setAdvancedFilter, setExpanded, setOrderBy, setOrderReverse, setSearchText } from '@renderer/store/search/slice';
 import { getPlatformIconURL } from '@renderer/Util';
 import { LangContext } from '@renderer/util/lang';
 import { getDefaultAdvancedFilter } from '@shared/search/util';
 import { formatString } from '@shared/utils/StringFormatter';
-import { AdvancedFilter, AdvancedFilterAndToggles, AdvancedFilterToggle, Tag } from 'flashpoint-launcher';
+import { AdvancedFilter, AdvancedFilterToggle, Tag } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { AutoSizer, List, ListRowProps } from 'react-virtualized-reactv17';
+import { useContext } from 'react';
+import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { GameOrder } from './GameOrder';
 import { OpenIcon } from './OpenIcon';
 import { SimpleButton } from './SimpleButton';
+
+function TestComponent2() {
+  const onClearFactory = (key: string) => {
+    return () => {
+      console.log('made clear ' + key);
+    };
+  };
+  const onClear = onClearFactory('test');
+
+  return (
+    <div onClick={onClear}>
+    </div>
+  );
+}
 
 export const categoryOrder = [
   'genre',
@@ -26,9 +40,10 @@ export const categoryOrder = [
 
 export function SearchBar() {
   const view = useView();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const strings = useContext(LangContext);
   const { main: mainState, tagCategories, search } = useAppSelector((state) => state);
+  const preferences = usePreferences();
 
   const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setSearchText({
@@ -175,6 +190,7 @@ export function SearchBar() {
   };
 
   const onClearFactory = (key: keyof AdvancedFilter) => {
+    console.log('made clear ' + key);
     return () => {
       dispatch(setAdvancedFilter({
         view: view.id,
@@ -194,7 +210,7 @@ export function SearchBar() {
           ...view.advancedFilter,
           andToggles: {
             ...view.advancedFilter.andToggles,
-            [key as keyof AdvancedFilterAndToggles]: value
+            [key]: value
           }
         }
       }));
@@ -242,18 +258,19 @@ export function SearchBar() {
   const onSetAndToggleRuffleSupport = onSetAndToggleFactory('ruffleSupport');
 
   const simpleSelectItems = (values: string[] | null): SearchableSelectItem[] => {
+    console.log(values);
     return values ? values.map(v => ({
       value: v,
       orderVal: v,
     })) : [];
   };
 
-  const libraryItems = useMemo(() => simpleSelectItems(mainState.libraries), [mainState.libraries]);
-  const playModeItems = useMemo(() => simpleSelectItems(mainState.suggestions.playMode), [mainState.suggestions.playMode]);
-  const platformItems = useMemo(() => simpleSelectItems(mainState.suggestions.platforms), [mainState.suggestions.platforms]);
-  const developerItems = useMemo(() => simpleSelectItems(search.dropdowns.developers), [search.dropdowns.developers]);
-  const publisherItems = useMemo(() => simpleSelectItems(search.dropdowns.publishers), [search.dropdowns.publishers]);
-  const seriesItems = useMemo(() => simpleSelectItems(search.dropdowns.series), [search.dropdowns.series]);
+  const libraryItems = simpleSelectItems(mainState.libraries);
+  const playModeItems = simpleSelectItems(mainState.suggestions.playMode);
+  const platformItems = simpleSelectItems(mainState.suggestions.platforms);
+  const developerItems = simpleSelectItems(search.dropdowns.developers);
+  const publisherItems = simpleSelectItems(search.dropdowns.publishers);
+  const seriesItems = simpleSelectItems(search.dropdowns.series);
   const ruffleSupportItems: SearchableSelectItem[] = [{
     value: '',
     orderVal: ''
@@ -261,20 +278,14 @@ export function SearchBar() {
     value: 'standalone',
     orderVal: 'Standalone'
   }];
-  const tagItems = useMemo((): TagSelectItem[] => {
-    if (search.dropdowns.tags) {
-      return search.dropdowns.tags.map(tag => {
-        const categoryId = tag.category ? categoryOrder.indexOf(tag.category) : 99999;
-        return {
-          value: tag.name,
-          orderVal: `${categoryId} ${tag.name} ${tag.aliases.join((' '))}`,
-          tag: tag,
-        };
-      });
-    } else {
-      return [];
-    }
-  }, [search.dropdowns.tags]);
+  const tagItems = search.dropdowns.tags ? search.dropdowns.tags.map(tag => {
+    const categoryId = tag.category ? categoryOrder.indexOf(tag.category) : 99999;
+    return {
+      value: tag.name,
+      orderVal: `${categoryId} ${tag.name} ${tag.aliases.join((' '))}`,
+      tag: tag,
+    };
+  }) : [];
 
   const genSelectItem = (missing: string): SearchableSelectItem => {
     return {
@@ -405,7 +416,7 @@ export function SearchBar() {
             title={strings.browse.installed}
             value={view.advancedFilter.installed}
             onChange={onInstalledChange} />
-          {window.Shared.preferences.data.enableEditing && (
+          {preferences.enableEditing && (
             <ThreeStateCheckbox
               title={strings.browse.legacyGame}
               value={view.advancedFilter.legacy}
@@ -418,7 +429,7 @@ export function SearchBar() {
               twoState={true}
               onChange={onPlaylistOrderChange} />
           )}
-          {window.Shared.preferences.data.useCustomViews && (
+          {preferences.useCustomViews && (
             <SearchableSelect
               title={strings.browse.library}
               items={libraryItems}
@@ -453,6 +464,7 @@ export function SearchBar() {
             onBlacklist={onBlacklistDeveloper}
             onClear={onClearDeveloper}
             onSetAndToggle={onSetAndToggleDeveloper} />
+          <TestComponent2/>
           <SearchableSelect
             title={strings.browse.publisher}
             items={publisherItems}
@@ -562,7 +574,7 @@ type SearchableSelectProps<T extends SearchableSelectItem> = {
   onClear: () => void;
   onSetAndToggle: (value: boolean) => void;
   mapName?: (name: string) => string;
-  labelRenderer?: (item: T, selected: boolean) => JSX.Element;
+  labelRenderer?: (item: T, selected: boolean) => React.JSX.Element;
   generateItem: (missing: string) => T;
 }
 
@@ -659,7 +671,7 @@ type SearchableSelectDropdownProps<T extends SearchableSelectItem> = {
   items: T[];
   andToggle: boolean;
   selected: Record<string, AdvancedFilterToggle>;
-  labelRenderer?: (item: T, selected: boolean) => JSX.Element;
+  labelRenderer?: (item: T, selected: boolean) => React.JSX.Element;
   mapName?: (id: string) => string;
   onWhitelist: (item: string) => void;
   onBlacklist: (item: string) => void;

@@ -78,7 +78,6 @@ type RightBrowseSidebarState = {
   gameDataBrowserOpen: boolean;
   activeData: GameData | null;
   showExtremeScreenshots: boolean;
-  middleScrollRef: React.RefObject<HTMLDivElement>;
   gameConfigDialogOpen: boolean;
   playlistGame: PlaylistGame | null;
 };
@@ -101,10 +100,13 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
   onLanguageClick = this.wrapOnTextClick('language');
   onRuffleSupportClick = this.wrapOnTextClick('ruffleSupport');
 
-  launchCommandRef: React.RefObject<HTMLInputElement> = React.createRef();
+  launchCommandRef: React.RefObject<HTMLInputElement | null>;
+  middleScrollRef: React.RefObject<HTMLDivElement | null>;
 
   constructor(props: RightBrowseSidebarProps) {
     super(props);
+    this.launchCommandRef = React.createRef();
+    this.middleScrollRef = React.createRef();
     this.state = {
       showPreview: false,
       screenshotExists: false,
@@ -116,7 +118,6 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       gameDataBrowserOpen: false,
       showExtremeScreenshots: false,
       activeData: null,
-      middleScrollRef: React.createRef(),
       gameConfigDialogOpen: false,
       playlistGame: null,
     };
@@ -199,8 +200,8 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       // Hide again when changing games
       this.setState({ showExtremeScreenshots: false });
       // Move scroll bar of middle section back to the top
-      if (this.state.middleScrollRef.current) {
-        this.state.middleScrollRef.current.scrollTo(0, 0);
+      if (this.middleScrollRef.current) {
+        this.middleScrollRef.current.scrollTo(0, 0);
       }
     }
     if (prevProps.currentGame && prevProps.currentGame.activeDataId && (!this.props.currentGame || !this.props.currentGame.activeDataId)) {
@@ -419,6 +420,12 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
         playlistGame,
         suggestions: this.props.suggestions,
         fpfssEditMode: this.props.fpfssEditMode || false,
+        doSearch: (text) => {
+          this.props.onSearch(text);
+        },
+        launchGame: (gameId) => {
+          this.props.onGameLaunch(gameId, null);
+        },
         launchAddApp: this.onAddAppLaunch,
         updateGame: this.props.onEditGame,
         updatePlaylistNotes: (notes) => {
@@ -683,7 +690,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
             )}
           </div>
           <div
-            ref={this.state.middleScrollRef}
+            ref={this.middleScrollRef}
             className='browse-right-sidebar__middle simple-scroll'>
             {/* -- Most Fields -- */}
             <>
@@ -817,15 +824,15 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
   }
 
   onApplicationPathExpand = () => {
-    if (this.state.middleScrollRef.current) {
-      this.state.middleScrollRef.current.scrollTo({
-        top: this.state.middleScrollRef.current.scrollHeight,
+    if (this.middleScrollRef.current) {
+      this.middleScrollRef.current.scrollTo({
+        top: this.middleScrollRef.current.scrollHeight,
         behavior: 'smooth'
       });
     }
   };
 
-  renderDeleteGameButton({ confirm, extra }: ConfirmElementArgs<LangContainer['browse']>): JSX.Element {
+  renderDeleteGameButton({ confirm, extra }: ConfirmElementArgs<LangContainer['browse']>): React.JSX.Element {
     return (
       <div
         className='browse-right-sidebar__title-row__buttons__delete-game'
@@ -836,7 +843,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     );
   }
 
-  renderRemoveFromPlaylistButton({ confirm, extra }: ConfirmElementArgs<LangContainer['browse']>): JSX.Element {
+  renderRemoveFromPlaylistButton({ confirm, extra }: ConfirmElementArgs<LangContainer['browse']>): React.JSX.Element {
     return (
       <div
         className='browse-right-sidebar__title-row__buttons__remove-from-playlist'
@@ -945,12 +952,12 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     const template: MenuItemConstructorOptions[] = [];
     if (currentGame) {
       template.push({
-        label: this.context.menu.viewThumbnailInFolder,
+        label: (this.context as LangContainer).menu.viewThumbnailInFolder,
         click: () => { remote.shell.showItemInFolder(getGameImagePath(LOGOS, currentGame.id).replace(/\//g, '\\')); },
         enabled: true
       });
       template.push({
-        label: this.context.menu.viewScreenshotInFolder,
+        label: (this.context as LangContainer).menu.viewScreenshotInFolder,
         click: () => { remote.shell.showItemInFolder(getGameImagePath(SCREENSHOTS, currentGame.id).replace(/\//g, '\\')); },
         enabled: true
       });

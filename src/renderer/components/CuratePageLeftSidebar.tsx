@@ -1,16 +1,15 @@
 import { OpenIcon } from '@renderer/components/OpenIcon';
 import { withMainState, WithMainStateProps } from '@renderer/containers/withMainState';
+import { useAppDispatch, useAppSelector } from '@renderer/hooks/useAppSelector';
 import { useMouse } from '@renderer/hooks/useMouse';
+import * as curateActions from '@renderer/store/curate/slice';
+import { CurateGroup } from '@renderer/store/curate/slice';
+import { createDialog } from '@renderer/store/main/slice';
 import { findElementAncestor, getPlatformIconURL } from '@renderer/Util';
 import { compare } from '@shared/Util';
 import { uuid } from '@shared/utils/uuid';
 import { CurationState, DialogState } from 'flashpoint-launcher';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import * as curateActions from '@renderer/store/curate/slice';
-import { useAppSelector } from '@renderer/hooks/useAppSelector';
-import { CurateGroup } from '@renderer/store/curate/slice';
-import { createDialog } from '@renderer/store/main/slice';
 
 const index_attr = 'data-index';
 
@@ -26,7 +25,7 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
   const [draggedCuration, setDraggedCuration] = React.useState('');
   const [dragGroupTarget, setDragGroupTarget] = React.useState<string | undefined>(undefined);
   const curate = useAppSelector((state) => state.curate);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   console.log('left list render items: ' + curate.curations.length);
 
   const [onListMouseDown, onListMouseUp] = useMouse<string>(() => ({
@@ -136,7 +135,7 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
     setDragGroupTarget(undefined);
   };
 
-  const renderCurationGroup = (group: CurateGroup, elems: JSX.Element[]) => {
+  const renderCurationGroup = (group: CurateGroup, elems: React.JSX.Element[]) => {
     const collapsed = curate.collapsedGroups.includes(group.name);
     const pinned = curate.groups.findIndex(g => g.name === group.name) !== -1;
     return (
@@ -183,8 +182,8 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
     };
     let stagingGroup: CurateGroup = matchGroup(sortedCurations[0].group);
     // Render all groups present on curations
-    let stagingElems: JSX.Element[] = [];
-    const groupRenders: Map<string, JSX.Element> = new Map();
+    let stagingElems: React.JSX.Element[] = [];
+    const groupRenders: Map<string, React.JSX.Element> = new Map();
     sortedCurations.forEach((cur) => {
       if (stagingGroup.name !== cur.group) {
         // New group, flush and set up new group
@@ -212,7 +211,7 @@ function CuratePageLeftSidebarComponent(props: CuratePageLeftSidebarComponentPro
         return 1;
       }
       return compare(a[0], b[0]);
-    }).reduce<JSX.Element[]>((prev, cur) => prev.concat([cur[1]]), []);
+    }).reduce<React.JSX.Element[]>((prev, cur) => prev.concat([cur[1]]), []);
   };
 
   const createNewGroup = () => {

@@ -12,7 +12,7 @@ export type ConfirmElementArgs<T = undefined> = {
 
 type ConfirmElementComponentProps<T = undefined> = {
   /** Function that renders the element (render prop). */
-  render?: (args: ConfirmElementArgs<T>) => JSX.Element | undefined;
+  render?: (args: ConfirmElementArgs<T>) => React.JSX.Element | undefined;
   /** Confirmation Message */
   message: string;
   /** Called when confirmed. */
@@ -45,4 +45,4 @@ function ConfirmElementComponent<T = undefined>(props: ConfirmElementComponentPr
 }
 
 export type ConfirmElementProps<T = undefined> = Subtract<ConfirmElementComponentProps<T>, WithConfirmDialogProps>;
-export const ConfirmElement = withConfirmDialog(ConfirmElementComponent) as unknown as <T = undefined>(props: ConfirmElementProps<T>) => JSX.Element;
+export const ConfirmElement = withConfirmDialog(ConfirmElementComponent) as unknown as <T = undefined>(props: ConfirmElementProps<T>) => React.JSX.Element;

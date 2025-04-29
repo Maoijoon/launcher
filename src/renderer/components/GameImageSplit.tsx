@@ -42,10 +42,11 @@ export class GameImageSplit extends React.Component<GameImageSplitProps, GameIma
   static contextType = LangContext;
   declare context: React.ContextType<typeof LangContext>;
 
-  inputRef: HTMLInputElement | null;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 
   constructor(props: GameImageSplitProps) {
     super(props);
+    this.inputRef = React.createRef();
     this.state = {
       hover: false,
       showPreview: false
@@ -80,13 +81,13 @@ export class GameImageSplit extends React.Component<GameImageSplitProps, GameIma
             <h1>{formatString(strings.misc.noBlankFound, text)}</h1>
             <input
               hidden={true}
-              ref={(ref) => this.inputRef = ref}
+              ref={this.inputRef}
               accept='image/png'
               onChange={this.onInputFileChange}
               type='file'/>
             <SimpleButton
               value={formatString(strings.misc.addBlank, text)}
-              onClick={() => this.inputRef && this.inputRef.click()}
+              onClick={() => this.inputRef.current && this.inputRef.current.click()}
               disabled={disabled} />
           </div>
         ) : (
@@ -162,7 +163,7 @@ export class GameImageSplit extends React.Component<GameImageSplitProps, GameIma
   };
 }
 
-function renderDeleteImageButton({ confirm, extra }: ConfirmElementArgs<[LangContainer['misc'], string, boolean]>): JSX.Element {
+function renderDeleteImageButton({ confirm, extra }: ConfirmElementArgs<[LangContainer['misc'], string, boolean]>): React.JSX.Element {
   const [ strings, text, disabled ] = extra;
   return (
     <div

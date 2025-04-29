@@ -5,14 +5,14 @@ import { getLibraryItemTitle } from '@shared/library/util';
 import { updatePreferencesData } from '@shared/preferences/util';
 import { formatString } from '@shared/utils/StringFormatter';
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 import { WithPreferencesProps } from '../containers/withPreferences';
 import { gameScaleSpan, getViewName } from '../Util';
 import { LangContext } from '../util/lang';
 import { WithViewProps } from '@renderer/containers/withView';
 import { GENERAL_VIEW_ID } from '@renderer/store/search/slice';
+import { WithNavigationProps } from '@renderer/containers/withNavigation';
 
-export type FooterProps = RouteComponentProps & WithViewProps & WithPreferencesProps & WithMainStateProps;
+export type FooterProps = WithViewProps & WithPreferencesProps & WithMainStateProps & WithNavigationProps;
 
 /** The footer that is always visible at the bottom of the main window. */
 export class Footer extends React.Component<FooterProps> {
@@ -21,7 +21,7 @@ export class Footer extends React.Component<FooterProps> {
 
   static scaleSliderMax = 1000;
   /** Reference to the scale slider. */
-  scaleSliderRef: React.RefObject<HTMLInputElement> = React.createRef();
+  scaleSliderRef: React.RefObject<HTMLInputElement | null> = React.createRef();
 
   componentDidMount() {
     window.addEventListener('keydown', this.onGlobalKeydown);

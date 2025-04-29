@@ -1,6 +1,6 @@
 import { GameOrderReverse, TagCategory } from 'flashpoint-launcher';
 import * as React from 'react';
-import { ArrowKeyStepper, AutoSizer, List, ListRowProps } from 'react-virtualized-reactv17';
+import { ArrowKeyStepper, AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { findElementAncestor } from '../Util';
 import { TagCategoriesListHeader } from './TagCategoriesListHeader';
 import { TagCategoriesListItem } from './TagCategoriesListItem';
@@ -21,7 +21,7 @@ export type TagCategoriesProps = {
   /** Height of each row in the list (in pixels). */
   rowHeight: number;
   /** Function that renders the elements to show instead of the grid if there are no games (render prop). */
-  noRowsRenderer?: () => JSX.Element;
+  noRowsRenderer?: () => React.JSX.Element;
   /** Called when the user attempts to select a game. */
   onCategorySelect: (tagId?: number) => void;
   // React-Virtualized pass-through props (their values are not used for anything other than updating the grid when changed)
@@ -32,7 +32,7 @@ export type TagCategoriesProps = {
 
 /** A list of rows, where each rows displays a game. */
 export class TagCategoriesList extends React.Component<TagCategoriesProps> {
-  private _wrapper: React.RefObject<HTMLDivElement> = React.createRef();
+  private _wrapper: React.RefObject<HTMLDivElement | null> = React.createRef();
   /** Currently displayed games. */
   currentCategories: TagCategory[] | undefined = undefined;
 

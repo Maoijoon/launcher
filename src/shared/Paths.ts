@@ -1,7 +1,7 @@
 /** URL Paths of the different pages */
 export enum Paths {
   HOME       = '/',
-  BROWSE     = '/browse',
+  BROWSE     = '/browse/*',
   TAGS       = '/tags',
   CATEGORIES = '/categories',
   LOGS       = '/logs',

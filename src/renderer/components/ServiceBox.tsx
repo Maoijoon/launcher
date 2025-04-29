@@ -165,7 +165,6 @@ function useInterval(callback: () => void, ms: number, deps?: any[]): void {
   React.useEffect(() => {
     const interval = setInterval(callback, ms);
     return () => { clearInterval(interval); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 

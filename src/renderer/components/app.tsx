@@ -29,10 +29,9 @@ import {
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
 import { ConnectedFooter } from '../containers/ConnectedFooter';
 import { ConnectedRightBrowseSidebar } from '../containers/ConnectedRightBrowseSidebar';
-import Header from '../containers/HeaderContainer';
+import HeaderContainer from '../containers/HeaderContainer';
 import { WithMainStateProps } from '../containers/withMainState';
 import { WithPreferencesProps } from '../containers/withPreferences';
 import { WithTagCategoriesProps } from '../containers/withTagCategories';
@@ -60,6 +59,7 @@ import { GameComponentDropdownSelectField, GameComponentInputField } from './Dis
 import { DynamicThemeProvider } from './DynamicThemeProvider';
 import { DisplaySettings } from 'flashpoint-launcher-renderer';
 import { uuid } from '@shared/utils/uuid';
+import { WithNavigationProps } from '@renderer/containers/withNavigation';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
@@ -92,10 +92,10 @@ const DEFAULT_DISPLAYS: DisplaySettings = {
   }
 };
 
-export type AppProps = AppOwnProps & RouteComponentProps & WithViewProps & WithFpfssProps & WithPreferencesProps & WithSearchProps & WithTagCategoriesProps & WithMainStateProps & WithTasksProps & WithCurateProps & WithShortcutProps;
+export type AppProps = AppOwnProps & WithViewProps & WithFpfssProps & WithPreferencesProps & WithSearchProps & WithTagCategoriesProps & WithMainStateProps & WithTasksProps & WithCurateProps & WithShortcutProps & WithNavigationProps;
 
 export class App extends React.Component<AppProps> {
-  appRef: React.RefObject<HTMLDivElement>;
+  appRef: React.RefObject<HTMLDivElement | null>;
 
   constructor(props: AppProps) {
     super(props);
@@ -356,7 +356,7 @@ export class App extends React.Component<AppProps> {
       }
 
       this.props.setTagCategories(data.tagCategories);
-      this.props.history.push(this.props.preferencesData.defaultOpeningPage);
+      this.props.navigate(this.props.preferencesData.defaultOpeningPage);
     })
     .then(() => {
       this.props.mainActions.addLoaded([BackInit.DATABASE]);
@@ -947,7 +947,7 @@ export class App extends React.Component<AppProps> {
   componentDidUpdate(prevProps: AppProps) {
     if (this.props.main.loadedAll) {
       const selectedPlaylistId = this.props.main.selectedPlaylistId;
-      const { history, location, preferencesData } = this.props;
+      const { preferencesData } = this.props;
 
       // Check if theme changed
       if (preferencesData.currentTheme !== prevProps.preferencesData.currentTheme) {
@@ -1014,8 +1014,8 @@ export class App extends React.Component<AppProps> {
       }
 
       // Update preference "lastSelectedLibrary"
-      const gameLibrary = getViewName(location.pathname);
-      if (location.pathname.startsWith(Paths.BROWSE) &&
+      const gameLibrary = getViewName(this.props.location.pathname);
+      if (this.props.location.pathname.startsWith(Paths.BROWSE) &&
         preferencesData.lastSelectedLibrary !== gameLibrary) {
         updatePreferencesData({ lastSelectedLibrary: gameLibrary });
       }
@@ -1024,7 +1024,7 @@ export class App extends React.Component<AppProps> {
       if (this.props.main.wasNewGameClicked) {
         const route = preferencesData.lastSelectedLibrary || preferencesData.defaultLibrary || '';
 
-        if (location.pathname.startsWith(Paths.BROWSE)) {
+        if (this.props.location.pathname.startsWith(Paths.BROWSE)) {
           this.props.setMainState({
             wasNewGameClicked: false
           });
@@ -1037,7 +1037,7 @@ export class App extends React.Component<AppProps> {
             });
           }
         } else {
-          history.push(joinLibraryRoute(route));
+          this.props.navigate(joinLibraryRoute(route));
         }
       }
     }
@@ -1150,6 +1150,7 @@ export class App extends React.Component<AppProps> {
       await window.Shared.back.request(BackIn.DELETE_PLAYLIST_GAME, this.props.currentView.selectedPlaylist.id, playlistGame.gameId);
       // Remove from playlist on frontend
       this.props.mainActions.removePlaylistGame({
+        viewId: getViewName(this.props.location.pathname),
         playlistId: this.props.currentView.selectedPlaylist.id,
         gameId: playlistGame.gameId
       });
@@ -1362,7 +1363,7 @@ export class App extends React.Component<AppProps> {
                     folder
                   });
                   // Redirect to Curate once it's been made
-                  this.props.history.push(Paths.CURATE);
+                  this.props.navigate(Paths.CURATE);
                 } else {
                   ipcRenderer.invoke(CustomIPC.SHOW_MESSAGE_BOX, {
                     title: 'Failed to create curation',
@@ -1566,7 +1567,7 @@ export class App extends React.Component<AppProps> {
                 {this.props.main.loadedAll ? (
                   <>
                     {/* Header */}
-                    <Header
+                    <HeaderContainer
                       logoutUser={this.logoutUser}
                       user={this.props.fpfss.user}
                       libraries={this.props.main.libraries}
@@ -1581,7 +1582,7 @@ export class App extends React.Component<AppProps> {
                           This website requires JavaScript to be enabled.
                         </div>
                       </noscript>
-                      {currentView.selectedGame && !hiddenRightSidebarPages.reduce((prev, cur) => prev || this.props.history.location.pathname.startsWith(cur), false) && (
+                      {currentView.selectedGame && !hiddenRightSidebarPages.reduce((prev, cur) => prev || this.props.location.pathname.startsWith(cur), false) && (
                         <ResizableSidebar
                           show={this.props.preferencesData.browsePageShowRightSidebar}
                           divider='before'

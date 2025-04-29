@@ -80,7 +80,7 @@ export function Dialog(props: DialogProps) {
   );
 }
 
-function renderDialogField(dialogId: string, field: DialogField, updateField: typeof updateDialogField): JSX.Element {
+function renderDialogField(dialogId: string, field: DialogField, updateField: typeof updateDialogField): React.JSX.Element {
   switch (field.type) {
     case 'string': {
       return (

@@ -1,5 +1,7 @@
 import { CurateBoxRow } from '@renderer/components/CurateBoxRow';
 import { InputElement, InputField, InputFieldEntry } from '@renderer/components/InputField';
+import { useAppDispatch } from '@renderer/hooks/useAppSelector';
+import { editCurationMeta } from '@renderer/store/curate/slice';
 import { LangContext } from '@renderer/util/lang';
 import { CurationMeta } from '@shared/curate/types';
 import { Tag, TagCategory, TagSuggestion } from 'flashpoint-launcher';
@@ -7,8 +9,6 @@ import * as React from 'react';
 import { Dispatch } from 'redux';
 import { DropdownInputField } from './DropdownInputField';
 import { TagInputField } from './TagInputField';
-import { useDispatch } from 'react-redux';
-import { editCurationMeta } from '@renderer/store/curate/slice';
 
 // TODO: Figure out why these type members are reading as unused props
 /* eslint-disable react/no-unused-prop-types */
@@ -49,7 +49,7 @@ export function CurateBoxInputEntryRow(props: CurateBoxInputEntryRowProps) {
 }
 
 export function CurateBoxInputRow(props: CurateBoxInputRowProps) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const onChange = useOnInputChange(props.property, props.curationFolder, dispatch);
 
   return (
@@ -78,7 +78,7 @@ export type CurateBoxDropdownInputRowProps = CurateBoxInputRowProps & {
 }
 
 export function CurateBoxDropdownInputRow(props: CurateBoxDropdownInputRowProps) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { curationFolder, property } = props;
   const onChange = (event: InputElementOnChangeEvent) => {
     const item = props.items.find(i => i.value === event.currentTarget.value);
@@ -116,7 +116,7 @@ export type CurateBoxTagDropdownInputRowProps = CurateBoxInputRowProps & {
   onChange?: (event: React.ChangeEvent<InputElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<InputElement>) => void;
   getTagFromName: (tagName: string) => Promise<Tag | null>;
-  renderIconSugg?: (sugg: TagSuggestion) => JSX.Element;
+  renderIconSugg?: (sugg: TagSuggestion) => React.JSX.Element;
 }
 
 export function CurateBoxTagDropdownInputRow(props: CurateBoxTagDropdownInputRowProps) {

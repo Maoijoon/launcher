@@ -5,7 +5,7 @@ import * as React from 'react';
 /** Props for an input element. */
 type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
-export type CheckBoxProps = Omit<InputProps, 'type'> & {
+export type CheckBoxProps = Omit<InputProps, 'type' | 'onToggle'> & {
   /** Called when the checkbox becomes checked or unchecked. This is called right after "onChange". */
   onToggle?: (isChecked: boolean) => void;
 };

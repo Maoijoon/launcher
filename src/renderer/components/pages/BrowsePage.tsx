@@ -16,7 +16,7 @@ import { Menu, MenuItemConstructorOptions } from 'electron';
 import { GameLaunchOverride, LangContainer, Playlist } from 'flashpoint-launcher';
 import * as path from 'path';
 import * as React from 'react';
-import { ScrollIndices } from 'react-virtualized-reactv17';
+import { ScrollIndices } from 'react-virtualized';
 import { ConnectedLeftBrowseSidebar } from '../../containers/ConnectedLeftBrowseSidebar';
 import { WithPreferencesProps } from '../../containers/withPreferences';
 import { gameDragDataType, gameScaleSpan } from '../../Util';
@@ -81,7 +81,7 @@ export class BrowsePage extends React.Component<BrowsePageProps, BrowsePageState
 
   /** Reference of the game grid/list element. */
   gameGridOrListRef: HTMLDivElement | null = null;
-  gameBrowserRef: React.RefObject<HTMLDivElement> = React.createRef();
+  gameBrowserRef: React.RefObject<HTMLDivElement | null> = React.createRef();
 
   /** Time it takes before the current "quick search" string to reset after a change was made (in milliseconds). */
   static readonly quickSearchTimeout: number = 1500;

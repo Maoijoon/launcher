@@ -30,7 +30,6 @@ export function DynamicThemeProvider({ fileList, children }: DynamicThemeProvide
       setLoadedFiles(prev => [...prev, ...newFiles]);
       loadFiles(newFiles);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileList]);
 
   return <>

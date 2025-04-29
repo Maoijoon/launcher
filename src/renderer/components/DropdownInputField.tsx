@@ -68,9 +68,9 @@ export function DropdownInputFieldMapped(props: DropdownInputFieldMappedProps) {
 
 /** An input element with a drop-down menu that can list any number of selectable and clickable text elements. */
 export class DropdownInputField extends React.Component<DropdownInputFieldProps, DropdownInputFieldState> {
-  rootRef: React.RefObject<HTMLDivElement> = React.createRef();
-  contentRef: React.RefObject<HTMLDivElement> = React.createRef();
-  inputRef: React.RefObject<InputElement> = React.createRef();
+  rootRef: React.RefObject<HTMLDivElement | null> = React.createRef();
+  contentRef: React.RefObject<HTMLDivElement | null> = React.createRef();
+  inputRef: React.RefObject<InputElement | null> = React.createRef();
 
   constructor(props: DropdownInputFieldProps) {
     super(props);
@@ -141,7 +141,7 @@ export class DropdownInputField extends React.Component<DropdownInputFieldProps,
   }
 
   /** Renders the list of items in the drop-down menu. */
-  renderItems = memoizeOne<(items: string[]) => JSX.Element[]>((items: string[]) => {
+  renderItems = memoizeOne<(items: string[]) => React.JSX.Element[]>((items: string[]) => {
     return items.map((text, index) => (
       <label
         key={index}

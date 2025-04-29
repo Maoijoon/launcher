@@ -25,21 +25,23 @@ export function GameComponentAlternateTitles(props: GameComponentProps) {
 }
 
 export function GameComponentSeries(props: GameComponentProps) {
-  const { lang, game, updateGame } = props;
+  const { editable, lang, game, updateGame, doSearch } = props;
   return <GameComponentInputField
     header={lang.browse.series}
     text={game.series}
     placeholder={lang.browse.noSeries}
+    onClick={() => { if (!editable) { doSearch(`series=${game.series}`); }}}
     onChange={(value) => updateGame({ series: value })}
     {...props} />;
 }
 
 export function GameComponentPublisher(props: GameComponentProps) {
-  const { lang, game, updateGame } = props;
+  const { editable, lang, game, updateGame, doSearch } = props;
   return <GameComponentInputField
     header={lang.browse.publisher}
     text={game.publisher}
     placeholder={lang.browse.noPublisher}
+    onClick={() => { if (!editable) { doSearch(`publisher=${game.publisher}`); }}}
     onChange={(value) => updateGame({ publisher: value })}
     {...props} />;
 }
@@ -65,17 +67,18 @@ export function GameComponentVersion(props: GameComponentProps) {
 }
 
 export function GameComponentLanguage(props: GameComponentProps) {
-  const { lang, game, updateGame } = props;
+  const { editable, lang, game, updateGame, doSearch } = props;
   return <GameComponentInputField
     header={lang.browse.language}
     text={game.language}
     placeholder={lang.browse.noLanguage}
+    onClick={() => { if (!editable) { doSearch(`language=${game.publisher}`); }}}
     onChange={(value) => updateGame({ language: value })}
     {...props} />;
 }
 
 export function GameComponentPlayMode(props: GameComponentProps) {
-  const { editable, suggestions, lang, game, updateGame } = props;
+  const { editable, suggestions, lang, game, updateGame, doSearch } = props;
   return (
     <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
       <p>{lang.browse.playMode}: </p>
@@ -85,6 +88,7 @@ export function GameComponentPlayMode(props: GameComponentProps) {
         onChange={(event) => updateGame({ playMode: event.currentTarget.value })}
         className='browse-right-sidebar__searchable'
         editable={editable}
+        onClick={() => { if (!editable) { doSearch(`playMode=${game.playMode}`); }}}
         items={suggestions && filterSuggestions(suggestions.playMode) || []}
         onItemSelect={text => updateGame({ playMode: text })} />
     </div>
@@ -92,7 +96,7 @@ export function GameComponentPlayMode(props: GameComponentProps) {
 }
 
 export function GameComponentStatus(props: GameComponentProps) {
-  const { editable, suggestions, lang, game, updateGame } = props;
+  const { editable, suggestions, lang, game, updateGame, doSearch } = props;
   return (
     <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
       <p>{lang.browse.status}: </p>
@@ -102,6 +106,7 @@ export function GameComponentStatus(props: GameComponentProps) {
         onChange={(event) => updateGame({ status: event.currentTarget.value })}
         className='browse-right-sidebar__searchable'
         editable={editable}
+        onClick={() => { if (!editable) { doSearch(`status=${game.status}`); }}}
         items={suggestions && filterSuggestions(suggestions.status) || []}
         onItemSelect={text => updateGame({ status: text })} />
     </div>
@@ -313,7 +318,7 @@ export function GameComponentNotes(props: GameComponentProps) {
 }
 
 export function GameComponentRuffleSupport(props: GameComponentProps) {
-  const { editable, lang, game, updateGame } = props;
+  const { editable, lang, game, updateGame, doSearch } = props;
 
   return (
     <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
@@ -330,6 +335,7 @@ export function GameComponentRuffleSupport(props: GameComponentProps) {
           key: 'standalone',
           value: 'Standalone'
         }]}
+        onClick={() => { if (!editable) { doSearch(`ruffle=${game.ruffleSupport}`); }}}
         onChange={(key) => {
           updateGame({ ruffleSupport: key });
         }} />
@@ -343,7 +349,7 @@ export function GameComponentRuffleSupport(props: GameComponentProps) {
 }
 
 export function GameComponentTags(props: GameComponentProps) {
-  const { editable, lang, game, tagCategories, fpfssEditMode, preferences, updateGame } = props;
+  const { editable, lang, game, tagCategories, fpfssEditMode, preferences, updateGame, doSearch } = props;
   const [currentTagInput, setCurrentTagInput] = useState('');
   const [tagSuggestions, setTagSuggestions] = useState<TagSuggestion[]>([]);
 
@@ -404,7 +410,7 @@ export function GameComponentTags(props: GameComponentProps) {
     setCurrentTagInput('');
   };
 
-  const   onAddTagByString = (text: string) => {
+  const onAddTagByString = (text: string) => {
     if (text !== '') {
       if (fpfssEditMode) {
         const newTagText = text.trim();
@@ -455,6 +461,7 @@ export function GameComponentTags(props: GameComponentProps) {
         tags={game.detailedTags || []}
         suggestions={tagSuggestions}
         categories={tagCategories}
+        onTagSelect={(tag) => { if (!editable) { doSearch(`tag="${tag.name}"`); }}}
         onTagEditableSelect={onRemoveTag}
         onTagSuggestionSelect={onAddTagSuggestion}
         onTagSubmit={onAddTagByString} />
@@ -463,12 +470,12 @@ export function GameComponentTags(props: GameComponentProps) {
 }
 
 export function GameComponentPlatforms(props: GameComponentProps) {
-  const { editable, lang, game, tagCategories, fpfssEditMode, logoVersion, updateGame } = props;
+  const { editable, lang, game, tagCategories, fpfssEditMode, logoVersion, updateGame, doSearch } = props;
 
   const [currentPlatformInput, setCurrentPlatformInput] = useState('');
   const [platformSuggestions, setPlatformSuggestions] = useState<TagSuggestion[]>([]);
 
-  const renderPlatformIcon = (platform: Platform): JSX.Element => {
+  const renderPlatformIcon = (platform: Platform): React.JSX.Element => {
     const platformIcon = getPlatformIconURL(platform.name, logoVersion);
     return (
       <div
@@ -596,6 +603,7 @@ export function GameComponentPlatforms(props: GameComponentProps) {
             tags={game.detailedPlatforms?.filter(p => p.name == game.primaryPlatform) || []}
             suggestions={[]}
             categories={[]}
+            onTagSelect={(tag) => { if (!editable) { doSearch(`platform="${tag.name}"`); }}}
             renderIcon={renderPlatformIcon}
             renderIconSugg={renderPlatformIconSugg} />
         </div>
