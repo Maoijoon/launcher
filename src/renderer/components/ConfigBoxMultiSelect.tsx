@@ -34,7 +34,7 @@ export function ConfigBoxMultiSelect<T>(props: ConfigBoxMultiSelectProps<T>) {
               </div>
               <div className='simple-center'>
                 <p className='simple-center__vertical-inner log-page__dropdown-item-text'>
-                  {item.display || item.value}
+                  {item.display || (item.value as any)}
                 </p>
               </div>
             </label>

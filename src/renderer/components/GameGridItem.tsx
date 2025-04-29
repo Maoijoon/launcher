@@ -68,12 +68,9 @@ export function GameGridItem(props: GameGridItemProps) {
   }
   const platformIcons = platforms.slice(0, 5).map(p => getPlatformIconURL(p, props.logoVersion));
   // Pick class names
-  const className = () => {
-    let className = 'game-grid-item';
-    if (isSelected) { className += ' game-grid-item--selected'; }
-    if (isDragged)  { className += ' game-grid-item--dragged';  }
-    return className;
-  };
+  let className = 'game-grid-item';
+  if (isSelected) { className += ' game-grid-item--selected'; }
+  if (isDragged)  { className += ' game-grid-item--dragged';  }
 
   const attributes: any = {};
   attributes[GameGridItem.idAttribute] = id;

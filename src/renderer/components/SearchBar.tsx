@@ -43,7 +43,7 @@ export function SearchBar() {
   const dispatch = useAppDispatch();
   const strings = useContext(LangContext);
   const { main: mainState, tagCategories, search } = useAppSelector((state) => state);
-  const preferences = usePreferences();
+  const { enableEditing, useCustomViews } = usePreferences();
 
   const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setSearchText({
@@ -416,7 +416,7 @@ export function SearchBar() {
             title={strings.browse.installed}
             value={view.advancedFilter.installed}
             onChange={onInstalledChange} />
-          {preferences.enableEditing && (
+          {enableEditing && (
             <ThreeStateCheckbox
               title={strings.browse.legacyGame}
               value={view.advancedFilter.legacy}
@@ -429,7 +429,7 @@ export function SearchBar() {
               twoState={true}
               onChange={onPlaylistOrderChange} />
           )}
-          {preferences.useCustomViews && (
+          {useCustomViews && (
             <SearchableSelect
               title={strings.browse.library}
               items={libraryItems}
