@@ -16,6 +16,12 @@ export type CreditsTooltipProps = {
 export function CreditsTooltip(props: CreditsTooltipProps) {
   const ref = useRef<HTMLDivElement>(null);
 
+  function onMouseMove(event: MouseEvent) {
+    if (ref.current) {
+      setPosition(ref.current, event.clientX, event.clientY);
+    }
+  }
+
   // Follow cursor
   useEffect(() => {
     if (!props.profile) { return; } // (Tooltip is not visible)
@@ -26,12 +32,6 @@ export function CreditsTooltip(props: CreditsTooltipProps) {
 
     document.addEventListener('mousemove', onMouseMove);
     return () => { document.removeEventListener('mousemove', onMouseMove); };
-
-    function onMouseMove(event: MouseEvent) {
-      if (ref.current) {
-        setPosition(ref.current, event.clientX, event.clientY);
-      }
-    }
   }, [props.profile, props.profileX, props.profileY]);
 
   // Render profile

@@ -6,16 +6,14 @@ type FloatingContainerProps = {
   onClick?: () => void;
 } & React.HTMLProps<HTMLDivElement>;
 
-export class FloatingContainer extends React.Component<FloatingContainerProps> {
-  render() {
-    return (
-      <div className='floating-container__wrapper'
-        { ...this.props }
-        onClick={this.props.onClick}>
-        <div className={`floating-container ${this.props.floatingClassName}`}>
-          {this.props.children}
-        </div>
+export function FloatingContainer(props: FloatingContainerProps) {
+  return (
+    <div className='floating-container__wrapper'
+      { ...props }
+      onClick={props.onClick}>
+      <div className={`floating-container ${props.floatingClassName}`}>
+        {props.children}
       </div>
-    );
-  }
+    </div>
+  );
 }

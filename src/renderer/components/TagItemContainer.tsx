@@ -5,7 +5,7 @@ type HTMLDivProps = React.HTMLAttributes<HTMLDivElement>;
 
 export type TagItemContainerProps = HTMLDivProps & {
   /** Reference to the underlying DIV element. */
-  realRef?: JSX.IntrinsicElements['div']['ref'];
+  realRef?: React.JSX.IntrinsicElements['div']['ref'];
   onTagSelect?: (event: React.MouseEvent<HTMLDivElement>, tagId: number | undefined) => void;
   /**
    * Find the tag ID of an element (or sub-element) of a game.
@@ -42,7 +42,7 @@ export function TagItemContainer(props: TagItemContainerProps) {
 }
 
 // Create a shallow copy of the props object, but without all non-div element props.
-function filterDivProps(props: TagItemContainerProps): JSX.IntrinsicElements['div'] {
+function filterDivProps(props: TagItemContainerProps): React.JSX.IntrinsicElements['div'] {
   const rest: HTMLDivProps & {
     // These need to be explicitly specified: the compiler doesn't infer them correctly.
     realRef?: any;

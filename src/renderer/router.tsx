@@ -75,107 +75,105 @@ export type AppRouterProps = {
   metaState?: RequestState,
 };
 
-export class AppRouter extends React.Component<AppRouterProps> {
-  render() {
-    const homeProps: ConnectedHomePageProps = {
-      gotdList: this.props.gotdList,
-      platforms: this.props.platforms,
-      playlists: this.props.allPlaylists,
-      onGameContextMenu: this.props.onGameContextMenu,
-      onLaunchGame: this.props.onLaunchGame,
-      randomGames: this.props.randomGames,
-      rollRandomGames: this.props.rollRandomGames,
-      logoVersion: this.props.logoVersion,
-      updateFeedMarkdown: this.props.updateFeedMarkdown,
-      selectedGameId: this.props.selectedGameId,
-    };
-    const browseProps: ConnectedBrowsePageProps = {
-      sourceTable: 'browse-page',
-      gamesTotal: this.props.gamesTotal,
-      playlists: this.props.playlists,
-      libraries: this.props.libraries,
-      playlistIconCache: this.props.playlistIconCache,
-      onGameContextMenu: this.props.onGameContextMenu,
-      onUpdatePlaylist: this.props.onUpdatePlaylist,
-      onDeletePlaylist: this.props.onDeletePlaylist,
-      logoVersion: this.props.logoVersion,
-      contextButtons: this.props.contextButtons,
-      onMovePlaylistGame: this.props.onMovePlaylistGame,
-      searchStatus: this.props.searchStatus,
-      metaState: this.props.metaState,
-    };
-    const configProps: ConnectedConfigPageProps = {
-      themeList: this.props.themeList,
-      logoSets: this.props.logoSets,
-      logoVersion: this.props.logoVersion,
-      availableLangs: this.props.languages,
-      libraries: this.props.libraries,
-      platforms: this.props.platforms,
-      localeCode: this.props.localeCode,
-      serverNames: this.props.serverNames,
-      extensions: this.props.extensions,
-      extConfigs: this.props.extConfigs,
-      extConfig: this.props.extConfig,
-    };
-    const aboutProps: AboutPageProps = {
-      creditsData: this.props.creditsData,
-      creditsDoneLoading: this.props.creditsDoneLoading
-    };
-    const curateProps: ConnectedCuratePageProps = {
-      extCurationTemplates: this.props.curationTemplates,
-      extContextButtons: this.props.contextButtons,
-      mad4fpEnabled: this.props.mad4fpEnabled,
-      logoVersion: this.props.logoVersion,
-    };
-    const developerProps: DeveloperPageProps = {
-      devConsole: this.props.devConsole,
-      devScripts: this.props.devScripts,
-      services: this.props.services,
-      totalGames: this.props.gamesTotal || 1,
-    };
-    const iframePageProps: IFramePageProps = {
-      url: this.props.manualUrl
-    };
-    return (
-      <Routes>
-        <Route
-          path={Paths.LOADING}
-          element={<LoadingPage/>}/>
-        <Route
-          path={Paths.HOME}
-          element={<ConnectedHomePage {...homeProps}/>}/>
-        <Route
-          path={Paths.BROWSE}
-          element={<ConnectedBrowsePage {...browseProps}/>}/>
-        <Route
-          path={Paths.TAGS}
-          element={<ConnectedTagsPage/>}/>
-        <Route
-          path={Paths.CATEGORIES}
-          element={<ConnectedTagCategoriesPage/>}/>
-        <Route
-          path={Paths.DOWNLOADS}
-          element={<DownloadsPage/>}/>
-        <Route
-          path={Paths.LOGS}
-          element={<ConnectedLogsPage/>}/>
-        <Route
-          path={Paths.CONFIG}
-          element={<ConnectedConfigPage {...configProps}/>}/>
-        <Route
-          path={Paths.MANUAL}
-          element={<IFramePage {...iframePageProps} />}/>
-        <Route
-          path={Paths.ABOUT}
-          element={<AboutPage {...aboutProps}/>}/>
-        <Route
-          path={Paths.CURATE}
-          element={<ConnectedCuratePage {...curateProps} />}/>
-        <Route
-          path={Paths.DEVELOPER}
-          element={<DeveloperPage {...developerProps}/>}/>
-        <Route element={<NotFoundPage/>}/>
-      </Routes>
-    );
-  }
+export function AppRouter(props: AppRouterProps) {
+  const homeProps: ConnectedHomePageProps = {
+    gotdList: props.gotdList,
+    platforms: props.platforms,
+    playlists: props.allPlaylists,
+    onGameContextMenu: props.onGameContextMenu,
+    onLaunchGame: props.onLaunchGame,
+    randomGames: props.randomGames,
+    rollRandomGames: props.rollRandomGames,
+    logoVersion: props.logoVersion,
+    updateFeedMarkdown: props.updateFeedMarkdown,
+    selectedGameId: props.selectedGameId,
+  };
+  const browseProps: ConnectedBrowsePageProps = {
+    sourceTable: 'browse-page',
+    gamesTotal: props.gamesTotal,
+    playlists: props.playlists,
+    libraries: props.libraries,
+    playlistIconCache: props.playlistIconCache,
+    onGameContextMenu: props.onGameContextMenu,
+    onUpdatePlaylist: props.onUpdatePlaylist,
+    onDeletePlaylist: props.onDeletePlaylist,
+    logoVersion: props.logoVersion,
+    contextButtons: props.contextButtons,
+    onMovePlaylistGame: props.onMovePlaylistGame,
+    searchStatus: props.searchStatus,
+    metaState: props.metaState,
+  };
+  const configProps: ConnectedConfigPageProps = {
+    themeList: props.themeList,
+    logoSets: props.logoSets,
+    logoVersion: props.logoVersion,
+    availableLangs: props.languages,
+    libraries: props.libraries,
+    platforms: props.platforms,
+    localeCode: props.localeCode,
+    serverNames: props.serverNames,
+    extensions: props.extensions,
+    extConfigs: props.extConfigs,
+    extConfig: props.extConfig,
+  };
+  const aboutProps: AboutPageProps = {
+    creditsData: props.creditsData,
+    creditsDoneLoading: props.creditsDoneLoading
+  };
+  const curateProps: ConnectedCuratePageProps = {
+    extCurationTemplates: props.curationTemplates,
+    extContextButtons: props.contextButtons,
+    mad4fpEnabled: props.mad4fpEnabled,
+    logoVersion: props.logoVersion,
+  };
+  const developerProps: DeveloperPageProps = {
+    devConsole: props.devConsole,
+    devScripts: props.devScripts,
+    services: props.services,
+    totalGames: props.gamesTotal || 1,
+  };
+  const iframePageProps: IFramePageProps = {
+    url: props.manualUrl
+  };
+  return (
+    <Routes>
+      <Route
+        path={Paths.LOADING}
+        element={<LoadingPage/>}/>
+      <Route
+        path={Paths.HOME}
+        element={<ConnectedHomePage {...homeProps}/>}/>
+      <Route
+        path={Paths.BROWSE}
+        element={<ConnectedBrowsePage {...browseProps}/>}/>
+      <Route
+        path={Paths.TAGS}
+        element={<ConnectedTagsPage/>}/>
+      <Route
+        path={Paths.CATEGORIES}
+        element={<ConnectedTagCategoriesPage/>}/>
+      <Route
+        path={Paths.DOWNLOADS}
+        element={<DownloadsPage/>}/>
+      <Route
+        path={Paths.LOGS}
+        element={<ConnectedLogsPage/>}/>
+      <Route
+        path={Paths.CONFIG}
+        element={<ConnectedConfigPage {...configProps}/>}/>
+      <Route
+        path={Paths.MANUAL}
+        element={<IFramePage {...iframePageProps} />}/>
+      <Route
+        path={Paths.ABOUT}
+        element={<AboutPage {...aboutProps}/>}/>
+      <Route
+        path={Paths.CURATE}
+        element={<ConnectedCuratePage {...curateProps} />}/>
+      <Route
+        path={Paths.DEVELOPER}
+        element={<DeveloperPage {...developerProps}/>}/>
+      <Route element={<NotFoundPage/>}/>
+    </Routes>
+  );
 }

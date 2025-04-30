@@ -30,7 +30,7 @@ export class RightTagCategoriesSidebar extends React.Component<RightTagCategorie
   static contextType = LangContext;
   declare context: React.ContextType<typeof LangContext>;
 
-  launchCommandRef: React.RefObject<HTMLInputElement> = React.createRef();
+  launchCommandRef: React.RefObject<HTMLInputElement | null> = React.createRef();
 
   constructor(props: RightTagCategoriesSidebarProps) {
     super(props);
@@ -144,7 +144,7 @@ export class RightTagCategoriesSidebar extends React.Component<RightTagCategorie
     }
   }
 
-  renderDeleteCategoryButton({ confirm, extra }: ConfirmElementArgs<LangContainer['tags']>): JSX.Element {
+  renderDeleteCategoryButton({ confirm, extra }: ConfirmElementArgs<LangContainer['tags']>): React.JSX.Element {
     const className = 'tag-category__buttons-delete';
     return (
       <div

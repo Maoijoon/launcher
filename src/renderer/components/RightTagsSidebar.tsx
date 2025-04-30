@@ -49,7 +49,7 @@ export class RightTagsSidebar extends React.Component<RightTagsSidebarProps, Rig
   static contextType = LangContext;
   declare context: React.ContextType<typeof LangContext>;
 
-  launchCommandRef: React.RefObject<HTMLInputElement> = React.createRef();
+  launchCommandRef: React.RefObject<HTMLInputElement | null> = React.createRef();
 
   constructor(props: RightTagsSidebarProps) {
     super(props);
@@ -207,7 +207,7 @@ export class RightTagsSidebar extends React.Component<RightTagsSidebarProps, Rig
     }
   }
 
-  renderDeleteTagButton({ confirm, extra }: ConfirmElementArgs<LangContainer['tags']>): JSX.Element {
+  renderDeleteTagButton({ confirm, extra }: ConfirmElementArgs<LangContainer['tags']>): React.JSX.Element {
     const className = 'tag-alias__buttons-delete';
     return (
       <div

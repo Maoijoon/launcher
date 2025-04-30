@@ -16,14 +16,12 @@ export function CurateBoxWarnings(props: CurateBoxWarningsProps) {
   // Converts warnings into a single string
   const warningsStrings = warnings.writtenWarnings.map(s => `- ${strings[s as keyof LangContainer['curate']] || s}\n`);
   // Render warnings
-  const warningElements = () => (
-    warningsStrings.length > 0 ? (
-      <span
-        className='curate-box-warnings__entry'>
-        {`${warningsStrings.join('')}`}
-      </span>
-    ) : ( undefined )
-  );
+  const warningElements = warningsStrings.length > 0 ? (
+    <span
+      className='curate-box-warnings__entry'>
+      {`${warningsStrings.join('')}`}
+    </span>
+  ) : undefined ;
   // Misc.
   const isEmpty = warningCount === 0;
   // Render
