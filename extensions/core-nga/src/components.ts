@@ -1,4 +1,4 @@
-import { NgCredits, NgFaves, NgRating, NgScore, NgViews } from './components/components';
+import { NgCredits, NgFaves, NgRating, NgScore, NgViews, NgRatingGridIcon, NgRatingListIcon } from './components/components';
 
 const components: Record<string, React.ComponentType<any>> = {
   'NgRating': NgRating,
@@ -6,6 +6,8 @@ const components: Record<string, React.ComponentType<any>> = {
   'NgViews': NgViews,
   'NgFaves': NgFaves,
   'NgCredits': NgCredits,
+  'NgRatingGridIcon': NgRatingGridIcon,
+  'NgRatingListIcon': NgRatingListIcon,
 };
 
 
@@ -33,6 +35,10 @@ const components: Record<string, React.ComponentType<any>> = {
     // If platforms is not in the middle to put after, just add to end of middle section
     window.displaySettings.gameSidebar.middle = sidebarMiddle.concat(compDisplay);
   }
+
+  // Add role icon
+  window.displaySettings.gameGrid.upper.unshift('NgRatingGridIcon');
+  window.displaySettings.gameList.icons.unshift('NgRatingListIcon');
 }());
 
 export default components;

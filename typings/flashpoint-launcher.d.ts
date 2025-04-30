@@ -2469,7 +2469,7 @@ declare module 'flashpoint-launcher' {
 }
 
 declare module 'flashpoint-launcher-renderer' {
-  import { Game, PlaylistGame, TagCategory, AppPreferencesData } from 'flashpoint-launcher';
+  import { Game, ViewGame, PlaylistGame, TagCategory, AppPreferencesData } from 'flashpoint-launcher';
   import { LangContainer } from 'flashpoint-launcher';
 
   /** Game properties that will have suggestions gathered and displayed. */
@@ -2533,6 +2533,18 @@ declare module 'flashpoint-launcher-renderer' {
     onChange: (value: string) => void;
   }
 
+  type GameListComponentProps = {
+    game?: ViewGame;
+    isSelected: boolean;
+    isDragged: boolean;
+  }
+
+  type GameGridComponentProps = {
+    game?: ViewGame;
+    isSelected: boolean;
+    isDragged: boolean;
+  }
+
   interface IExtensionWindow {
     utils: {
       getExtensionFileURL: (extId: string, filePath: string) => string;
@@ -2547,6 +2559,12 @@ declare module 'flashpoint-launcher-renderer' {
     gameSidebar: {
       middle: string[],
       bottom: string[],
+    },
+    gameGrid: {
+      upper: string[],
+    },
+    gameList: {
+      icons: string[],
     }
   }
 

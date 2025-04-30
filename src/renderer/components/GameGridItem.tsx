@@ -4,8 +4,12 @@ import { GridCellProps } from 'react-virtualized';
 import { getPlatformIconURL } from '../Util';
 import { GameDragEventData } from './pages/BrowsePage';
 import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
+import { ViewGame } from 'flashpoint-launcher';
+import { DynamicComponent } from './DynamicComponent';
+import { GameGridComponentProps } from 'flashpoint-launcher-renderer';
 
 export type GameGridItemProps = Partial<GridCellProps> & {
+  game?: ViewGame;
   id: string;
   title: string;
   platforms: string[];
@@ -76,6 +80,12 @@ export function GameGridItem(props: GameGridItemProps) {
   attributes[GameGridItem.idAttribute] = id;
   attributes[GameGridItem.indexAttribute] = rowIndex;
 
+  const gameGridComponentProps: GameGridComponentProps = {
+    isSelected,
+    isDragged,
+    game: props.game
+  };
+
   // Memoize render
   return (
     <li
@@ -90,19 +100,22 @@ export function GameGridItem(props: GameGridItemProps) {
         <div
           className='game-grid-item__thumb__image'
           style={{ backgroundImage: `url('${ willShowScreenshot ? screenshot : thumbnail }')` }}>
-          {(extreme) ? (
-            <div className='game-grid-item__thumb__icons--upper'>
+          <div className='game-grid-item__thumb__icons--upper'>
+            { window.displaySettings.gameGrid.upper.map((name) => {
+              return (
+                <DynamicComponent name={name} props={gameGridComponentProps}/>
+              );
+            })}
+            {(extreme) ? (
               <div
                 className='game-grid-item__thumb__icons__icon'
                 style={{ backgroundImage: `url('${extremeIconPath}')` }} />
-            </div>
-          ) : (tagGroupIconBase64 ? (
-            <div className='game-grid-item__thumb__icons--upper'>
+            ) : (
               <div
                 className='game-grid-item__thumb__icons__icon'
                 style={{ backgroundImage: `url("${tagGroupIconBase64}")` }} />
-            </div>
-          ) : undefined )}
+            )}
+          </div>
           <div className='game-grid-item__thumb__icons'>
             {platformIcons.map(p => (
               <div

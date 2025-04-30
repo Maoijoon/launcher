@@ -1,4 +1,4 @@
-import { DropdownItem, GameComponentProps } from 'flashpoint-launcher-renderer';
+import { DropdownItem, GameComponentProps, GameGridComponentProps, GameListComponentProps } from 'flashpoint-launcher-renderer';
 import { IconType } from 'react-icons';
 import { FaBug, FaChalkboardTeacher, FaCog, FaCrown, FaDesktop, FaDollarSign, FaFilm, FaMicrophone, FaMusic, FaPaintBrush, FaPenAlt, FaPencilAlt, FaSun, FaTruck, FaVolumeUp } from 'react-icons/fa';
 
@@ -58,6 +58,28 @@ export function mapNgRatingString(rs: string) {
       return 'Standalone';
     default:
       return 'Broken Value';
+  }
+}
+
+export function NgRatingListIcon(props: GameListComponentProps) {
+  if (props.game) {
+    const extData: ExtData | undefined = props.game.extData?.nga;
+    const rating = extData?.rating || '';
+    return (
+      <div className={`game-list-item__icon ng-rating-list-icon ng-image-rating_${rating.toLowerCase()}`}/>
+    );
+  }
+}
+
+export function NgRatingGridIcon(props: GameGridComponentProps) {
+  if (props.game) {
+    const extData: ExtData | undefined = props.game.extData?.nga;
+    const rating = extData?.rating || '';
+    if (rating) {
+      return (
+        <div className={`game-grid-item__thumb__icons__icon ng-rating-grid-icon ng-image-rating_${rating.toLowerCase()}`}/>
+      );
+    }
   }
 }
 

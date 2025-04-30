@@ -92,6 +92,12 @@ const DEFAULT_DISPLAYS: DisplaySettings = {
       'game_addApps',
       'game_legacyData'
     ],
+  },
+  gameGrid: {
+    upper: []
+  },
+  gameList: {
+    icons: []
   }
 };
 

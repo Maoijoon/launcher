@@ -51,6 +51,11 @@ export function GameListHeader(props: GameListHeaderProps) {
       { props.showExtremeIcon ? (
         <Column modifier='icon' hideDivider={true} />
       ) : undefined}
+      { window.displaySettings.gameList.icons.map(() => {
+        return (
+          <Column modifier='icon' hideDivider={true} />
+        );
+      }) }
       <SortableColumn
         modifier='icon'
         hideDivider={true}

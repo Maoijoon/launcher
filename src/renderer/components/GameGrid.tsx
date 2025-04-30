@@ -253,6 +253,7 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
         <GameGridItem
           { ...props }
           key={props.key}
+          game={game}
           id={game ? game.id : ''}
           title={game ? game.title : ''}
           platforms={game ? [game.primaryPlatform] : []}

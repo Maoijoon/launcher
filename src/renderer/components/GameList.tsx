@@ -200,6 +200,7 @@ class _GameList extends React.Component<GameListProps> {
     return game ? (
       <GameListItem
         { ...cellProps }
+        game={game}
         key={cellProps.key}
         id={game.id}
         title={game.title}

@@ -1,10 +1,14 @@
+import { num } from '@shared/utils/Coerce';
+import { Game } from 'flashpoint-launcher';
+import { GameListComponentProps } from 'flashpoint-launcher-renderer';
 import * as React from 'react';
 import { ListRowProps } from 'react-virtualized';
 import { getPlatformIconURL } from '../Util';
+import { DynamicComponent } from './DynamicComponent';
 import { GameDragEventData } from './pages/BrowsePage';
-import { num } from '@shared/utils/Coerce';
 
 export type GameListItemProps = ListRowProps & {
+  game?: Game;
   id: string;
   title: string;
   platform: string;
@@ -48,6 +52,13 @@ export function GameListItem(props: GameListItemProps) {
   const attributes: any = {};
   attributes[GameListItem.idAttribute] = id;
   attributes[GameListItem.indexAttribute] = index;
+
+  const gameListComponentProps: GameListComponentProps = {
+    isSelected,
+    isDragged,
+    game: props.game
+  };
+
   // Render
   return (
     <li
@@ -57,6 +68,11 @@ export function GameListItem(props: GameListItemProps) {
       onDrop={onDrop}
       onDragOver={onDragOver}
       { ...attributes }>
+      { window.displaySettings.gameList.icons.map((name) => {
+        return (
+          <DynamicComponent name={name} props={gameListComponentProps}/>
+        );
+      })}
       { showExtremeIcon &&
           (extreme ? (
             <div
