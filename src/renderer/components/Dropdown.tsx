@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { checkIfAncestor } from '../Util';
+import { useRef, useState } from 'react';
 
 export type DropdownProps = {
   /** Extra class name to add to dropdown frame */
@@ -17,45 +16,51 @@ export type DropdownProps = {
 export function Dropdown(props: DropdownProps) {
   // Hooks
   const [expanded, setExpanded] = useState<boolean>(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { // ("Hide" the drop-downs content if the user clicks outside the content element)
-    if (expanded) {
-      const onGlobalMouseDown = (event: MouseEvent) => {
-        if (!event.defaultPrevented) {
-          if (!checkIfAncestor(event.target as HTMLElement | null, contentRef.current)) {
-            setExpanded(false);
-          }
-        }
-      };
-      document.addEventListener('mousedown', onGlobalMouseDown);
-      return () => { document.removeEventListener('mousedown', onGlobalMouseDown); };
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const onToggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
+  // Close dropdown when clicking outside of it
+  const handleClickOutside = (event: any) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setExpanded(false);
     }
-  }, [expanded, contentRef]);
-  const onMouseDown = useCallback((event: React.MouseEvent) => {
-    if (event.button === 0) { // (Left mouse button)
-      setExpanded(!expanded);
-    }
-  }, [expanded]);
+  };
+
+  React.useEffect(() => {
+    // Add event listener to handle clicks outside the dropdown
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  });
 
   const baseClass = props.form ? 'simple-dropdown-form' : 'simple-dropdown';
 
   // Render
   return (
-    <div className={`${baseClass} ${props.className}`}>
+    <div
+      className={`${baseClass} ${props.className}`}
+      onClick={onToggleExpanded}>
       <div
         className={`${baseClass}__select-box ${props.headerClassName}`}
-        onMouseDown={onMouseDown}
         tabIndex={0}>
         <div className={`${baseClass}__select-text`}>
-          { props.text }
+          {props.text}
         </div>
         <div className={`${baseClass}__select-icon`} />
       </div>
       <div
         className={`${baseClass}__content` + (expanded ? '' : ` ${baseClass}__content--hidden`)}
-        onMouseUp={() => setExpanded(false)}
-        ref={contentRef}>
-        { props.children }
+        ref={dropdownRef}
+        onClick={(e) => e.stopPropagation()}>
+        {expanded && (
+          props.children
+        )}
       </div>
     </div>
   );

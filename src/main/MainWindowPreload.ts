@@ -84,6 +84,7 @@ window.Shared = {
 
   customVersion: undefined,
 
+  initialLogEntries: createErrorProxy('initialLogEntries'),
   initialLang: createErrorProxy('initialLang'),
   initialLangList: createErrorProxy('initialLangList'),
   initialThemes: createErrorProxy('initialThemes'),
@@ -126,7 +127,7 @@ const onInit = (async () => {
         fullJsonFolderPath: path.resolve(data.config.flashpointPath, data.preferences.jsonFolderPath),
       };
       window.Shared.fileServerPort = data.fileServerPort;
-      window.Shared.log.entries = data.log;
+      window.Shared.initialLogEntries = data.log;
       // window.Shared.initialServices = data.services;
       window.Shared.customVersion = data.customVersion;
       window.Shared.initialLang = data.language;

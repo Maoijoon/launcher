@@ -68,10 +68,10 @@ export function NgCredits(props: GameComponentProps) {
   return (
     <div className='browse-right-sidebar__row'>
       <p>Credits: </p>
-      { credits.map((credit, idx) => {
+      {credits.map((credit, idx) => {
         return (
           <div className='nga-credit' key={idx}>
-            { credit.roles?.map((role, idx) => {
+            {credit.roles?.map((role, idx) => {
               if (role in ROLE_ICONS) {
                 const Component = ROLE_ICONS[role];
                 return (
@@ -91,10 +91,16 @@ export function NgCredits(props: GameComponentProps) {
                 );
               }
             })}
-            <div className='nga-credt-name'>{credit.name}</div>
+            <div
+              className='nga-credt-name browse-right-sidebar__searchable'
+              onClick={() => {
+                props.doSearch(`developer:"${credit.name}"`);
+              }}>
+              {credit.name}
+            </div>
           </div>
         );
-      }) }
+      })}
     </div>
   );
 }

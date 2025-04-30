@@ -16,7 +16,7 @@ type OwnProps = {
   selectedPlaylistID?: string;
   isEditing: boolean;
   isNewPlaylist: boolean;
-  currentPlaylist?: Playlist;
+  currentPlaylist: Playlist | null;
   playlistIconCache: Record<string, string>;
   onDelete: () => void;
   onSave: () => void;
@@ -100,7 +100,7 @@ export class LeftBrowseSidebar extends React.Component<LeftBrowseSidebarProps> {
   renderPlaylistsMemo = memoizeOne((
     playlists: Playlist[],
     playlistIconCache: Record<string, string>,
-    currentPlaylist: Playlist | undefined,
+    currentPlaylist: Playlist | null,
     editingDisabled: boolean,
     editingExtremeDisabled: boolean,
     isEditing: boolean,
@@ -109,7 +109,7 @@ export class LeftBrowseSidebar extends React.Component<LeftBrowseSidebarProps> {
   ) => {
     const renderItem = (playlist: Playlist, isNew: boolean): void => {
       const isSelected = isNew || playlist.id === selectedPlaylistID;
-      const p = (isSelected && currentPlaylist) ? currentPlaylist : playlist;
+      const p = (isSelected && currentPlaylist !== null) ? currentPlaylist : playlist;
       const key = isNew ? '?new' : playlist.id;
       elements.push(
         <PlaylistItem

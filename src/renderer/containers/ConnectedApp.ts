@@ -9,5 +9,6 @@ import { withNavigation } from './withNavigation';
 import { withPreferences } from './withPreferences';
 import { withTagCategories } from './withTagCategories';
 import { withTasks } from './withTasks';
+import { withLogs } from './withLogs';
 
-export default withView(withFpfss(withSearch(withShortcut(withNavigation(withCurate(withTasks(withMainState(withTagCategories(withPreferences(App))))))))));
+export default withLogs(withView(withFpfss(withSearch(withShortcut(withNavigation(withCurate(withTasks(withMainState(withTagCategories(withPreferences(App)))))))))));

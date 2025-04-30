@@ -1,18 +1,17 @@
+import { BackIn, BackInit, BackInitArgs, BackOut, BackResParams, ComponentState, ComponentStatus, DownloadDetails } from '@shared/back/types';
+import { getContentFolderByKey, getCurationFolder } from '@shared/curate/util';
+import { ILogoSet, LogoSet } from '@shared/extensions/interfaces';
+import { IBackProcessInfo, RecursivePartial } from '@shared/interfaces';
+import { LangFileContent, getDefaultLocalization } from '@shared/lang';
 import { ILogEntry, LogLevel } from '@shared/Log/interface';
+import { PreferencesFile } from '@shared/preferences/PreferencesFile';
+import { defaultPreferencesData } from '@shared/preferences/util';
 import { Theme } from '@shared/ThemeFile';
 import {
   createErrorProxy, deepCopy,
   removeFileExtension,
   stringifyArray
 } from '@shared/Util';
-import * as os from 'os';
-import { BackIn, BackInit, BackInitArgs, BackOut, BackResParams, ComponentState, ComponentStatus, DownloadDetails, FpfssUser } from '@shared/back/types';
-import { getContentFolderByKey, getCurationFolder } from '@shared/curate/util';
-import { ILogoSet, LogoSet } from '@shared/extensions/interfaces';
-import { IBackProcessInfo, RecursivePartial } from '@shared/interfaces';
-import { LangFileContent, getDefaultLocalization } from '@shared/lang';
-import { PreferencesFile } from '@shared/preferences/PreferencesFile';
-import { defaultPreferencesData } from '@shared/preferences/util';
 import { validateSemiUUID } from '@shared/utils/uuid';
 import { FPA_VERSION, VERSION } from '@shared/version';
 import * as child_process from 'child_process';
@@ -22,32 +21,31 @@ import * as fs from 'fs-extra';
 import * as http from 'http';
 import * as mime from 'mime';
 import { Progress, add, extractFull } from 'node-7z';
+import * as os from 'os';
 import * as path from 'path';
 import 'reflect-metadata';
 import { genCurationWarnings, loadCurationFolder } from './curate/util';
 // Required for the DB Models to function
+import { FlashpointArchive, enableDebug, loggerSusbcribe } from '@fparchive/flashpoint-archive';
 import {
   CURATIONS_FOLDER_EXPORTED,
   CURATIONS_FOLDER_EXTRACTING,
   CURATIONS_FOLDER_TEMP,
   CURATIONS_FOLDER_WORKING, CURATION_META_FILENAMES
 } from '@shared/constants';
-import { FlashpointArchive, enableDebug, loggerSusbcribe } from '@fparchive/flashpoint-archive';
+import { formatString } from '@shared/utils/StringFormatter';
 import { Tail } from 'tail';
 import { ConfigFile } from './ConfigFile';
-import { loadExecMappingsFile } from './Execs';
-import { ExtConfigFile } from './ExtConfigFile';
-import { InstancedAbortController } from './InstancedAbortController';
-import { ManagedChildProcess } from './ManagedChildProcess';
-import { PlaylistFile } from './PlaylistFile';
-import { ServicesFile } from './ServicesFile';
-import { SocketServer } from './SocketServer';
-import { newThemeWatcher } from './Themes';
 import { CONFIG_FILENAME, DISCORD_LINK, EXT_CONFIG_FILENAME, PREFERENCES_FILENAME, SERVICES_SOURCE, WIKI_AV_TROUBLESHOOTING } from './constants';
+import { saveCurationFpfssInfo } from './curate/fpfss';
 import { loadCurationIndexImage } from './curate/parse';
 import { readCurationMeta } from './curate/read';
 import { onFileServerRequestCurationFileFactory, onFileServerRequestPostCuration } from './curate/util';
+import { axios } from './dns';
 import { downloadGameData } from './download';
+import { Downloader } from './Downloader';
+import { loadExecMappingsFile } from './Execs';
+import { ExtConfigFile } from './ExtConfigFile';
 import { ApiEmitter } from './extensions/ApiEmitter';
 import { ExtensionService } from './extensions/ExtensionService';
 import {
@@ -57,24 +55,26 @@ import {
   registerInterceptor
 } from './extensions/NodeInterceptor';
 import { Command, RegisteredMiddleware } from './extensions/types';
+import { InstancedAbortController } from './InstancedAbortController';
+import { ManagedChildProcess } from './ManagedChildProcess';
 import { SystemEnvMiddleware } from './middleware';
+import { PlaylistFile } from './PlaylistFile';
 import { registerRequestCallbacks } from './responses';
 import { genContentTree } from './rust';
+import { ServicesFile } from './ServicesFile';
+import { SocketServer } from './SocketServer';
+import { newThemeWatcher } from './Themes';
 import { BackState, ImageDownloadItem } from './types';
+import { awaitDialog } from './util/dialog';
 import { EventQueue } from './util/EventQueue';
+import { onDidInstallGameData, onDidRemoveGame, onDidRemovePlaylistGame, onDidUninstallGameData, onDidUpdateGame, onDidUpdatePlaylist, onDidUpdatePlaylistGame, onServiceChange, onWillImportCuration, onWillUninstallGameData } from './util/events';
 import { FileServer, serveFile } from './util/FileServer';
 import { FolderWatcher } from './util/FolderWatcher';
+import { dispose } from './util/lifecycle';
 import { LogFile } from './util/LogFile';
 import { logFactory } from './util/logging';
 import { createContainer, exit, getMacPATH, promiseSleep, runService } from './util/misc';
 import { uuid } from './util/uuid';
-import { onDidInstallGameData, onDidRemoveGame, onDidRemovePlaylistGame, onDidUninstallGameData, onDidUpdateGame, onDidUpdatePlaylist, onDidUpdatePlaylistGame, onServiceChange, onWillImportCuration, onWillUninstallGameData } from './util/events';
-import { dispose } from './util/lifecycle';
-import { formatString } from '@shared/utils/StringFormatter';
-import { awaitDialog } from './util/dialog';
-import { saveCurationFpfssInfo } from './curate/fpfss';
-import { axios } from './dns';
-import { Downloader } from './Downloader';
 
 export const VERBOSE = {
   enabled: false
@@ -1461,7 +1461,6 @@ async function updateFileServerDownloadQueue() {
     })
     .catch((err) => {
       item.res.writeHead(404);
-      log.error('Launcher', 'Failure downloading image on demand: ' + err);
     })
     .finally(async () => {
       removeFileServerDownloadItem(item);

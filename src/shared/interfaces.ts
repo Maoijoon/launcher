@@ -90,6 +90,7 @@ export interface IMainWindowExternal {
   customVersion?: string;
 
   // @REFACTOR Figure out a way to delete these after they have been used (put them in a sub-object and just set it to undefined after it has been used?)
+  initialLogEntries: ILogEntry[];
   initialLang: LangContainer;
   initialLangList: LangFile[];
   initialThemes: ITheme[];

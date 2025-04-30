@@ -714,6 +714,7 @@ export const {
   resetDropdownData,
   setDropdownData,
   setGridScroll,
+  setGridScrollTop,
   setListScroll,
   addData } = searchSlice.actions;
 export default searchSlice.reducer;

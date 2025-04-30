@@ -11,9 +11,6 @@ import { GameListItem } from './GameListItem';
 import { GameDragData, GameDragEventData } from './pages/BrowsePage';
 import { GameLaunchOverride, TagFilter } from 'flashpoint-launcher';
 
-/** A function that receives an HTML element. */
-type RefFunc<T extends HTMLElement> = (instance: T | null) => void;
-
 const RENDERER_OVERSCAN = 15;
 
 export type OwnProps = {
@@ -51,8 +48,6 @@ export type OwnProps = {
   /** Moves a game at the specified index above the other game at the destination index, inside the playlist */
   onMovePlaylistGame: (sourceGameId: string, destGameId: string) => void;
   updateView: UpdateView;
-  /** Function for getting a reference to grid element. Called whenever the reference could change. */
-  listRef?: RefFunc<HTMLDivElement>;
   /** Updates to clear platform icon cache */
   logoVersion: number;
   /** View id */

@@ -3,6 +3,7 @@ import { addCurationMiddleware } from './curate/middleware';
 import curateReducer from './curate/slice';
 import fpfssReducer from './fpfss/slice';
 import { listenerMiddleware } from './listenerMiddleware';
+import logsReducer from './logs/slice';
 import { addMainMiddleware } from './main/middleware';
 import mainReducer from './main/slice';
 import { addSearchMiddleware } from './search/middleware';
@@ -24,6 +25,7 @@ export const store = configureStore({
     search: searchReducer,
     tagCategories: tagCategoriesReducer,
     tasks: tasksReducer,
+    logs: logsReducer,
   },
   middleware: (getDefaultMiddleware) => {
     const middleware = getDefaultMiddleware({

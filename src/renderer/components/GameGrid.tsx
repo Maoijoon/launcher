@@ -13,9 +13,6 @@ import { GameLaunchOverride, TagFilter } from 'flashpoint-launcher';
 
 const RENDERER_OVERSCAN = 5;
 
-/** A function that receives an HTML element. */
-type RefFunc<T extends HTMLElement> = (instance: T | null) => void;
-
 type ColumnsRows = {
   columns: number;
   rows: number;
@@ -54,8 +51,6 @@ export type GameGridProps = {
   /** Moves a game at the specified index above the other game at the destination index, inside the playlist */
   onMovePlaylistGame: (sourceGameId: string, destGameId: string) => void;
   updateView: UpdateView;
-  /** Function for getting a reference to grid element. Called whenever the reference could change. */
-  gridRef?: RefFunc<HTMLDivElement>;
   /** Updates to clear platform icon cache */
   logoVersion: number;
   /** Screenshot Preview Mode */
@@ -106,7 +101,6 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
   componentDidMount(): void {
     window.Shared.back.registerAny(this.onResponse);
     this.updateCssVars();
-    this.updatePropRefs();
   }
 
   componentDidUpdate(prevProps: GameGridProps): void {
@@ -116,7 +110,6 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
       });
     }
     this.updateCssVars();
-    this.updatePropRefs();
 
     // Clear forced scrollTop after use
     if (this.state.forceScrollTop !== undefined) {
@@ -414,26 +407,6 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
     if (this.currentHeight !== this.props.cellHeight) {
       this.currentHeight = this.props.cellHeight;
       wrapper.style.setProperty('--height', this.currentHeight+'');
-    }
-  }
-
-  /**
-   * Call the "ref" property functions.
-   * Do this whenever there's a possibility that the referenced elements has been replaced.
-   */
-  updatePropRefs(): void {
-    if (this.props.gridRef) {
-      // Find the grid element
-      let ref: HTMLDivElement | null = null;
-      if (this.wrapperRef.current) {
-        const inner = this.wrapperRef.current.querySelector('.game-grid');
-        if (inner) { ref = inner as HTMLDivElement; }
-      }
-      // Call callback
-      if (ref !== this.prevWrapperRef) {
-        this.prevWrapperRef = ref;
-        this.props.gridRef(ref);
-      }
     }
   }
 

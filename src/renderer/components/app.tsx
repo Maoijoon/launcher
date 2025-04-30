@@ -1,9 +1,11 @@
 import * as remote from '@electron/remote';
 import { WithCurateProps } from '@renderer/containers/withCurateState';
 import { WithFpfssProps } from '@renderer/containers/withFpfss';
+import { WithNavigationProps } from '@renderer/containers/withNavigation';
 import { WithSearchProps } from '@renderer/containers/withSearch';
 import { WithViewProps } from '@renderer/containers/withView';
 import { RANDOM_GAME_ROW_COUNT } from '@renderer/store/main/slice';
+import { WithShortcutProps } from '@renderer/store/reactKeybindCompat';
 import { BackIn, BackInit, BackOut, FpfssUser } from '@shared/back/types';
 import { APP_TITLE, LOGOS, SCREENSHOTS } from '@shared/constants';
 import { CustomIPC, IService, ProcessState, WindowIPC } from '@shared/interfaces';
@@ -16,16 +18,20 @@ import { arrayShallowStrictEquals } from '@shared/utils/compare';
 import { debounce } from '@shared/utils/debounce';
 import { newGame } from '@shared/utils/misc';
 import { formatString } from '@shared/utils/StringFormatter';
+import { uuid } from '@shared/utils/uuid';
+import { isAxiosError } from 'axios';
 import { clipboard, ipcRenderer, Menu, MenuItemConstructorOptions } from 'electron';
 import {
   CurationFpfssInfo,
   DialogState,
   Game,
   GameLaunchOverride,
+  ILogEntry,
   LangContainer,
   Playlist,
   PlaylistGame
 } from 'flashpoint-launcher';
+import { DisplaySettings } from 'flashpoint-launcher-renderer';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as React from 'react';
@@ -43,6 +49,9 @@ import { axios, getGameImagePath, getGameImageURL, getGamePath, getViewName, joi
 import { LangContext } from '../util/lang';
 import { queueOne } from '../util/queue';
 import { Dialog } from './Dialog';
+import { GameComponentDropdownSelectField, GameComponentInputField } from './DisplayComponent';
+import { DynamicComponentProvider } from './DynamicComponentProvider';
+import { DynamicThemeProvider } from './DynamicThemeProvider';
 import { FloatingContainer } from './FloatingContainer';
 import { ConnectedFpfssEditGame } from './FpfssEditGame';
 import { newCurateTask } from './pages/CuratePage';
@@ -52,14 +61,8 @@ import { SimpleButton } from './SimpleButton';
 import { SplashScreen } from './SplashScreen';
 import { TaskBar } from './TaskBar';
 import { TitleBar } from './TitleBar';
-import { isAxiosError } from 'axios';
-import { WithShortcutProps } from '@renderer/store/reactKeybindCompat';
-import { DynamicComponentProvider } from './DynamicComponentProvider';
-import { GameComponentDropdownSelectField, GameComponentInputField } from './DisplayComponent';
-import { DynamicThemeProvider } from './DynamicThemeProvider';
-import { DisplaySettings } from 'flashpoint-launcher-renderer';
-import { uuid } from '@shared/utils/uuid';
-import { WithNavigationProps } from '@renderer/containers/withNavigation';
+import { WithLogsProps } from '@renderer/containers/withLogs';
+import { batchProcessor } from '@shared/utils/throttle';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
@@ -92,7 +95,7 @@ const DEFAULT_DISPLAYS: DisplaySettings = {
   }
 };
 
-export type AppProps = AppOwnProps & WithViewProps & WithFpfssProps & WithPreferencesProps & WithSearchProps & WithTagCategoriesProps & WithMainStateProps & WithTasksProps & WithCurateProps & WithShortcutProps & WithNavigationProps;
+export type AppProps = AppOwnProps & WithLogsProps & WithViewProps & WithFpfssProps & WithPreferencesProps & WithSearchProps & WithTagCategoriesProps & WithMainStateProps & WithTasksProps & WithCurateProps & WithShortcutProps & WithNavigationProps;
 
 export class App extends React.Component<AppProps> {
   appRef: React.RefObject<HTMLDivElement | null>;
@@ -124,9 +127,15 @@ export class App extends React.Component<AppProps> {
       localeCode: window.Shared.initialLocaleCode,
     });
 
+    props.logsActions.setEntries(window.Shared.initialLogEntries);
+
     // Initialize app
     this.init();
   }
+
+  addLogEntry = batchProcessor((entries: ILogEntry[]) => {
+    this.props.logsActions.addLogEntries(entries);
+  }, 500);
 
   registerIpcListeners() {
     const handleProtocol = (url: string) => {
@@ -424,7 +433,7 @@ export class App extends React.Component<AppProps> {
     });
 
     window.Shared.back.register(BackOut.LOG_ENTRY_ADDED, (event, entry, index) => {
-      window.Shared.log.entries[index - window.Shared.log.offset] = entry;
+      this.addLogEntry(entry);
     });
 
     window.Shared.back.register(BackOut.LOCALE_UPDATE, (event, data) => {
