@@ -1145,6 +1145,7 @@ declare module 'flashpoint-launcher' {
       publisher: boolean;
       series: boolean;
       ruffleSupport: boolean;
+      ext: Record<string, Record<string, bool | undefined> | undefined>;
     }
 
     type AdvancedFilter = {
@@ -1159,6 +1160,10 @@ declare module 'flashpoint-launcher' {
       publisher: Record<string, AdvancedFilterToggle>;
       series: Record<string, AdvancedFilterToggle>;
       ruffleSupport: Record<string, AdvancedFilterToggle>;
+      ext: {
+        bools: Record<string, Record<string, bool> | undefined>;
+        toggles: Record<string, Record<string, Record<string, AdvancedFilterToggle>> | undefined>;
+      };
       andToggles: AdvancedFilterAndToggles;
     }
 
@@ -2469,7 +2474,7 @@ declare module 'flashpoint-launcher' {
 }
 
 declare module 'flashpoint-launcher-renderer' {
-  import { Game, ViewGame, PlaylistGame, TagCategory, AppPreferencesData } from 'flashpoint-launcher';
+  import { Game, ViewGame, PlaylistGame, TagCategory, AppPreferencesData, AdvancedFilter } from 'flashpoint-launcher';
   import { LangContainer } from 'flashpoint-launcher';
 
   /** Game properties that will have suggestions gathered and displayed. */
@@ -2548,10 +2553,17 @@ declare module 'flashpoint-launcher-renderer' {
   interface IExtensionWindow {
     utils: {
       getExtensionFileURL: (extId: string, filePath: string) => string;
+      search: {
+        onWhitelistFactory: (extId: string, key: string, filter: AdvancedFilter, setAdvancedFilter: (advFilter: AdvancedFilter) => void) => (value: string) => void,
+        onBlacklistFactory: (extId: string, key: string, filter: AdvancedFilter, setAdvancedFilter: (advFilter: AdvancedFilter) => void) => (value: string) => void,
+        onClearFactory: (extId: string, key: string, filter: AdvancedFilter, setAdvancedFilter: (advFilter: AdvancedFilter) => void) => () => void,
+        onSetAndToggleFactory: (extId: string, key: string, filter: AdvancedFilter, setAdvancedFilter: (advFilter: AdvancedFilter) => void) => (value: boolean) => void
+      }
     },
     components: {
       GameComponentInputField: React.ComponentType<GameComponentInputFieldProps>,
       GameComponentDropdownSelectField: React.ComponentType<GameComponentDropdownSelectFieldProps>,
+      SearchableSelect: React.ComponentType<SearchableSelectProps<any>>,
     }
   }
 
@@ -2565,7 +2577,32 @@ declare module 'flashpoint-launcher-renderer' {
     },
     gameList: {
       icons: string[],
-    }
+    },
+    searchComponents: string[],
+  }
+
+  type SearchableSelectItem = {
+    value: string;
+    orderVal: string;
+  }
+
+  type SearchComponentProps = {
+    advancedFilter: AdvancedFilter;
+    setAdvancedFilter: (filter: AdvancedFilter) => void;
+  }
+
+  type SearchableSelectProps<T extends SearchableSelectItem> = {
+    title: string;
+    items: T[];
+    andToggle: boolean;
+    selected: Record<string, AdvancedFilterToggle>;
+    onWhitelist: (value: string) => void;
+    onBlacklist: (value: string) => void;
+    onClear: () => void;
+    onSetAndToggle: (value: boolean) => void;
+    mapName?: (name: string) => string;
+    labelRenderer?: (item: T, selected: boolean) => React.JSX.Element;
+    generateItem: (missing: string) => T;
   }
 
   declare global {

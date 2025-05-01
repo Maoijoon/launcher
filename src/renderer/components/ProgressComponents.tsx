@@ -47,9 +47,9 @@ export function StatusBar(props: ProgressComponentProps) {
 // Large top text `Percent% Complete`, medium progress bar, small underneath primary text.
 export function ProgressBar(props: ProgressComponentProps) {
   const strings = React.useContext(LangContext);
-  const barCssProps: React.CSSProperties = React.useMemo(() => ({
+  const barCssProps: React.CSSProperties = {
     width: `${props.progressData.percentDone}%`
-  }), [props.progressData.percentDone]);
+  };
 
   return (
     <div className={'progress-component__wrapper' + (props.wrapperClass ? ' ' + props.wrapperClass : '')}>

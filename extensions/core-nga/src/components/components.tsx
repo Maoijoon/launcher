@@ -1,4 +1,4 @@
-import { DropdownItem, GameComponentProps, GameGridComponentProps, GameListComponentProps } from 'flashpoint-launcher-renderer';
+import { DropdownItem, GameComponentProps, GameGridComponentProps, GameListComponentProps, SearchableSelectItem, SearchComponentProps } from 'flashpoint-launcher-renderer';
 import { IconType } from 'react-icons';
 import { FaBug, FaChalkboardTeacher, FaCog, FaCrown, FaDesktop, FaDollarSign, FaFilm, FaMicrophone, FaMusic, FaPaintBrush, FaPenAlt, FaPencilAlt, FaSun, FaTruck, FaVolumeUp } from 'react-icons/fa';
 
@@ -50,15 +50,95 @@ type ExtData = {
 
 const numFormat = new Intl.NumberFormat();
 
-export function mapNgRatingString(rs: string) {
-  switch (rs) {
-    case '':
-      return 'None';
+export function mapNgRatingString(s: string) {
+  switch (s) {
     case 'e':
-      return 'Standalone';
+      return 'Everyone';
+    case 't':
+      return 'Teen';
+    case 'm':
+      return 'Mature';
+    case 'a':
+      return 'Adult';
     default:
-      return 'Broken Value';
+      return s;
   }
+}
+
+const genSelectItem = (missing: string): SearchableSelectItem => {
+  return {
+    value: missing,
+    orderVal: `zzzzzzz${missing}`,
+  };
+};
+
+export function NgRatingSearchableSelect(props: SearchComponentProps) {
+  const { SearchableSelect } = window.ext.components;
+  const { onBlacklistFactory, onWhitelistFactory, onClearFactory, onSetAndToggleFactory } = window.ext.utils.search;
+  const { advancedFilter, setAdvancedFilter } = props;
+  const extFilter = advancedFilter.ext.toggles['nga'];
+  const extAndToggles = advancedFilter.andToggles.ext['nga'];
+
+  const labelRenderer = (item: SearchableSelectItem) => {
+    const label = mapNgRatingString(item.value);
+    return (
+      <div className='platform-label-row'>
+        <div
+          className={`dropdown-icon dropdown-icon-image ng-image-rating_${item.value}`}>
+        </div>
+        <div className="searchable-select-dropdown-item-title">
+          {label}
+        </div>
+      </div>
+    );
+  };
+
+  const ratingItems: SearchableSelectItem[] = [
+    {
+      value: 'e',
+      orderVal: '1'
+    }, {
+      value: 't',
+      orderVal: '2'
+    }, {
+      value: 'm',
+      orderVal: '3'
+    }, {
+      value: 'a',
+      orderVal: '4'
+    }
+  ];
+
+  const onWhitelist = onWhitelistFactory('nga', 'rating', advancedFilter, setAdvancedFilter);
+  const onBlacklist = onBlacklistFactory('nga', 'rating', advancedFilter, setAdvancedFilter);
+  const onClear = onClearFactory('nga', 'rating', advancedFilter, setAdvancedFilter);
+  const onSetAndToggle = onSetAndToggleFactory('nga', 'rating', advancedFilter, setAdvancedFilter);
+
+  const andToggle = !!(extAndToggles?.rating);
+  const selected = extFilter?.rating || {};
+
+  return (
+    <SearchableSelect
+      title={'NG Rating'}
+      items={ratingItems}
+      andToggle={andToggle}
+      selected={selected}
+      labelRenderer={labelRenderer}
+      generateItem={genSelectItem}
+      onWhitelist={onWhitelist}
+      onBlacklist={onBlacklist}
+      onClear={onClear}
+      onSetAndToggle={onSetAndToggle}
+      mapName={(item) => {
+        switch (item) {
+          case 'e': return 'Everyone';
+          case 't': return 'Teen';
+          case 'm': return 'Mature';
+          case 'a': return 'Adult';
+          default: return '';
+        }
+      }}/>
+  );
 }
 
 export function NgRatingListIcon(props: GameListComponentProps) {
@@ -174,9 +254,9 @@ export function NgScore(props: GameComponentProps) {
   const extData: ExtData | undefined = props.game.extData?.nga;
   const { GameComponentInputField } = window.ext.components;
   const score = Number(extData?.score) || 0;
-  const { updateGameExtData } = props;
+  const { updateGameExtData, editable } = props;
 
-  return (
+  return editable ? (
     <GameComponentInputField
       header='NG Score'
       text={score.toString()}
@@ -190,6 +270,20 @@ export function NgScore(props: GameComponentProps) {
         }
       }}
       {...props} />
+  ) : (
+    <div className='browse-right-sidebar__row browse-right-sidebar__row--one-line'>
+      <p>NG Score: </p>
+      {!score ? (
+        <p>None</p>
+      ) : (
+        <div className={'ng-score-sidebar'}>
+          <div className='ng-score-value'>{score}</div>
+          <div className='ng-score-stars'>
+            <div className='ng-score-stars-filled' style={{ clipPath: `inset(0 ${(1 - (score / 5)) * 100}% 0 0)` }}></div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

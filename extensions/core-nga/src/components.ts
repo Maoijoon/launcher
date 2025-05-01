@@ -1,4 +1,4 @@
-import { NgCredits, NgFaves, NgRating, NgScore, NgViews, NgRatingGridIcon, NgRatingListIcon } from './components/components';
+import { NgCredits, NgFaves, NgRating, NgScore, NgViews, NgRatingGridIcon, NgRatingListIcon, NgRatingSearchableSelect } from './components/components';
 
 const components: Record<string, React.ComponentType<any>> = {
   'NgRating': NgRating,
@@ -8,8 +8,8 @@ const components: Record<string, React.ComponentType<any>> = {
   'NgCredits': NgCredits,
   'NgRatingGridIcon': NgRatingGridIcon,
   'NgRatingListIcon': NgRatingListIcon,
+  'NgRatingSearchableSelect': NgRatingSearchableSelect,
 };
-
 
 (function() {
   // Update the display settings with our components
@@ -39,6 +39,8 @@ const components: Record<string, React.ComponentType<any>> = {
   // Add role icon
   window.displaySettings.gameGrid.upper.unshift('NgRatingGridIcon');
   window.displaySettings.gameList.icons.unshift('NgRatingListIcon');
+
+  window.displaySettings.searchComponents.push('NgRatingSearchableSelect');
 }());
 
 export default components;

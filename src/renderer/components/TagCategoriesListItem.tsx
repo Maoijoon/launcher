@@ -13,42 +13,36 @@ export type TagCategoriesListItemProps = ListRowProps & {
 export function TagCategoriesListItem(props: TagCategoriesListItemProps) {
   const { category, isSelected, index, style } = props;
   // Pick class names
-  const className = React.useMemo(() => {
-    let className = 'tag-list-item';
-    if (index % 2 === 0) { className += ' tag-list-item--even';     }
-    if (isSelected)      { className += ' tag-list-item--selected'; }
-    return className;
-  }, [index, isSelected]);
+  let className = 'tag-list-item';
+  if (index % 2 === 0) { className += ' tag-list-item--even';     }
+  if (isSelected)      { className += ' tag-list-item--selected'; }
   // Memoize render
-  return React.useMemo(() => {
-    // Set element attributes
-    const attributes: any = {};
-    attributes[TagCategoriesListItem.idAttribute] = category.id;
-    // Render
-    return (
-      <li
-        style={style}
-        className={className}
-        { ...attributes }>
-        <OpenIcon
-          className='tag-list-icon'
-          icon='tag'
-          color={category ? category.color : '#FFFFFF'} />
-        <div className='tag-list-item__right'>
-          <div
-            className='tag-list-item__field tag-list-item__field--name'
-            title={category.name}>
-            {category.name}
-          </div>
-          <div
-            className='tag-list-item__field tag-list-item__field--description'
-            title={category.description}>
-            {category.description}
-          </div>
+  const attributes: any = {};
+  attributes[TagCategoriesListItem.idAttribute] = category.id;
+  // Render
+  return (
+    <li
+      style={style}
+      className={className}
+      { ...attributes }>
+      <OpenIcon
+        className='tag-list-icon'
+        icon='tag'
+        color={category ? category.color : '#FFFFFF'} />
+      <div className='tag-list-item__right'>
+        <div
+          className='tag-list-item__field tag-list-item__field--name'
+          title={category.name}>
+          {category.name}
         </div>
-      </li>
-    );
-  }, [style, className, category]);
+        <div
+          className='tag-list-item__field tag-list-item__field--description'
+          title={category.description}>
+          {category.description}
+        </div>
+      </div>
+    </li>
+  );
 }
 
 export namespace TagCategoriesListItem {

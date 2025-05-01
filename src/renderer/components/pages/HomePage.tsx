@@ -330,6 +330,7 @@ export function HomePage(props: HomePageProps) {
                       onGameLaunch={(event, gameId) => props.onLaunchGame(gameId, null)}
                       findGameDragEventData={findGameDragEventDataGrid}>
                       <GameGridItem
+                        game={loadedGotd}
                         key={loadedGotd.id}
                         id={loadedGotd.id}
                         title={loadedGotd.title}

@@ -50,6 +50,7 @@ export function RandomGames(props: RandomGamesProps) {
 
   const gameItems = props.games.slice(0, 6).map(game => (
     <GameGridItem
+      game={game}
       key={game.id}
       id={game.id}
       title={game.title}

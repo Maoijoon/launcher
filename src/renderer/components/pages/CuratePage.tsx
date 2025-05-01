@@ -410,7 +410,7 @@ export function CuratePage(props: CuratePageProps) {
     }
   };
 
-  const warningCount = React.useMemo(() => curation ? curation.warnings.writtenWarnings.length : 0, [curation]);
+  const warningCount = curation ? curation.warnings.writtenWarnings.length : 0;
   const disabled = !curation;
 
   const runExtCommand = (command: string) => {

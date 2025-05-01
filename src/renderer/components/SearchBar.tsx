@@ -13,6 +13,8 @@ import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { GameOrder } from './GameOrder';
 import { OpenIcon } from './OpenIcon';
 import { SimpleButton } from './SimpleButton';
+import { DynamicComponent } from './DynamicComponent';
+import { SearchComponentProps } from 'flashpoint-launcher-renderer';
 
 function TestComponent2() {
   const onClearFactory = (key: string) => {
@@ -366,6 +368,16 @@ export function SearchBar() {
     }
   }, [view.id]);
 
+  const searchComponentProps: SearchComponentProps = {
+    advancedFilter: view.advancedFilter,
+    setAdvancedFilter: (advFilter) => {
+      dispatch(setAdvancedFilter({
+        view: view.id,
+        filter: advFilter,
+      }));
+    }
+  };
+
   return (
     <div className='search-bar-wrapper search-bar-wrapper--expanded-simple'>
       <div className="search-bar">
@@ -517,6 +529,11 @@ export function SearchBar() {
             onBlacklist={onBlacklistTag}
             onClear={onClearTags}
             onSetAndToggle={onSetAndToggleTags} />
+          { window.displaySettings.searchComponents.map((name) => {
+            return (
+              <DynamicComponent name={name} props={searchComponentProps}/>
+            );
+          }) }
         </div>
       )}
     </div>
@@ -587,7 +604,7 @@ type TagSelectItem = {
   tag: Tag;
 } & SearchableSelectItem;
 
-function SearchableSelect<T extends SearchableSelectItem>(props: SearchableSelectProps<T>) {
+export function SearchableSelect<T extends SearchableSelectItem>(props: SearchableSelectProps<T>) {
   const { title, items, selected, andToggle, onWhitelist, onBlacklist, onClear, onSetAndToggle, mapName, labelRenderer } = props;
   const [expanded, setExpanded] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);

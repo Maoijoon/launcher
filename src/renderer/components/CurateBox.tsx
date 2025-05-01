@@ -59,8 +59,8 @@ export function CurateBox(props: CurateBoxProps) {
   const dispatch = useAppDispatch();
   const folder = props.curation.folder;
 
-  const splitStatus = React.useMemo(() => props.curation.game.status ? props.curation.game.status.split(';').map(s => s.trim()).sort() : [], [props.curation.game.status]);
-  const splitPlayMode = React.useMemo(() => props.curation.game.playMode ? props.curation.game.playMode.split(';').map(s => s.trim()).sort() : [], [props.curation.game.playMode]);
+  const splitStatus = props.curation.game.status ? props.curation.game.status.split(';').map(s => s.trim()).sort() : [];
+  const splitPlayMode = props.curation.game.playMode ? props.curation.game.playMode.split(';').map(s => s.trim()).sort() : [];
   const tags = props.curation.game.tags;
   let sortedTags: Tag[] = [];
   if (tags) {

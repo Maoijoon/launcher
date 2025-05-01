@@ -41,14 +41,11 @@ export function GameListItem(props: GameListItemProps) {
   // Get the platform icon path
   const platformIcon = getPlatformIconURL(platform, props.logoVersion);
   // Pick class names
-  const className = React.useMemo(() => {
-    let className = 'game-list-item';
-    if (index % 2 === 0) { className += ' game-list-item--even';     }
-    if (isSelected)      { className += ' game-list-item--selected'; }
-    if (isDragged)       { className += ' game-list-item--dragged';  }
-    return className;
-  }, [index, isSelected, isDragged]);
-    // Set element attributes
+  let className = 'game-list-item';
+  if (index % 2 === 0) { className += ' game-list-item--even';     }
+  if (isSelected)      { className += ' game-list-item--selected'; }
+  if (isDragged)       { className += ' game-list-item--dragged';  }
+  // Set element attributes
   const attributes: any = {};
   attributes[GameListItem.idAttribute] = id;
   attributes[GameListItem.indexAttribute] = index;

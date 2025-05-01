@@ -23,9 +23,7 @@ export function ServiceBox(props: ServiceBoxProps) {
   const strings = lang.developer;
   // Log
   const entries = window.Shared.log.entries;
-  const logData = React.useMemo(() => {
-    return stringifyServiceLogEntries(entries, service.name);
-  }, [entries, service.name]);
+  const logData = stringifyServiceLogEntries(entries, service.name);
   // Uptime
   const uptimeRef = React.useRef<HTMLDivElement>(null);
   useInterval(() => { // (Update the value of the timer at an interval)

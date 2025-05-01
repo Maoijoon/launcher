@@ -63,6 +63,8 @@ import { TaskBar } from './TaskBar';
 import { TitleBar } from './TitleBar';
 import { WithLogsProps } from '@renderer/containers/withLogs';
 import { batchProcessor } from '@shared/utils/throttle';
+import { SearchableSelect } from './SearchBar';
+import * as extUtils from '@renderer/util/ext';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
@@ -98,7 +100,8 @@ const DEFAULT_DISPLAYS: DisplaySettings = {
   },
   gameList: {
     icons: []
-  }
+  },
+  searchComponents: [],
 };
 
 export type AppProps = AppOwnProps & WithLogsProps & WithViewProps & WithFpfssProps & WithPreferencesProps & WithSearchProps & WithTagCategoriesProps & WithMainStateProps & WithTasksProps & WithCurateProps & WithShortcutProps & WithNavigationProps;
@@ -116,11 +119,18 @@ export class App extends React.Component<AppProps> {
       utils: {
         getExtensionFileURL: (extId, filePath) => {
           return `${getFileServerURL()}/extdata/${extId}/${filePath}`;
+        },
+        search: {
+          onWhitelistFactory: extUtils.onWhitelistFactory,
+          onBlacklistFactory: extUtils.onBlacklistFactory,
+          onClearFactory: extUtils.onClearFactory,
+          onSetAndToggleFactory: extUtils.onSetAndToggleFactory,
         }
       },
       components: {
         GameComponentInputField: GameComponentInputField,
         GameComponentDropdownSelectField: GameComponentDropdownSelectField,
+        SearchableSelect: SearchableSelect,
       }
     };
     window.displaySettings = DEFAULT_DISPLAYS;
