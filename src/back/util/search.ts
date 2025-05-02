@@ -96,6 +96,9 @@ export function createSearchFilter(query: QueryData, preferences: AppPreferences
     }
   }
 
+  if (query.extOrder.extId !== '') {
+    search.extOrder = query.extOrder;
+  }
 
   // Tag filters
   const filteredTags = preferences.tagFilters

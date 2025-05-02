@@ -1,6 +1,6 @@
 import { GameData, PartialGameData } from '@fparchive/flashpoint-archive';
 import { ArchiveState } from '@shared/back/types';
-import { CURATIONS_FOLDER_TEMP, CURATIONS_FOLDER_WORKING, LOGOS, SCREENSHOTS } from '@shared/constants';
+import { CURATIONS_FOLDER_TEMP, LOGOS, SCREENSHOTS } from '@shared/constants';
 import { CurationIndexImage } from '@shared/curate/OLD_types';
 import { convertEditToCurationMetaFile } from '@shared/curate/metaToMeta';
 import { AddAppCuration, CurationMeta } from '@shared/curate/types';

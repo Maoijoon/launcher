@@ -18,6 +18,7 @@ import {
   DownloaderStatus,
   DownloadTask,
   DownloadWorkerState,
+  ExtOrder,
   Game,
   GameConfig,
   GameData,
@@ -797,6 +798,7 @@ export type QueryData = {
   searchId: number;
   orderBy: GameOrderBy;
   orderDirection: GameOrderDirection;
+  extOrder: ExtOrder;
   text: string;
   advancedFilter: AdvancedFilter;
   playlist?: Playlist;

@@ -233,7 +233,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       const { isEditing, isNewGame, preferencesData, suggestions } = this.props;
       const editDisabled = !preferencesData.enableEditing;
       const editable = isEditing;
-      const screenshotSrc = getGameImageURL(SCREENSHOTS, game.id);
+      const screenshotSrc = getGameImageURL(SCREENSHOTS, game.screenshotPath);
       const anyActiveDataDownloaded = game.gameData !== undefined && game.gameData.findIndex((gd) => gd.presentOnDisk) !== -1;
 
       const contextMenu: MenuItemConstructorOptions[] = [];
@@ -745,7 +745,7 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
                         <div className='browse-right-sidebar__row__screenshot__placeholder__back'>
                           <GameImageSplit
                             text={strings.thumbnail}
-                            imgSrc={this.state.thumbnailExists ? getGameImageURL(LOGOS, game.id) : undefined}
+                            imgSrc={this.state.thumbnailExists ? getGameImageURL(LOGOS, game.logoPath) : undefined}
                             showHeaders={true}
                             onSetImage={this.onSetThumbnail}
                             onRemoveClick={this.onRemoveThumbnailClick}
@@ -861,16 +861,16 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
       // Refresh image if it was replaced or removed
       if (this.props.isEditing && this.props.currentGame && this.props.currentGame.id === id) {
         if (folder === LOGOS) {
-          this.checkImageExistance(LOGOS, this.props.currentGame.id);
+          this.checkImageExistance(LOGOS, this.props.currentGame.logoPath);
         } else if (folder === SCREENSHOTS) {
-          this.checkImageExistance(SCREENSHOTS, this.props.currentGame.id);
+          this.checkImageExistance(SCREENSHOTS, this.props.currentGame.screenshotPath);
         }
       }
     }
   };
 
-  checkImageExistance(folder: typeof LOGOS | typeof SCREENSHOTS, id: string) {
-    fetch(getGameImageURL(folder, id))
+  checkImageExistance(folder: typeof LOGOS | typeof SCREENSHOTS, imagePath: string) {
+    fetch(getGameImageURL(folder, imagePath))
     .then(res => {
       const target = (folder === LOGOS) ? 'thumbnailExists' : 'screenshotExists';
       const exists = (res.status >= 200 && res.status < 300);
@@ -953,12 +953,12 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
     if (currentGame) {
       template.push({
         label: (this.context as LangContainer).menu.viewThumbnailInFolder,
-        click: () => { remote.shell.showItemInFolder(getGameImagePath(LOGOS, currentGame.id).replace(/\//g, '\\')); },
+        click: () => { remote.shell.showItemInFolder(getGameImagePath(LOGOS, currentGame.logoPath).replace(/\//g, '\\')); },
         enabled: true
       });
       template.push({
         label: (this.context as LangContainer).menu.viewScreenshotInFolder,
-        click: () => { remote.shell.showItemInFolder(getGameImagePath(SCREENSHOTS, currentGame.id).replace(/\//g, '\\')); },
+        click: () => { remote.shell.showItemInFolder(getGameImagePath(SCREENSHOTS, currentGame.screenshotPath).replace(/\//g, '\\')); },
         enabled: true
       });
     }
@@ -970,7 +970,8 @@ export class RightBrowseSidebar extends React.Component<RightBrowseSidebarProps,
 
   setImageFactory = (folder: typeof LOGOS | typeof SCREENSHOTS) => async (data: ArrayBuffer) => {
     if (this.props.currentGame) {
-      const res = await axios.post(`${getGameImageURL(folder, this.props.currentGame.id)}`, data);
+      const imagePath = folder === 'Logos' ? this.props.currentGame.logoPath : this.props.currentGame.screenshotPath;
+      const res = await axios.post(`${getGameImageURL(folder, imagePath)}`, data);
       if (res.status !== 200) {
         alert(`ERROR: Server Returned ${res.status} - ${res.statusText}`);
       }

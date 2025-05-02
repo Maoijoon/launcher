@@ -1,4 +1,4 @@
-import { GameOrderBy, GameOrderReverse } from 'flashpoint-launcher';
+import { ExtOrder, GameOrderBy, GameOrderReverse } from 'flashpoint-launcher';
 import * as React from 'react';
 import { LangContext } from '../util/lang';
 import { useContext } from 'react';
@@ -8,6 +8,8 @@ export type GameOrderProps = {
   onChange?: (event: GameOrderChangeEvent) => void;
   /** What property to order the games by. */
   orderBy: GameOrderBy;
+  /** Extension order settings */
+  extOrder: ExtOrder;
   /** What way to order the games in. */
   orderReverse: GameOrderReverse;
 };
@@ -16,6 +18,7 @@ export type GameOrderProps = {
 export type GameOrderChangeEvent = {
   orderBy: GameOrderBy;
   orderReverse: GameOrderReverse;
+  extOrder: ExtOrder;
 };
 
 /**
@@ -27,32 +30,56 @@ export function GameOrder(props: GameOrderProps) {
   const strings = allStrings.filter;
 
   const onOrderByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    updateOrder({ orderBy: event.target.value as GameOrderBy }); // Let the parser deal with invalid values instead. How would this even happen?
+    const orderBy = event.target.value as GameOrderBy;
+    const extId = event.target.selectedOptions[0].getAttribute('ext-id');
+    const extKey = event.target.selectedOptions[0].getAttribute('ext-key');
+    const extOrderable = window.ext.orderables.find(e => e.extId === extId && e.key === extKey);
+    console.log(`selected ${extId} ${extKey}`);
+    if (extOrderable) {
+      updateOrder({ orderBy }, extOrderable);
+    } else {
+      updateOrder({ orderBy }, {
+        extId: '',
+        key: '',
+        default: ''
+      });
+    }
   };
 
   const onOrderReverseChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     if (isOrderReverse(event.target.value)) {
-      updateOrder({ orderReverse: event.target.value });
+      updateOrder({ orderReverse: event.target.value }, props.extOrder);
     } else {
       console.error(`Failed to set "Order Reverse". Value is invalid! (value: "${event.target.value}")`);
     }
   };
 
-  const updateOrder = (data: Partial<GameOrderChangeEvent>) => {
+  const updateOrder = (data: Partial<GameOrderChangeEvent>, extOrder: ExtOrder) => {
     if (props.onChange) {
       props.onChange({
-        orderBy:      data.orderBy      || props.orderBy,
+        orderBy: data.orderBy || props.orderBy,
         orderReverse: data.orderReverse || props.orderReverse,
+        extOrder,
       });
     }
   };
+
+  // Only apply ext selection if it exists
+  const extOrderables = window.ext.orderables.map(e => `ext_${e.extId}_${e.key}`);
+  let selected: string = props.orderBy;
+  if (props.extOrder) {
+    const extOrderKey = `ext_${props.extOrder.extId}_${props.extOrder.key}`;
+    if (extOrderables.includes(extOrderKey)) {
+      selected = extOrderKey;
+    }
+  }
 
   return (
     <>
       {/* Order By */}
       <select
         className='search-selector search-bar-order-dropdown'
-        value={props.orderBy}
+        value={selected}
         onChange={onOrderByChange}>
         <option value='title'>{strings.title}</option>
         <option value='developer'>{strings.developer}</option>
@@ -64,6 +91,16 @@ export function GameOrder(props: GameOrderProps) {
         <option value='dateModified'>{strings.dateModified}</option>
         <option value='lastPlayed'>{allStrings.browse.lastPlayed}</option>
         <option value='playtime'>{allStrings.browse.playtime}</option>
+        { window.ext.orderables.map((orderable) => {
+          return (
+            <option
+              ext-id={orderable.extId}
+              ext-key={orderable.key}
+              value={`ext_${orderable.extId}_${orderable.key}`}>
+              {orderable.title}
+            </option>
+          );
+        })}
       </select>
       {/* Order Reverse */}
       <select

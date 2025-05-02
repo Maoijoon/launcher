@@ -131,7 +131,8 @@ export class App extends React.Component<AppProps> {
         GameComponentInputField: GameComponentInputField,
         GameComponentDropdownSelectField: GameComponentDropdownSelectField,
         SearchableSelect: SearchableSelect,
-      }
+      },
+      orderables: [],
     };
     window.displaySettings = DEFAULT_DISPLAYS;
 
@@ -1225,7 +1226,7 @@ export class App extends React.Component<AppProps> {
   });
 
   private onGameContextMenuMemo = memoizeOne((playlists: Playlist[], strings: LangContainer, selectedPlaylistId?: string) => {
-    return (gameId: string) => {
+    return (gameId: string, logoPath: string, screenshotPath: string) => {
       const fpfssButtons: MenuItemConstructorOptions[] = this.props.preferencesData.fpfssBaseUrl ? [
         {
           /* Edit via FPFSS */
@@ -1331,16 +1332,16 @@ export class App extends React.Component<AppProps> {
           label: strings.menu.openLogoLocation,
           enabled: !window.Shared.isBackRemote, // (Local "back" only)
           click: () => {
-            const logoPath = getGameImagePath(LOGOS, gameId);
-            fs.promises.access(logoPath, fs.constants.R_OK)
+            const fullLogoPath = getGameImagePath(LOGOS, logoPath);
+            fs.promises.access(fullLogoPath, fs.constants.R_OK)
             .then(() => {
               /* Downloaded, open */
-              remote.shell.showItemInFolder(logoPath);
+              remote.shell.showItemInFolder(fullLogoPath);
             }).catch(() => {
               /* Not downloaded, try and force it */
-              fetch(getGameImageURL(LOGOS, gameId))
+              fetch(getGameImageURL(LOGOS, logoPath))
               .then(() => {
-                remote.shell.showItemInFolder(logoPath);
+                remote.shell.showItemInFolder(fullLogoPath);
               });
             });
           }
@@ -1350,16 +1351,16 @@ export class App extends React.Component<AppProps> {
           label: strings.menu.openScreenshotLocation,
           enabled: !window.Shared.isBackRemote, // (Local "back" only)
           click: () => {
-            const logoPath = getGameImagePath(SCREENSHOTS, gameId);
-            fs.promises.access(logoPath, fs.constants.R_OK)
+            const fullScreenshotPath = getGameImagePath(SCREENSHOTS, screenshotPath);
+            fs.promises.access(fullScreenshotPath, fs.constants.R_OK)
             .then(() => {
               /* Downloaded, open */
-              remote.shell.showItemInFolder(logoPath);
+              remote.shell.showItemInFolder(fullScreenshotPath);
             }).catch(() => {
               /* Not downloaded, try and force it */
-              fetch(getGameImageURL(SCREENSHOTS, gameId))
+              fetch(getGameImageURL(SCREENSHOTS, screenshotPath))
               .then(() => {
-                remote.shell.showItemInFolder(logoPath);
+                remote.shell.showItemInFolder(fullScreenshotPath);
               });
             });
           }

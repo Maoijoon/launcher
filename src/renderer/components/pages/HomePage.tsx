@@ -31,7 +31,7 @@ type OwnProps = {
   platforms: string[];
   playlists: Playlist[];
   /** Generator for game context menu */
-  onGameContextMenu: (gameId: string) => void;
+  onGameContextMenu: (gameId: string, logoPath: string, screenshotPath: string) => void;
   onLaunchGame: (gameId: string, override: GameLaunchOverride) => void;
   /** Pass to Random Picks */
   randomGames: ViewGame[];
@@ -325,7 +325,7 @@ export function HomePage(props: HomePageProps) {
                   { loadedGotd ? (
                     <GameItemContainer
                       className='gotd-container'
-                      onGameContextMenu={(event, gameId) => props.onGameContextMenu(gameId)}
+                      onGameContextMenu={(event, gameId, logoPath, screenshotPath) => props.onGameContextMenu(gameId, logoPath, screenshotPath)}
                       onGameSelect={(event, gameId) => gameId && onSelectGame(gameId)}
                       onGameLaunch={(event, gameId) => props.onLaunchGame(gameId, null)}
                       findGameDragEventData={findGameDragEventDataGrid}>
@@ -338,8 +338,8 @@ export function HomePage(props: HomePageProps) {
                         extreme={loadedGotd.tags.findIndex(t => extremeTags.includes(t.trim())) !== -1}
                         extremeIconPath={extremeIconPath}
                         tagGroupIconBase64={tagGroupIcons.find(tg => tg.tagFilter.find(t => loadedGotd?.tags.includes(t)))?.iconBase64 || ''}
-                        thumbnail={getGameImageURL(LOGOS, loadedGotd.id)}
-                        screenshot={getGameImageURL(SCREENSHOTS, loadedGotd.id)}
+                        thumbnail={getGameImageURL(LOGOS, loadedGotd.logoPath)}
+                        screenshot={getGameImageURL(SCREENSHOTS, loadedGotd.screenshotPath)}
                         screenshotPreviewMode={props.preferencesData.screenshotPreviewMode}
                         screenshotPreviewDelay={props.preferencesData.screenshotPreviewDelay}
                         hideExtremeScreenshots={props.preferencesData.hideExtremeScreenshots}

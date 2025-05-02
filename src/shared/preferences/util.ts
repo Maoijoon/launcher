@@ -8,6 +8,7 @@ import {
   AppPathOverride,
   AppPreferencesData,
   AppPreferencesDataMainWindow,
+  ExtOrder,
   GameDataSource,
   GameMetadataSource, GameOrderBy, GameOrderReverse,
   MetadataUpdateInfo,
@@ -414,7 +415,7 @@ function parseAdvancedFilterAndToggles(parser: IObjectParserProp<AdvancedFilterA
   parser.prop('platform', v => output.platform = !!v, true);
   parser.prop('tags', v => output.tags = !!v, true);
   parser.prop('developer', v => output.developer = !!v, true);
-  parser.prop('publisher', v => output.publisher = !!v, true)
+  parser.prop('publisher', v => output.publisher = !!v, true);
   parser.prop('series', v => output.series = !!v, true);
   parser.prop('ruffleSupport', v => output.ruffleSupport = !!v, true);
 }
@@ -434,6 +435,12 @@ function parseAdvancedFilter(parser: IObjectParserProp<AdvancedFilter>, output: 
   parseAdvancedFilterAndToggles(parser.prop('andToggles'), output.andToggles);
 }
 
+function parseExtOrder(parser: IObjectParserProp<ExtOrder>, output: ExtOrder) {
+  parser.prop('extId', v => output.extId = str(v));
+  parser.prop('key', v => output.key = str(v));
+  parser.prop('default', v => output.default = v);
+}
+
 function parseStoredView(parser: IObjectParserProp<StoredView>): StoredView {
   const source: StoredView = {
     view: '',
@@ -441,6 +448,11 @@ function parseStoredView(parser: IObjectParserProp<StoredView>): StoredView {
     advancedFilter: getDefaultAdvancedFilter(),
     orderBy: 'title',
     orderReverse: 'ASC',
+    extOrder: {
+      extId: '',
+      key: '',
+      default: ''
+    },
     expanded: true,
   };
 
@@ -449,6 +461,7 @@ function parseStoredView(parser: IObjectParserProp<StoredView>): StoredView {
   parseAdvancedFilter(parser.prop('advancedFilter'), source.advancedFilter);
   parser.prop('orderBy', v => source.orderBy = parseOrderBy(v), true);
   parser.prop('orderReverse', v => source.orderReverse = parseOrderReverse(v), true);
+  parseExtOrder(parser.prop('extOrder'), source.extOrder);
   parser.prop('selectedPlaylistId', v => source.selectedPlaylistId = str(v), true);
   parser.prop('selectedGameId', v => source.selectedGameId = str(v), true);
   parser.prop('expanded', v => source.expanded = !!v, true);

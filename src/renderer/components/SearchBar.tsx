@@ -1,7 +1,7 @@
 import { useView } from '@renderer/hooks/search';
 import { useAppDispatch, useAppSelector } from '@renderer/hooks/useAppSelector';
 import { usePreferences } from '@renderer/hooks/usePreferences';
-import { forceSearch, setAdvancedFilter, setExpanded, setOrderBy, setOrderReverse, setSearchText } from '@renderer/store/search/slice';
+import { forceSearch, setAdvancedFilter, setExpanded, setExtOrder, setOrderBy, setOrderReverse, setSearchText } from '@renderer/store/search/slice';
 import { getPlatformIconURL } from '@renderer/Util';
 import { LangContext } from '@renderer/util/lang';
 import { getDefaultAdvancedFilter } from '@shared/search/util';
@@ -407,6 +407,7 @@ export function SearchBar() {
         <GameOrder
           orderBy={view.orderBy}
           orderReverse={view.orderReverse}
+          extOrder={view.extOrder}
           onChange={(event) => {
             dispatch(setOrderBy({
               view: view.id,
@@ -415,6 +416,10 @@ export function SearchBar() {
             dispatch(setOrderReverse({
               view: view.id,
               value: event.orderReverse
+            }));
+            dispatch(setExtOrder({
+              view: view.id,
+              value: event.extOrder
             }));
           }} />
         <SimpleButton

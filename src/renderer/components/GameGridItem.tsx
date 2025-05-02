@@ -79,6 +79,8 @@ export function GameGridItem(props: GameGridItemProps) {
   const attributes: any = {};
   attributes[GameGridItem.idAttribute] = id;
   attributes[GameGridItem.indexAttribute] = rowIndex;
+  attributes[GameGridItem.logoPathAttribute] = props.game?.logoPath;
+  attributes[GameGridItem.screenshotPathAttribute] = props.game?.screenshotPath;
 
   const gameGridComponentProps: GameGridComponentProps = {
     isSelected,
@@ -137,6 +139,8 @@ export namespace GameGridItem {
   /** ID of the attribute used to store the game's id. */
   export const idAttribute = 'data-game-id';
   export const indexAttribute = 'data-game-index';
+  export const logoPathAttribute = 'data-game-logo-path';
+  export const screenshotPathAttribute = 'data-game-screenshot-path';
 
   /**
    * Get the id of the game displayed in a GameGridItem element (or throw an error if it fails).
@@ -146,10 +150,14 @@ export namespace GameGridItem {
   export function getDragEventData(element: Element): GameDragEventData {
     const gameId = element.getAttribute(GameGridItem.idAttribute);
     const index = num(element.getAttribute(GameGridItem.indexAttribute));
+    const logoPath = element.getAttribute(GameGridItem.logoPathAttribute) || '';
+    const screenshotPath = element.getAttribute(GameGridItem.screenshotPathAttribute) || '';
     if (typeof gameId !== 'string') { throw new Error('Failed to get ID from GameListItem element. Attribute not found.'); }
     return {
       gameId,
-      index
+      index,
+      logoPath,
+      screenshotPath,
     };
   }
 

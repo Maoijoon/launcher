@@ -7,7 +7,7 @@ import { VIEW_PAGE_SIZE } from '@shared/constants';
 import { updatePreferencesData } from '@shared/preferences/util';
 import { getDefaultAdvancedFilter, getDefaultGameSearch } from '@shared/search/util';
 import { deepCopy } from '@shared/Util';
-import { AdvancedFilter, Game, GameOrderBy, GameOrderReverse, Playlist, StoredView, Tag, ViewGame } from 'flashpoint-launcher';
+import { AdvancedFilter, ExtOrder, Game, GameOrderBy, GameOrderReverse, Playlist, StoredView, Tag, ViewGame } from 'flashpoint-launcher';
 import { RootState } from '../store';
 
 export const GENERAL_VIEW_ID = '!general!';
@@ -53,6 +53,7 @@ export type ResultsView = {
   data: ResultsViewData;
   orderBy: GameOrderBy;
   orderReverse: GameOrderReverse;
+  extOrder: ExtOrder;
   text: string;
   textPositions: ElementPosition[];
   advancedFilter: AdvancedFilter;
@@ -70,7 +71,7 @@ type SearchDropdownDataSet = {
   tags: Tag[] | null;
   developers: string[] | null;
   publishers: string[] | null;
-  series: string[]| null;
+  series: string[] | null;
 }
 
 type SearchGridScrollAction = {
@@ -117,6 +118,11 @@ export type SearchOrderByAction = {
 export type SearchOrderReverseAction = {
   view: string;
   value: GameOrderReverse;
+}
+
+export type SearchExtOrderAction = {
+  view: string;
+  value: ExtOrder;
 }
 
 export type SearchAdvancedFilterAction = {
@@ -187,6 +193,11 @@ const defaultGeneralState: ResultsView = {
   loaded: false,
   orderBy: 'title',
   orderReverse: 'ASC',
+  extOrder: {
+    extId: '',
+    key: '',
+    default: ''
+  },
   searchFilter: {
     ...getDefaultGameSearch(),
     viewId: GENERAL_VIEW_ID,
@@ -255,12 +266,27 @@ export const forceSearch = createAsyncThunk(
       };
     }
 
+    // Make sure the extOrder exists
+    let extOrderExists = true;
+    if (view.extOrder) {
+      const extOrderKey = `ext_${view.extOrder.extId}_${view.extOrder.key}`;
+      const extOrders = window.ext.orderables.map(e => `ext_${e.extId}_${e.key}`);
+      if (!extOrders.includes(extOrderKey)) {
+        extOrderExists = false;
+      }
+    }
+
     const filter = await window.Shared.back.request(BackIn.PARSE_QUERY_DATA, {
       viewId: payload.view,
       searchId: view.data.searchId + 1,
       text: view.text,
       advancedFilter: advFilter,
       orderBy: view.orderBy,
+      extOrder: extOrderExists ? view.extOrder : {
+        extId: '',
+        key: '',
+        default: ''
+      },
       orderDirection: view.orderReverse,
       playlist: view.selectedPlaylist
     });
@@ -292,6 +318,11 @@ const searchSlice = createSlice({
             expanded: true,
             orderBy: 'title',
             orderReverse: 'ASC',
+            extOrder: {
+              extId: '',
+              key: '',
+              default: ''
+            },
             searchFilter: {
               ...getDefaultGameSearch(),
               viewId: view,
@@ -314,6 +345,7 @@ const searchSlice = createSlice({
             view.advancedFilter = storedView.advancedFilter;
             view.orderBy = storedView.orderBy;
             view.orderReverse = storedView.orderReverse;
+            view.extOrder = storedView.extOrder;
           }
         }
       }
@@ -346,6 +378,11 @@ const searchSlice = createSlice({
           expanded: true,
           orderBy: 'title',
           orderReverse: 'ASC',
+          extOrder: {
+            extId: '',
+            key: '',
+            default: ''
+          },
           searchFilter: {
             ...getDefaultGameSearch(),
             viewId: view,
@@ -402,6 +439,11 @@ const searchSlice = createSlice({
             expanded: true,
             orderBy: 'title',
             orderReverse: 'ASC',
+            extOrder: {
+              extId: '',
+              key: '',
+              default: ''
+            },
             searchFilter: {
               ...getDefaultGameSearch(),
               viewId: view,
@@ -486,6 +528,12 @@ const searchSlice = createSlice({
       const view = state.views[payload.view];
       if (view) {
         view.orderReverse = payload.value;
+      }
+    },
+    setExtOrder(state: SearchState, { payload }: PayloadAction<SearchExtOrderAction>) {
+      const view = state.views[payload.view];
+      if (view) {
+        view.extOrder = payload.value;
       }
     },
     setAdvancedFilter(state: SearchState, { payload }: PayloadAction<SearchAdvancedFilterAction>) {
@@ -706,6 +754,7 @@ export const {
   setSearchId,
   setOrderBy,
   setOrderReverse,
+  setExtOrder,
   setAdvancedFilter,
   movePlaylistGame,
   requestRange,

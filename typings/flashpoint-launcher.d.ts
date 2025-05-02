@@ -709,6 +709,10 @@ declare module 'flashpoint-launcher' {
          * 2 = Available
          */
       archiveState: number;
+      /** Relative path to the logo file from the logos directory */
+      logoPath: string;
+      /** Relative path to the screenshot file from the screenshots directory */
+      screenshotPath: string;
       /** Ruffle support for flash entries
        * Valid values: 'standalone', '' (none)
        */
@@ -1131,6 +1135,7 @@ declare module 'flashpoint-launcher' {
       advancedFilter: AdvancedFilter;
       orderBy: GameOrderBy;
       orderReverse: GameOrderReverse;
+      extOrder: ExtOrder;
       selectedPlaylistId?: string;
       selectedGameId?: string;
       expanded: boolean;
@@ -1148,9 +1153,16 @@ declare module 'flashpoint-launcher' {
       ext: Record<string, Record<string, bool | undefined> | undefined>;
     }
 
+    type ExtOrder = {
+      extId: string;
+      key: string;
+      default: any;
+    }
+
     type AdvancedFilter = {
       installed?: boolean;
       legacy?: boolean;
+      extOrder?: ExtOrder;
       playlistOrder: boolean;
       library: Record<string, AdvancedFilterToggle>;
       playMode: Record<string, AdvancedFilterToggle>;
@@ -2474,7 +2486,7 @@ declare module 'flashpoint-launcher' {
 }
 
 declare module 'flashpoint-launcher-renderer' {
-  import { Game, ViewGame, PlaylistGame, TagCategory, AppPreferencesData, AdvancedFilter } from 'flashpoint-launcher';
+  import { Game, ViewGame, ExtOrder, PlaylistGame, TagCategory, AppPreferencesData, AdvancedFilter } from 'flashpoint-launcher';
   import { LangContainer } from 'flashpoint-launcher';
 
   /** Game properties that will have suggestions gathered and displayed. */
@@ -2564,7 +2576,8 @@ declare module 'flashpoint-launcher-renderer' {
       GameComponentInputField: React.ComponentType<GameComponentInputFieldProps>,
       GameComponentDropdownSelectField: React.ComponentType<GameComponentDropdownSelectFieldProps>,
       SearchableSelect: React.ComponentType<SearchableSelectProps<any>>,
-    }
+    },
+    orderables: ExtOrderable[],
   }
 
   type DisplaySettings = {
@@ -2604,6 +2617,10 @@ declare module 'flashpoint-launcher-renderer' {
     labelRenderer?: (item: T, selected: boolean) => React.JSX.Element;
     generateItem: (missing: string) => T;
   }
+
+  type ExtOrderable = ExtOrder & {
+    title: string;
+  };
 
   declare global {
     interface Window {

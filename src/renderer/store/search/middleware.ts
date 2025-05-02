@@ -19,6 +19,7 @@ import {
   setAdvancedFilter,
   setDropdownData,
   setExpanded,
+  setExtOrder,
   setFilter,
   setOrderBy,
   setOrderReverse,
@@ -29,7 +30,7 @@ import {
 export function addSearchMiddleware() {
   // Build filter immediately
   startAppListening({
-    matcher: isAnyOf(selectPlaylist, setAdvancedFilter, setOrderBy, setOrderReverse),
+    matcher: isAnyOf(selectPlaylist, setAdvancedFilter, setOrderBy, setOrderReverse, setExtOrder),
     effect: async(action: PayloadAction<SearchViewAction>, listenerApi) => {
       const state = listenerApi.getState();
       const view = state.search.views[action.payload.view];
@@ -52,6 +53,7 @@ export function addSearchMiddleware() {
           text: view.text,
           advancedFilter: advFilter,
           orderBy: view.orderBy,
+          extOrder: view.extOrder,
           orderDirection: view.orderReverse,
           playlist: view.selectedPlaylist
         });
@@ -140,7 +142,7 @@ export function addSearchMiddleware() {
 
   // Save stored view
   startAppListening({
-    matcher: isAnyOf(setSearchText, selectGame, selectPlaylist, setAdvancedFilter, setOrderBy, setOrderReverse, setExpanded, duplicateView),
+    matcher: isAnyOf(setSearchText, selectGame, selectPlaylist, setAdvancedFilter, setOrderBy, setOrderReverse, setExtOrder, setExpanded, duplicateView),
     effect: async(action: PayloadAction<SearchViewAction>, listenerApi) => {
       const state = listenerApi.getState();
       const view = state.search.views[action.payload.view];
@@ -153,6 +155,7 @@ export function addSearchMiddleware() {
           existingStoredView.advancedFilter = view.advancedFilter;
           existingStoredView.orderBy = view.orderBy;
           existingStoredView.orderReverse = view.orderReverse;
+          existingStoredView.extOrder = view.extOrder;
           existingStoredView.selectedPlaylistId = view.selectedPlaylist ? view.selectedPlaylist.id : undefined;
           existingStoredView.selectedGameId = view.selectedGame ? view.selectedGame.id : undefined;
           existingStoredView.expanded = view.expanded;
@@ -163,6 +166,7 @@ export function addSearchMiddleware() {
             advancedFilter: view.advancedFilter,
             orderBy: view.orderBy,
             orderReverse: view.orderReverse,
+            extOrder: view.extOrder,
             selectedPlaylistId: view.selectedPlaylist ? view.selectedPlaylist.id : undefined,
             selectedGameId: view.selectedGame ? view.selectedGame.id : undefined,
             expanded: view.expanded,

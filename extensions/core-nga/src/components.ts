@@ -41,6 +41,30 @@ const components: Record<string, React.ComponentType<any>> = {
   window.displaySettings.gameList.icons.unshift('NgRatingListIcon');
 
   window.displaySettings.searchComponents.push('NgRatingSearchableSelect');
+  window.ext.orderables.push({
+    title: 'NG Ratings',
+    extId: 'nga',
+    key: 'rating',
+    default: 'e'
+  });
+  window.ext.orderables.push({
+    title: 'NG Views',
+    extId: 'nga',
+    key: 'views',
+    default: 0
+  });
+  window.ext.orderables.push({
+    title: 'NG Score',
+    extId: 'nga',
+    key: 'score',
+    default: 0
+  });
+  window.ext.orderables.push({
+    title: 'NG Faves',
+    extId: 'nga',
+    key: 'faves',
+    default: 0
+  });
 }());
 
 export default components;

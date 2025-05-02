@@ -43,7 +43,7 @@ export type GameGridProps = {
   /** Called when the user attempts to select a game. */
   onGameSelect: (gameId?: string, col?: number, row?: number) => void;
   /** Called when the user attempts to open a context menu (at a game). */
-  onContextMenu?: (gameId: string) => void;
+  onContextMenu?: (gameId: string, logoPath: string, screenshotPath: string) => void;
   /** Called when the user starts to drag a game. */
   onGameDragStart?: (event: React.DragEvent, dragEventData: GameDragEventData) => void;
   /** Called when the user stops dragging a game (when they release it). */
@@ -260,8 +260,8 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
           extreme={game ? game.tags.findIndex(t => this.props.extremeTags.includes(t.trim())) !== -1 : false}
           extremeIconPath={extremeIconPath}
           tagGroupIconBase64={tagGroupIcon || ''}
-          thumbnail={game ? getGameImageURL(LOGOS, game.id) : ''}
-          screenshot={game ? getGameImageURL(SCREENSHOTS, game.id) : ''}
+          thumbnail={game ? getGameImageURL(LOGOS, game.logoPath) : ''}
+          screenshot={game ? getGameImageURL(SCREENSHOTS, game.logoPath) : ''}
           screenshotPreviewMode={this.props.screenshotPreviewMode}
           screenshotPreviewDelay={this.props.screenshotPreviewDelay}
           logoVersion={this.props.logoVersion}
@@ -349,9 +349,9 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
    * @param event React event
    * @param gameId ID of Game to open context menu for
    */
-  onGameContextMenu = (event: React.MouseEvent<HTMLDivElement>, gameId: string | undefined): void => {
+  onGameContextMenu = (event: React.MouseEvent<HTMLDivElement>, gameId: string | undefined, logoPath: string, screenshotPath: string): void => {
     if (this.props.onContextMenu) {
-      if (gameId) { this.props.onContextMenu(gameId); }
+      if (gameId) { this.props.onContextMenu(gameId, logoPath, screenshotPath); }
     }
   };
 

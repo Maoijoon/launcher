@@ -33,6 +33,8 @@ import { Spinner } from '../Spinner';
 export type GameDragEventData = {
   gameId: string;
   index: number;
+  logoPath: string;
+  screenshotPath: string;
 }
 
 export type GameDragData = {
@@ -52,7 +54,7 @@ type OwnProps = {
   onMovePlaylistGame: (sourceGameId: string, destGameId: string) => void;
 
   /** Generator for game context menu */
-  onGameContextMenu: (gameId: string) => void;
+  onGameContextMenu: (gameId: string, logoPath: string, screenshotPath: string) => void;
   /** Called when a playlist is updated */
   onUpdatePlaylist: (playlist: Playlist) => void;
   /** Called when a playlist is deleted */
