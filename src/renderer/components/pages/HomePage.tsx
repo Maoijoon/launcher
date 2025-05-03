@@ -4,7 +4,7 @@ import { GENERAL_VIEW_ID } from '@renderer/store/search/slice';
 import { idToGame } from '@renderer/util/async';
 import { Paths } from '@shared/Paths';
 import { BackIn, GameOfTheDay } from '@shared/back/types';
-import { ARCADE, LOGOS, SCREENSHOTS, THEATRE } from '@shared/constants';
+import { ARCADE, THEATRE } from '@shared/constants';
 import { updatePreferencesData } from '@shared/preferences/util';
 import { formatString } from '@shared/utils/StringFormatter';
 import { uuid } from '@shared/utils/uuid';
@@ -338,8 +338,8 @@ export function HomePage(props: HomePageProps) {
                         extreme={loadedGotd.tags.findIndex(t => extremeTags.includes(t.trim())) !== -1}
                         extremeIconPath={extremeIconPath}
                         tagGroupIconBase64={tagGroupIcons.find(tg => tg.tagFilter.find(t => loadedGotd?.tags.includes(t)))?.iconBase64 || ''}
-                        thumbnail={getGameImageURL(LOGOS, loadedGotd.logoPath)}
-                        screenshot={getGameImageURL(SCREENSHOTS, loadedGotd.screenshotPath)}
+                        thumbnail={getGameImageURL(loadedGotd.logoPath)}
+                        screenshot={getGameImageURL(loadedGotd.screenshotPath)}
                         screenshotPreviewMode={props.preferencesData.screenshotPreviewMode}
                         screenshotPreviewDelay={props.preferencesData.screenshotPreviewDelay}
                         hideExtremeScreenshots={props.preferencesData.hideExtremeScreenshots}

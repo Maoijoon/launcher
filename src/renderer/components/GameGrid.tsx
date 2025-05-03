@@ -1,6 +1,8 @@
 import { BackOut, BackOutTemplate } from '@shared/back/types';
-import { LOGOS, SCREENSHOTS, VIEW_PAGE_SIZE } from '@shared/constants';
+import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
+import { LOGOS, VIEW_PAGE_SIZE } from '@shared/constants';
 import { memoizeOne } from '@shared/memoize';
+import { GameLaunchOverride, TagFilter } from 'flashpoint-launcher';
 import * as React from 'react';
 import { ArrowKeyStepper, AutoSizer, Grid, GridCellProps, ScrollIndices } from 'react-virtualized';
 import { UpdateView, ViewGameSet } from '../interfaces';
@@ -8,8 +10,6 @@ import { findElementAncestor, gameDragDataType, getExtremeIconURL, getGameImageU
 import { GameGridItem } from './GameGridItem';
 import { GameItemContainer } from './GameItemContainer';
 import { GameDragData, GameDragEventData } from './pages/BrowsePage';
-import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
-import { GameLaunchOverride, TagFilter } from 'flashpoint-launcher';
 
 const RENDERER_OVERSCAN = 5;
 
@@ -260,8 +260,8 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
           extreme={game ? game.tags.findIndex(t => this.props.extremeTags.includes(t.trim())) !== -1 : false}
           extremeIconPath={extremeIconPath}
           tagGroupIconBase64={tagGroupIcon || ''}
-          thumbnail={game ? getGameImageURL(LOGOS, game.logoPath) : ''}
-          screenshot={game ? getGameImageURL(SCREENSHOTS, game.logoPath) : ''}
+          thumbnail={game ? getGameImageURL(game.logoPath) : ''}
+          screenshot={game ? getGameImageURL(game.logoPath) : ''}
           screenshotPreviewMode={this.props.screenshotPreviewMode}
           screenshotPreviewDelay={this.props.screenshotPreviewDelay}
           logoVersion={this.props.logoVersion}
@@ -281,7 +281,7 @@ export class GameGrid extends React.Component<GameGridProps, GameGridState> {
 
       // Update the image in the browsers cache
       if (folder === LOGOS) {
-        fetch(getGameImageURL(folder, id))
+        fetch(getGameImageURL(id))
         .then(() => {
           // Refresh the image for the game(s) that uses it
           const elements = document.getElementsByClassName('game-grid-item');

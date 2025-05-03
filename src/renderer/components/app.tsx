@@ -1,13 +1,15 @@
 import * as remote from '@electron/remote';
 import { WithCurateProps } from '@renderer/containers/withCurateState';
 import { WithFpfssProps } from '@renderer/containers/withFpfss';
+import { WithLogsProps } from '@renderer/containers/withLogs';
 import { WithNavigationProps } from '@renderer/containers/withNavigation';
 import { WithSearchProps } from '@renderer/containers/withSearch';
 import { WithViewProps } from '@renderer/containers/withView';
 import { RANDOM_GAME_ROW_COUNT } from '@renderer/store/main/slice';
 import { WithShortcutProps } from '@renderer/store/reactKeybindCompat';
+import * as extUtils from '@renderer/util/ext';
 import { BackIn, BackInit, BackOut, FpfssUser } from '@shared/back/types';
-import { APP_TITLE, LOGOS, SCREENSHOTS } from '@shared/constants';
+import { APP_TITLE } from '@shared/constants';
 import { CustomIPC, IService, ProcessState, WindowIPC } from '@shared/interfaces';
 import { memoizeOne } from '@shared/memoize';
 import { Paths } from '@shared/Paths';
@@ -18,6 +20,7 @@ import { arrayShallowStrictEquals } from '@shared/utils/compare';
 import { debounce } from '@shared/utils/debounce';
 import { newGame } from '@shared/utils/misc';
 import { formatString } from '@shared/utils/StringFormatter';
+import { batchProcessor } from '@shared/utils/throttle';
 import { uuid } from '@shared/utils/uuid';
 import { isAxiosError } from 'axios';
 import { clipboard, ipcRenderer, Menu, MenuItemConstructorOptions } from 'electron';
@@ -57,14 +60,11 @@ import { ConnectedFpfssEditGame } from './FpfssEditGame';
 import { newCurateTask } from './pages/CuratePage';
 import { placeholderProgressData, ProgressBar } from './ProgressComponents';
 import { ResizableSidebar, SidebarResizeEvent } from './ResizableSidebar';
+import { SearchableSelect } from './SearchBar';
 import { SimpleButton } from './SimpleButton';
 import { SplashScreen } from './SplashScreen';
 import { TaskBar } from './TaskBar';
 import { TitleBar } from './TitleBar';
-import { WithLogsProps } from '@renderer/containers/withLogs';
-import { batchProcessor } from '@shared/utils/throttle';
-import { SearchableSelect } from './SearchBar';
-import * as extUtils from '@renderer/util/ext';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
@@ -1332,14 +1332,14 @@ export class App extends React.Component<AppProps> {
           label: strings.menu.openLogoLocation,
           enabled: !window.Shared.isBackRemote, // (Local "back" only)
           click: () => {
-            const fullLogoPath = getGameImagePath(LOGOS, logoPath);
+            const fullLogoPath = getGameImagePath(logoPath);
             fs.promises.access(fullLogoPath, fs.constants.R_OK)
             .then(() => {
               /* Downloaded, open */
               remote.shell.showItemInFolder(fullLogoPath);
             }).catch(() => {
               /* Not downloaded, try and force it */
-              fetch(getGameImageURL(LOGOS, logoPath))
+              fetch(getGameImageURL(logoPath))
               .then(() => {
                 remote.shell.showItemInFolder(fullLogoPath);
               });
@@ -1351,14 +1351,14 @@ export class App extends React.Component<AppProps> {
           label: strings.menu.openScreenshotLocation,
           enabled: !window.Shared.isBackRemote, // (Local "back" only)
           click: () => {
-            const fullScreenshotPath = getGameImagePath(SCREENSHOTS, screenshotPath);
+            const fullScreenshotPath = getGameImagePath(screenshotPath);
             fs.promises.access(fullScreenshotPath, fs.constants.R_OK)
             .then(() => {
               /* Downloaded, open */
               remote.shell.showItemInFolder(fullScreenshotPath);
             }).catch(() => {
               /* Not downloaded, try and force it */
-              fetch(getGameImageURL(SCREENSHOTS, screenshotPath))
+              fetch(getGameImageURL(screenshotPath))
               .then(() => {
                 remote.shell.showItemInFolder(fullScreenshotPath);
               });

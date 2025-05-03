@@ -1,6 +1,5 @@
 import { LangContext } from '@renderer/util/lang';
 import { ScreenshotPreviewMode } from '@shared/BrowsePageLayout';
-import { LOGOS, SCREENSHOTS } from '@shared/constants';
 import { TagFilter, ViewGame } from 'flashpoint-launcher';
 import * as React from 'react';
 import { findGameDragEventDataGrid, getExtremeIconURL, getGameImageURL } from '../Util';
@@ -58,8 +57,8 @@ export function RandomGames(props: RandomGamesProps) {
       extreme={game ? game.tags.findIndex(t => props.extremeTags.includes(t.trim())) !== -1 : false}
       extremeIconPath={getExtremeIconURL(props.logoVersion)}
       tagGroupIconBase64={props.tagGroupIcons.find(tg => tg.tagFilter.find(t => game?.tags.includes(t)))?.iconBase64 || ''}
-      thumbnail={getGameImageURL(LOGOS, game.logoPath)}
-      screenshot={getGameImageURL(SCREENSHOTS, game.screenshotPath)}
+      thumbnail={getGameImageURL(game.logoPath)}
+      screenshot={getGameImageURL(game.screenshotPath)}
       screenshotPreviewMode={props.screenshotPreviewMode}
       screenshotPreviewDelay={props.screenshotPreviewDelay}
       hideExtremeScreenshots={props.hideExtremeScreenshots}
