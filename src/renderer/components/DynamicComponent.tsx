@@ -1,6 +1,6 @@
-import { useContext } from 'react';
-import { DynamicComponentContext } from './DynamicComponentProvider';
+import { Suspense, useContext } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { DynamicComponentContext } from './DynamicComponentProvider';
 
 type DynamicComponentProps = {
   name: string;
@@ -8,20 +8,14 @@ type DynamicComponentProps = {
 }
 
 export function DynamicComponent({ name, props }: DynamicComponentProps) {
-  const { components, loading } = useContext(DynamicComponentContext);
+  const { getComponent } = useContext(DynamicComponentContext);
 
-  const Component = components[name];
-  if (Component) {
-    return (
-      <ErrorBoundary fallbackRender={({ error }) => <div>{`Error rendering dynamic component '${name}': ${error}`}</div>}>
-        <Component {...props}/>
-      </ErrorBoundary>
-    );
-  }
-
-  if (loading) {
-    return <div>Loading dynamic components...</div>;
-  } else {
-    return <div>Dynamic component '{name}' not found</div>;
-  }
+  const Component = getComponent(name);
+  return (
+    <ErrorBoundary fallbackRender={({ error }) => <div>{`Error rendering dynamic component '${name}': ${error}`}</div>}>
+      <Suspense>
+        <Component {...props} />
+      </Suspense>
+    </ErrorBoundary>
+  );
 }

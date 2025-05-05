@@ -184,7 +184,7 @@ function parseContributions(parser: IObjectParserProp<Contributions>): Contribut
     applications: [],
     configuration: [],
     curationTemplates: [],
-    componentFiles: [],
+    mfScope: '',
     themeFiles: [],
   };
   parser.prop('logoSets',          true).array(item => contributes.logoSets.push(parseLogoSet(item)));
@@ -194,7 +194,7 @@ function parseContributions(parser: IObjectParserProp<Contributions>): Contribut
   parser.prop('applications',      true).array(item => contributes.applications.push(parseApplication(item)));
   parser.prop('configuration',     true).array(item => contributes.configuration.push(parseConfiguration(item)));
   parser.prop('curationTemplates', true).array(item => contributes.curationTemplates.push(parseCurationTemplate(item)));
-  parser.prop('componentFiles',    true).arrayRaw(item => contributes.componentFiles.push(str(item)));
+  parser.prop('mfScope', item  => contributes.mfScope = str(item), true);
   parser.prop('themeFiles',        true).arrayRaw(item => contributes.themeFiles.push(str(item)));
   return contributes;
 }

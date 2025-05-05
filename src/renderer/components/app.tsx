@@ -53,7 +53,7 @@ import { LangContext } from '../util/lang';
 import { queueOne } from '../util/queue';
 import { Dialog } from './Dialog';
 import { GameComponentDropdownSelectField, GameComponentInputField } from './DisplayComponent';
-import { DynamicComponentProvider } from './DynamicComponentProvider';
+import { DynamicComponentProvider, RemoteModule } from './DynamicComponentProvider';
 import { DynamicThemeProvider } from './DynamicThemeProvider';
 import { FloatingContainer } from './FloatingContainer';
 import { ConnectedFpfssEditGame } from './FpfssEditGame';
@@ -65,6 +65,7 @@ import { SimpleButton } from './SimpleButton';
 import { SplashScreen } from './SplashScreen';
 import { TaskBar } from './TaskBar';
 import { TitleBar } from './TitleBar';
+import { useNavigate } from 'react-router-dom';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
@@ -117,6 +118,7 @@ export class App extends React.Component<AppProps> {
     // Set up renderer ext model
     window.ext = {
       utils: {
+        getFileServerURL: getFileServerURL,
         getExtensionFileURL: (extId, filePath) => {
           return `${getFileServerURL()}/extdata/${extId}/${filePath}`;
         },
@@ -131,6 +133,9 @@ export class App extends React.Component<AppProps> {
         GameComponentInputField: GameComponentInputField,
         GameComponentDropdownSelectField: GameComponentDropdownSelectField,
         SearchableSelect: SearchableSelect,
+      },
+      hooks: {
+        useNavigate: () => useNavigate(),
       },
       orderables: [],
     };
@@ -777,6 +782,10 @@ export class App extends React.Component<AppProps> {
     window.Shared.back.register(BackOut.UPDATE_DOWNLOADER_STATE_WORKER, async (event, workerState) => {
       this.props.mainActions.updateDownloaderWorker(workerState);
     });
+
+    window.Shared.back.register(BackOut.OPEN_DYNAMIC_PAGE, async (event, name, props) => {
+      this.props.mainActions.openDynamicPage({ name, props });
+    });
   }
 
   init() {
@@ -1065,6 +1074,11 @@ export class App extends React.Component<AppProps> {
         } else {
           this.props.navigate(joinLibraryRoute(route));
         }
+      }
+
+      // Dynamic page opened
+      if (this.props.main.dynamicPage !== undefined && (this.props.main.dynamicPage !== prevProps.main.dynamicPage)) {
+        this.props.navigate(Paths.DYNAMIC);
       }
     }
   }
@@ -1452,9 +1466,15 @@ export class App extends React.Component<AppProps> {
     const { currentView } = this.props;
     const playlists = this.orderPlaylistsMemo(this.props.main.playlists);
     const extremeTags = this.props.preferencesData.tagFilters.filter(t => t.extreme).reduce<string[]>((prev, cur) => prev.concat(cur.tags), []);
-    const dynamicComponentFileList = this.props.main.extensions.reduce<string[]>((prev, cur) => prev.concat(cur.contributes?.componentFiles.map(file => {
-      return `${getFileServerURL()}/extdata/${cur.id}/${file}`;
-    }) || []), []);
+    const remoteModules = this.props.main.extensions.reduce<RemoteModule[]>((prev, cur) => {
+      if (cur.contributes?.mfScope) {
+        const remoteModule: RemoteModule = { scope: cur.contributes.mfScope, url: `${getFileServerURL()}/extdata/${cur.id}/mf-manifest.json` };
+        return prev.concat([remoteModule]);
+      } else {
+        return prev;
+      }
+    }, []);
+
     const dynamicThemeFileList = this.props.main.extensions.reduce<string[]>((prev, cur) => prev.concat(cur.contributes?.themeFiles.map(file => {
       return `${getFileServerURL()}/extdata/${cur.id}/${file}`;
     }) || []), []);
@@ -1506,13 +1526,14 @@ export class App extends React.Component<AppProps> {
       componentStatuses: this.props.main.componentStatuses,
       openFlashpointManager: this.openFlashpointManager,
       metaState: this.props.currentView.data.metaState,
+      dynamicPageProps: this.props.main.dynamicPage,
       searchStatus: null, // TODO: remove
     };
 
     // Render
     return (
       <DynamicThemeProvider fileList={dynamicThemeFileList} >
-        <DynamicComponentProvider fileList={dynamicComponentFileList}>
+        <DynamicComponentProvider manifests={remoteModules}>
           <LangContext.Provider value={this.props.main.lang}>
             {!this.props.main.stopRender ? (
               <>

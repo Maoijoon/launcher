@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DynamicPageProps } from '@renderer/components/pages/DynamicPage';
 import { CreditsData } from '@renderer/credits/types';
 import { UpgradeStage } from '@renderer/upgrade/types';
 import { BackIn, BackInit, ComponentStatus, GameOfTheDay } from '@shared/back/types';
@@ -136,6 +137,8 @@ export type MainState = {
   openDialogs: DialogState[];
   /** Last resolved dialog (mostly to handle side effects) */
   lastResolvedDialog?: DialogState;
+  /** Dynamic page contents */
+  dynamicPage?: DynamicPageProps;
 }
 
 const initialState: MainState = {
@@ -356,6 +359,9 @@ const mainSlice = createSlice({
         state.downloaderState.workers.push(payload);
       }
     },
+    openDynamicPage(state: MainState, { payload }: PayloadAction<DynamicPageProps>) {
+      state.dynamicPage = payload;
+    },
     setUpdateInfo(state: MainState, { payload }: PayloadAction<number>) {
       state.metadataUpdate = {
         ready: true,
@@ -384,6 +390,7 @@ export const { setMainState,
   updateDownloaderTask,
   updateDownloaderStatus,
   updateDownloaderWorker,
+  openDynamicPage,
   setUpdateInfo } = mainSlice.actions;
 export default mainSlice.reducer;
 

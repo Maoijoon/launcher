@@ -186,7 +186,10 @@ export function createApiFactory(extId: string, extManifest: IExtensionManifest,
           state.socketServer.broadcast(BackOut.SHORTCUT_UNREGISTER, shortcuts);
         }
       };
-    }
+    },
+    openDynamicPage: (name, props) => {
+      state.socketServer.broadcast(BackOut.OPEN_DYNAMIC_PAGE, name, props);
+    },
   };
 
   const extGames: typeof flashpoint.games = {

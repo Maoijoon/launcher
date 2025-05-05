@@ -9,7 +9,6 @@ const { installExtensions, buildExtensions, watchExtensions } = require('./gulpf
 const { execute } = require('./gulpfile.util');
 const { execSync } = require('child_process');
 const { promisify } = require('util');
-const esbuild = require('esbuild');
 const { createRsbuild, loadConfig } = require('@rsbuild/core');
 
 // Promisify the pipeline function
@@ -203,7 +202,10 @@ function watchBack(done) {
 async function watchRenderer() {
   const config = await loadConfig();
   const rsbuild = await createRsbuild({
-    rsbuildConfig: config.content
+    rsbuildConfig: {
+      ...config.content,
+      mode: 'development'
+    }
   });
   await rsbuild.build({
     watch: true
@@ -226,18 +228,6 @@ async function buildRenderer() {
     rsbuildConfig: config.content
   });
   return rsbuild.build();
-  // return esbuild.build({
-  //   bundle: true,
-  //   loader: { '.node': 'file' },
-  //   entryPoints: ['./src/renderer/index.tsx'],
-  //   outdir: './build/window',
-  //   minify: true,
-  //   plugins: [ReactCompilerEsbuildPlugin],
-  //   outExtension: {
-  //     '.js': '.bundle.js'
-  //   },
-  //   external: ['electron', ...require('module').builtinModules],
-  // });
 }
 
 function buildStatic() {
@@ -453,5 +443,3 @@ exports.nexusPack = series(
 );
 
 exports.extInstall = series(installExtensions);
-
-exports.esbuildTest = series(buildRenderer);

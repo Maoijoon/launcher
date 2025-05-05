@@ -297,6 +297,8 @@ export enum BackOut {
   UPDATE_DIALOG_MESSAGE,
   UPDATE_DIALOG_FIELD_VALUE,
 
+  OPEN_DYNAMIC_PAGE,
+
   FPFSS_ACTION
 }
 
@@ -550,6 +552,8 @@ export type BackOutTemplate = SocketTemplate<BackOut, {
   [BackOut.CANCEL_DIALOG]: (dialogId: string) => void;
   [BackOut.UPDATE_DIALOG_MESSAGE]: (message: string, dialogId: string) => void;
   [BackOut.UPDATE_DIALOG_FIELD_VALUE]: (dialogId: string, name: string, value: any) => void;
+
+  [BackOut.OPEN_DYNAMIC_PAGE]: (componentName: string, props: any) => void;
 
   [BackOut.FPFSS_ACTION]: (extId: string) => FpfssUser | undefined;
 }>

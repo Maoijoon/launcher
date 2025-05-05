@@ -94,7 +94,7 @@ export function main(init: Init): void {
   // -- Functions --
 
   async function startup(opts: LaunchOptions) {
-    app.disableHardwareAcceleration();
+    // app.disableHardwareAcceleration();
 
     // Single process
     // No more than one "main" instance should exist at any time. Multiple "flash" instances are fine.
@@ -389,6 +389,11 @@ export function main(init: Init): void {
     // (instead of navigating to it with the electron window that opened it)
     webContents.on('will-navigate', onNewPage);
     webContents.on('new-window', onNewPage);
+
+    webContents.session.setProxy({
+      proxyRules: 'http=localhost:22500;direct://',
+      proxyBypassRules: '<local>,*.unstable.life,*.flashpointarchive.org',
+    });
 
     function onNewPage(event: Electron.Event, navigationUrl: string): void {
       event.preventDefault();

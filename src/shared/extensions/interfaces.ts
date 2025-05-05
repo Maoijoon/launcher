@@ -78,7 +78,7 @@ export type Contributions = {
   applications: Application[];
   configuration: ExtConfiguration[];
   curationTemplates: CurationTemplate[];
-  componentFiles: string[];
+  mfScope: string;
   themeFiles: string[];
 }
 

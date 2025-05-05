@@ -1,20 +1,24 @@
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { loadRemote, preloadRemote, registerRemotes } from '@module-federation/enhanced/runtime';
+import { ComponentType, createContext, lazy, ReactNode, useEffect, useState } from 'react';
+import { DynamicComponent } from './DynamicComponent';
 import { GameComponentAddApps, GameComponentAlternateTitles, GameComponentDates, GameComponentLanguage, GameComponentLegacyData, GameComponentNotes, GameComponentOriginalDescription, GameComponentPlatforms, GameComponentPlaylistNotes, GameComponentPlayMode, GameComponentPublisher, GameComponentRuffleSupport, GameComponentSeries, GameComponentSource, GameComponentStatus, GameComponentTags, GameComponentVersion } from './GameComponents';
 
+export type RemoteModule = {
+  scope: string,
+  url: string,
+};
 type ComponentMap = Record<string, React.ComponentType<any>>;
 
 type DynamicComponentProviderProps = {
-  fileList: string[];
+  manifests: RemoteModule[];
   children: ReactNode;
 }
 
 export const DynamicComponentContext = createContext<{
-  components: ComponentMap;
-  loading: boolean;
+  getComponent:(name: string) => React.ComponentType<any>;
 }>({
-  components: {},
-  loading: true,
-});
+      getComponent: () => () => <></>
+    });
 
 const DEFAULT_COMPONENT_MAP: ComponentMap = {
   'game_alternateTitles': GameComponentAlternateTitles,
@@ -36,42 +40,74 @@ const DEFAULT_COMPONENT_MAP: ComponentMap = {
   'game_ruffleSupport': GameComponentRuffleSupport,
 };
 
-export function DynamicComponentProvider({ fileList, children }: DynamicComponentProviderProps) {
-  const [components, setComponents] = useState<ComponentMap>(DEFAULT_COMPONENT_MAP);
-  const [loading, setLoading] = useState(true);
-  const [loadedFiles, setLoadedFiles] = useState<string[]>([]);
+const initProps = {
+  'init': true
+};
+
+export function DynamicComponentProvider({ manifests, children }: DynamicComponentProviderProps) {
+  const [components] = useState<ComponentMap>(DEFAULT_COMPONENT_MAP);
+  const [lazyComponents, setLazyComponents] = useState<Record<string, React.LazyExoticComponent<any>>>({});
+  const [loadedManifests, setLoadedManifests] = useState<string[]>([]);
 
   useEffect(() => {
-    const newFiles = fileList.filter(f => !loadedFiles.includes(f));
+    const newManifests = manifests.filter(f => !loadedManifests.includes(f.url));
 
-    if (newFiles.length > 0) {
-      setLoading(true);
-
-      const loadFiles = async (files: string[]) => {
-        for (const file of files) {
+    if (newManifests.length > 0) {
+      const loadManifests = async (manifests: RemoteModule[]) => {
+        for (const manifest of manifests) {
           try {
-            const module = await import(/* webpackIgnore: true */ file);
-            const newComponents = module.default || {};
-            console.log('Imported components: ', Object.keys(newComponents));
-            setComponents(prevComponents => ({
-              ...prevComponents,
-              ...newComponents
-            }));
-            log.debug('Extensions', `Loaded dynamic component file '${file}'`);
+            // Register with module federation
+            registerRemotes([{
+              name: manifest.scope,
+              entry: manifest.url,
+            }]);
+            preloadRemote([{
+              nameOrAlias: manifest.scope,
+              resourceCategory: 'all',
+            }]);
+            console.log(`Registered MF Provider with name '${manifest.scope}' to '${manifest.url}'`);
+            log.debug('Extensions', `Registered MF Providern with name '${manifest.scope}' to '${manifest.url}'`);
           } catch (err) {
-            log.error('Extensions', `Failed to load dynamic component file '${file}': ${err}`);
+            log.error('Extensions', `Failed to register MF Provider with name '${manifest.scope}' to '${manifest.url}': ${err}`);
           }
         }
-        setLoading(false);
       };
 
-      setLoadedFiles(prev => [...prev, ...newFiles]);
-      loadFiles(newFiles);
+      setLoadedManifests(prev => [...prev, ...(newManifests.map(m => m.url))]);
+      loadManifests(newManifests);
     }
-  }, [fileList]);
+  }, [manifests]);
+
+  const getComponent = (name: string) => {
+    // Check if it's cached
+    if (name in lazyComponents) {
+      return lazyComponents[name];
+    }
+    if (name in components) {
+      return components[name];
+    }
+
+    // Not loaded yet
+    const LazyComponent = lazy(async () => {
+      return loadRemote(name) as unknown as Promise<{ default: ComponentType<any> }>;
+    });
+    setLazyComponents((prev) => {
+      return {
+        ...prev,
+        [name]: LazyComponent
+      };
+    });
+
+    return LazyComponent;
+  };
 
   return (
-    <DynamicComponentContext.Provider value={{ components, loading }}>
+    <DynamicComponentContext.Provider value={{ getComponent }}>
+      <div style={{ display: 'none' }}>
+        { manifests.filter(f => loadedManifests.includes(f.url)).map(f => {
+          return (<DynamicComponent key={f.scope} name={`${f.scope}/Initializer`} props={initProps}/>);
+        })}
+      </div>
       {children}
     </DynamicComponentContext.Provider>
   );

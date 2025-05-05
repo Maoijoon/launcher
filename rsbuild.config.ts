@@ -21,7 +21,7 @@ export default defineConfig({
   },
   output: {
     target: 'web',
-    assetPrefix: './',
+    assetPrefix: 'auto',
     minify: false,
     distPath: {
       root: './build/window',
@@ -38,6 +38,6 @@ export default defineConfig({
       babelLoaderOptions(opts) {
         opts.plugins?.unshift(['babel-plugin-react-compiler']);
       },
-    }),
+    })
   ],
 });

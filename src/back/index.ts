@@ -218,6 +218,7 @@ async function main() {
   registerRequestCallbacks(state, initialize);
   state.fileServer.registerRequestHandler('themes', onFileServerRequestThemes);
   state.fileServer.registerRequestHandler('images', onFileServerRequestImages);
+  state.fileServer.registerRequestHandler('ruffle', onFileServerRequestRuffle);
   state.fileServer.registerRequestHandler('logos', onFileServerRequestLogos);
   state.fileServer.registerRequestHandler('exticons', onFileServerRequestExtIcons);
   state.fileServer.registerRequestHandler('extdata', onFileServerRequestExtData);
@@ -1210,6 +1211,47 @@ function onFileServerRequestThemes(pathname: string, url: URL, req: http.Incomin
       serveFile(req, res, filePath);
     } else {
       log.warn('Launcher', `Illegal file request: "${filePath}"`);
+    }
+  }
+}
+
+async function onFileServerRequestRuffle(pathname: string, url: URL, req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+  const ruffleFolder = path.join(state.config.flashpointPath, 'Data', 'Ruffle');
+  const filePath = path.join(ruffleFolder, pathname);
+  if (filePath.startsWith(ruffleFolder)) {
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      req.on('error', (err) => {
+        log.error('Launcher', `Error serving Game file - ${err}`);
+        res.writeHead(500);
+        res.end();
+      });
+      fs.stat(filePath)
+      .then((stats) => {
+        // Respond with file
+        res.writeHead(200, {
+          'Content-Type': mime.getType(path.extname(filePath)) || '',
+          'Content-Length': stats.size,
+        });
+        if (req.method === 'GET') {
+          const stream = fs.createReadStream(filePath);
+          stream.on('error', error => {
+            console.warn(`File server failed to stream file. ${error}`);
+            stream.destroy(); // Calling "destroy" inside the "error" event seems like it could case an endless loop (although it hasn't thus far)
+            if (!res.writableEnded) { res.end(); }
+          });
+          stream.pipe(res);
+        } else {
+          res.end();
+        }
+      })
+      .catch(async () => {
+        // Can't read file
+        res.writeHead(404);
+        res.end();
+      });
+    } else {
+      res.writeHead(404);
+      res.end();
     }
   }
 }

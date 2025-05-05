@@ -25,6 +25,7 @@ import { CreditsData } from './credits/types';
 import { RequestState } from '@renderer/store/search/slice';
 import { LoadingPage } from './components/pages/LoadingPage';
 import { DownloadsPage } from './components/pages/Downloads';
+import { DynamicPage, DynamicPageProps } from './components/pages/DynamicPage';
 
 export type AppRouterProps = {
   fpfssUser: FpfssUser | null;
@@ -72,6 +73,7 @@ export type AppRouterProps = {
   openFlashpointManager: () => void,
   onMovePlaylistGame: (sourceGameId: string, destGameId: string) => void,
   searchStatus: string | null,
+  dynamicPageProps?: DynamicPageProps,
   metaState?: RequestState,
 };
 
@@ -173,6 +175,9 @@ export function AppRouter(props: AppRouterProps) {
       <Route
         path={Paths.DEVELOPER}
         element={<DeveloperPage {...developerProps}/>}/>
+      <Route
+        path={Paths.DYNAMIC}
+        element={<DynamicPage name={props.dynamicPageProps?.name || ''} props={props.dynamicPageProps?.props}/>}/>
       <Route element={<NotFoundPage/>}/>
     </Routes>
   );

@@ -151,6 +151,12 @@ declare module 'flashpoint-launcher' {
          * @returns Disposable to register to context.subscriptions
          */
     function registerShortcut(command: string, shortcut: string[] | string): Disposable;
+    /**
+         * Opens the 'dynamic page' in the frontend with the given data
+         * @param componentName Name of the component to render in the page
+         * @param props Props to pass to the component. Must be JSON compliant.
+         */
+    function openDynamicPage(componentName: string, props: any): void;
   }
 
   namespace curations {
@@ -2562,9 +2568,14 @@ declare module 'flashpoint-launcher-renderer' {
     isDragged: boolean;
   }
 
+  interface NavigateFunction {
+    (delta: number): void | Promise<void>;
+  }
+
   interface IExtensionWindow {
     utils: {
       getExtensionFileURL: (extId: string, filePath: string) => string;
+      getFileServerURL: () => string;
       search: {
         onWhitelistFactory: (extId: string, key: string, filter: AdvancedFilter, setAdvancedFilter: (advFilter: AdvancedFilter) => void) => (value: string) => void,
         onBlacklistFactory: (extId: string, key: string, filter: AdvancedFilter, setAdvancedFilter: (advFilter: AdvancedFilter) => void) => (value: string) => void,
@@ -2577,8 +2588,12 @@ declare module 'flashpoint-launcher-renderer' {
       GameComponentDropdownSelectField: React.ComponentType<GameComponentDropdownSelectFieldProps>,
       SearchableSelect: React.ComponentType<SearchableSelectProps<any>>,
     },
+    hooks: {
+      useNavigate: () => NavigateFunction
+    },
     orderables: ExtOrderable[],
   }
+
 
   type DisplaySettings = {
     gameSidebar: {

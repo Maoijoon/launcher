@@ -4,6 +4,7 @@ const gulp = require('gulp');
 const zip = require('gulp-zip');
 const merge = require('merge-stream');
 const esbuild = require('esbuild');
+const { build: rslibBuild, loadConfig } = require('@rslib/core');
 
 const filesToCopy = [
     'extension.js',
@@ -13,30 +14,23 @@ const filesToCopy = [
     'README.md'
 ];
 
-function build(done) {
-    esbuild.build({
+async function build(done) {
+    // Build main extension (Node.js)
+    const nodeBuild = esbuild.build({
         bundle: true,
         entryPoints: ['./src/extension.ts'],
         outfile: './dist/extension.js',
         platform: 'node',
-        external: ['flashpoint-launcher', '*.css'],
-    })
+        external: ['flashpoint-launcher'],
+    });
+
+    const config = await loadConfig('./rslib.config.ts');
+    
+    Promise.all([nodeBuild, rslibBuild({
+        ...config.content,
+        mode: 'development'
+    })])
     .catch(console.error)
-    .then(async () => {
-        try {
-            return await esbuild.build({
-                bundle: true,
-                entryPoints: ['./src/components.ts'],
-                outfile: './static/components.js',
-                format: 'esm',
-                target: ['es2020'],
-                platform: 'browser',
-                external: ['flashpoint-launcher', '*.css'],
-            });
-        } catch (message) {
-            return console.error(message);
-        }
-    })
     .finally(done);
 }
 
