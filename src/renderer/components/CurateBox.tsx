@@ -606,6 +606,9 @@ export function CurateBox(props: CurateBoxProps) {
                 }, {
                   key: 'standalone',
                   value: 'Standalone'
+                }, {
+                  key: 'launcher',
+                  value: 'Launcher Embed'
                 }]}
                 warned={false}
                 property='ruffleSupport'

@@ -14,7 +14,7 @@ export async function downloadFile(url: string, filePath: string): Promise<void>
   }
   res.data.pipe(file);
   return new Promise<void>((resolve, reject) => {
-    file.on('finish', resolve);
+    file.on('close', resolve);
     file.on('error', reject);
   });
 }

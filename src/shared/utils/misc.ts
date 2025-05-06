@@ -46,6 +46,8 @@ export function newGame(): Game {
     archiveState: 0,
     gameData: [],
     addApps: [],
+    logoPath: '',
+    screenshotPath: '',
     ruffleSupport: '',
   };
 }
@@ -61,6 +63,8 @@ export function mapRuffleSupportString(rs: string) {
       return 'None';
     case 'standalone':
       return 'Standalone';
+    case 'launcher':
+      return 'Launcher Embed';
     default:
       return 'Broken Value';
   }

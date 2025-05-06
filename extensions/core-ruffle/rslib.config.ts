@@ -14,17 +14,10 @@ export default defineConfig({
       },
     }),
     pluginModuleFederation({
-      name: 'nga',
+      name: 'ruffle',
       exposes: {
         './Initializer': './src/components/Initializer.tsx',
-        './NgCredits': './src/components/NgCredits.tsx',
-        './NgFaves': './src/components/NgFaves.tsx',
-        './NgRating': './src/components/NgRating.tsx',
-        './NgRatingGridIcon': './src/components/NgRatingGridIcon.tsx',
-        './NgRatingListIcon': './src/components/NgRatingListIcon.tsx',
-        './NgScore': './src/components/NgScore.tsx',
-        './NgViews': './src/components/NgViews.tsx',
-        './NgRatingSearchableSelect': './src/components/NgRatingSearchableSelect.tsx',
+        './LauncherEmbedPage': './src/components/LauncherEmbedPage.tsx',
       },
       shared: {
         react: { singleton: true, requiredVersion: dependencies.react },
@@ -48,7 +41,7 @@ export default defineConfig({
         assetPrefix: 'auto',
         minify: false,
         cleanDistPath: {
-          keep: [/assets*/, /\.css/],
+          keep: [/assets*/, /\.css/, /\.svg/, /templates*/],
         }
       },
     }

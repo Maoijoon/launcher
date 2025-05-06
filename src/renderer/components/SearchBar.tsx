@@ -279,6 +279,9 @@ export function SearchBar() {
   }, {
     value: 'standalone',
     orderVal: 'Standalone'
+  }, {
+    value: 'launcher',
+    orderVal: 'Launcher Embed',
   }];
   const tagItems = search.dropdowns.tags ? search.dropdowns.tags.map(tag => {
     const categoryId = tag.category ? categoryOrder.indexOf(tag.category) : 99999;

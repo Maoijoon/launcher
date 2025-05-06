@@ -720,7 +720,7 @@ declare module 'flashpoint-launcher' {
       /** Relative path to the screenshot file from the screenshots directory */
       screenshotPath: string;
       /** Ruffle support for flash entries
-       * Valid values: 'standalone', '' (none)
+       * Valid values: 'standalone', 'launcher', '' (none)
        */
       ruffleSupport: string;
       /** Extension data (key is ext id) */
@@ -1364,6 +1364,8 @@ declare module 'flashpoint-launcher' {
     };
 
     type LaunchInfo = {
+      // If provided, let a React component use the launch info instead
+      component?: string;
       override: GameLaunchOverride;
       gamePath: string;
       gameArgs: string | string[];

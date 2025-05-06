@@ -96,6 +96,8 @@ export async function activate(context: flashpoint.ExtensionContext): Promise<vo
           config: defaultConfig.config,
         });
         return;
+      } else if (launchInfo.game.ruffleSupport.toLowerCase() === 'launcher') {
+        launchInfo.launchInfo.component = 'ruffle/LauncherEmbedPage';
       } else if (launchInfo.game.ruffleSupport.toLowerCase() === 'webhosted') {
         flashpoint.log.info('Using Web Embed Ruffle for supported game...');
         const defaultConfig = webEmbedMiddleware.getDefaultConfig(launchInfo.game);
@@ -152,7 +154,7 @@ export async function activate(context: flashpoint.ExtensionContext): Promise<vo
     const lastStandaloneUpdate = rawLastStandaloneUpdate ? Date.parse(rawLastStandaloneUpdate) : 0;
     if (standalonePublishedAt > lastStandaloneUpdate) {
       flashpoint.log.info(`Found Ruffle Standalone Update for ${standaloneAssetFile.publishedAt}, downloading...`);
-      downloadRuffleStandalone(ruffleStandaloneLatestDir, standaloneAssetFile, logVoid)
+      downloadRuffleStandalone(ruffleStandaloneLatestDir, standaloneAssetFile, logDev)
       .then(() => flashpoint.log.info('Ruffle Standalone Update Downloaded!'))
       .catch((err) => flashpoint.log.error(`Error updating Ruffle Standalone: ${err}`));
     } else {

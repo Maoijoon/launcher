@@ -249,9 +249,9 @@ export async function importCuration(opts: ImportCurationOpts): Promise<void> {
     const zipPath = path.join(tempDir, `${curation.folder}.zip`);
     // Create content.json just for safety / compat
     const contentJson = {
-      "version": 1,
-      "uniqueId": gameId,
-      "platform": curation.game.primaryPlatform
+      'version': 1,
+      'uniqueId': gameId,
+      'platform': curation.game.primaryPlatform
     };
     const contentJsonPath = path.join(tempDir, 'content.json');
     await fs.promises.writeFile(contentJsonPath, JSON.stringify(contentJson, undefined, 2));
@@ -261,7 +261,7 @@ export async function importCuration(opts: ImportCurationOpts): Promise<void> {
       contentPath,
       contentJsonPath
     ], { $bin: opts.sevenZipPath, recursive: true });
-    
+
     log.debug('Import', 'Importing game data...');
     taskProgress.setStageProgress(0.9, 'Importing Zipped File...');
     await importGameData(game.id, zipPath, dataPacksFolderPath, curation.game.applicationPath, curation.game.launchCommand, curation.game.mountParameters);
@@ -468,7 +468,7 @@ async function createGameFromCurationMeta(gameId: string, gameMeta: CurationMeta
     activeDataOnDisk: false,
     ruffleSupport:         gameMeta.ruffleSupport       || '',
   };
-  game.addApps = addApps.map(addApp => createAddAppFromCurationMeta(addApp, game))
+  game.addApps = addApps.map(addApp => createAddAppFromCurationMeta(addApp, game));
   return game;
 }
 

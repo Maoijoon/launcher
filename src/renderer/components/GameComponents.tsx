@@ -334,6 +334,9 @@ export function GameComponentRuffleSupport(props: GameComponentProps) {
         }, {
           key: 'standalone',
           value: 'Standalone'
+        }, {
+          key: 'launcher',
+          value: 'Launcher Embed'
         }]}
         onClick={() => { if (!editable) { doSearch(`ruffle=${game.ruffleSupport}`); }}}
         onChange={(key) => {

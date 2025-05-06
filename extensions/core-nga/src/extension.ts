@@ -63,11 +63,4 @@ export async function activate(context: flashpoint.ExtensionContext): Promise<vo
       }
     ]
   });
-
-  // We'll delay registering the game launch interrupt so we always come after auto mount
-  setTimeout(() => {
-    flashpoint.games.onWillLaunchGame((gameLaunchInfo) => {
-      flashpoint.commands.openDynamicPage('nga/NgRuffleEmbed', { ...gameLaunchInfo });
-    });
-  }, 1500);
 }
