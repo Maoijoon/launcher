@@ -1,5 +1,6 @@
 .ruffle-page {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
@@ -11,6 +12,8 @@
 }
 
 .ruffle-title {
+  font-size: 1.2em;
+  font-weight: bold;
   position: absolute;
   top: -2rem;
   width: 100%;
@@ -18,7 +21,7 @@
 }
 
 .ruffle-container {
+  display: flex;
   margin: auto;
   box-shadow: 0 0 20px rgba(245, 245, 245, 0.4);
-  border: 4px solid white;
 }

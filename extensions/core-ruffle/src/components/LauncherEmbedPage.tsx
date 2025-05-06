@@ -51,10 +51,10 @@ export default function LauncherEmbedPage(props: GameLaunchInfo) {
   };
 
   return <div className='ruffle-page'>
-    <button className='simple-button' onClick={onBack}>Back</button>
     <div className='ruffle-wrapper'>
       <div className='ruffle-title'>{props.game.title}</div>
       <div className='ruffle-container' ref={containerRef}></div>
     </div>
+    <button className='simple-button' onClick={onBack}>Back</button>
   </div>;
 }

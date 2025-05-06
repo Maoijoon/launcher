@@ -78,8 +78,13 @@ export type Contributions = {
   applications: Application[];
   configuration: ExtConfiguration[];
   curationTemplates: CurationTemplate[];
-  mfScope: string;
+  moduleFederation: ModuleContribution[];
   themeFiles: string[];
+}
+
+export type ModuleContribution = {
+  scope: string;
+  path: string;
 }
 
 export interface CurationTemplate {

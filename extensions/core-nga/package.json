@@ -5,7 +5,12 @@
     "version": "1.0.0",
     "main": "./dist/extension.js",
     "contributes": {
-        "mfScope": "nga",
+        "moduleFederation": [
+            {
+                "scope": "nga",
+                "path": "mf-manifest.json"
+            }
+        ],
         "themeFiles": [
             "nga.css"
         ]

@@ -5,7 +5,12 @@
   "version": "1.0.0",
   "main": "./dist/extension.js",
   "contributes": {
-    "mfScope": "ruffle",
+    "moduleFederation": [
+      {
+          "scope": "ruffle",
+          "path": "mf-manifest.json"
+      }
+    ],
     "themeFiles": [
       "ruffle.css"
     ],

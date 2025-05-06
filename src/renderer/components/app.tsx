@@ -1467,9 +1467,14 @@ export class App extends React.Component<AppProps> {
     const playlists = this.orderPlaylistsMemo(this.props.main.playlists);
     const extremeTags = this.props.preferencesData.tagFilters.filter(t => t.extreme).reduce<string[]>((prev, cur) => prev.concat(cur.tags), []);
     const remoteModules = this.props.main.extensions.reduce<RemoteModule[]>((prev, cur) => {
-      if (cur.contributes?.mfScope) {
-        const remoteModule: RemoteModule = { scope: cur.contributes.mfScope, url: `${getFileServerURL()}/extdata/${cur.id}/mf-manifest.json` };
-        return prev.concat([remoteModule]);
+      if (cur.contributes?.moduleFederation) {
+        const remoteModules: RemoteModule[] = cur.contributes.moduleFederation.map(mc => {
+          return {
+            scope: mc.scope,
+            url: `${getFileServerURL()}/extdata/${cur.id}/${mc.path}`
+          };
+        });
+        return prev.concat(remoteModules);
       } else {
         return prev;
       }

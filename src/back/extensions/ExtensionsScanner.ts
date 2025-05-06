@@ -5,7 +5,7 @@ import * as Coerce from '@shared/utils/Coerce';
 import { IObjectParserProp, ObjectParser } from '@shared/utils/ObjectParser';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Application, ButtonContext, ContextButton, Contributions, CurationTemplate, DevScript, ExtConfiguration, ExtConfigurationProp, ExtensionType, ExtTheme, IExtension, IExtensionManifest, ILogoSet } from '@shared/extensions/interfaces';
+import { Application, ButtonContext, ContextButton, Contributions, CurationTemplate, DevScript, ExtConfiguration, ExtConfigurationProp, ExtensionType, ExtTheme, IExtension, IExtensionManifest, ILogoSet, ModuleContribution } from '@shared/extensions/interfaces';
 
 const { str, num } = Coerce;
 const fsPromises = fs.promises;
@@ -184,7 +184,7 @@ function parseContributions(parser: IObjectParserProp<Contributions>): Contribut
     applications: [],
     configuration: [],
     curationTemplates: [],
-    mfScope: '',
+    moduleFederation: [],
     themeFiles: [],
   };
   parser.prop('logoSets',          true).array(item => contributes.logoSets.push(parseLogoSet(item)));
@@ -194,7 +194,7 @@ function parseContributions(parser: IObjectParserProp<Contributions>): Contribut
   parser.prop('applications',      true).array(item => contributes.applications.push(parseApplication(item)));
   parser.prop('configuration',     true).array(item => contributes.configuration.push(parseConfiguration(item)));
   parser.prop('curationTemplates', true).array(item => contributes.curationTemplates.push(parseCurationTemplate(item)));
-  parser.prop('mfScope', item  => contributes.mfScope = str(item), true);
+  parser.prop('moduleFederation',  true).array(item => contributes.moduleFederation.push(parseModuleContribution(item)));
   parser.prop('themeFiles',        true).arrayRaw(item => contributes.themeFiles.push(str(item)));
   return contributes;
 }
@@ -296,6 +296,18 @@ function parseCurationTemplate(parser: IObjectParserProp<CurationTemplate>): Cur
   // @TODO reuse code
 
   return curationTemplate;
+}
+
+function parseModuleContribution(parser: IObjectParserProp<ModuleContribution>): ModuleContribution {
+  const mc: ModuleContribution = {
+    scope: '',
+    path: ''
+  };
+
+  parser.prop('scope', v => mc.scope = str(v));
+  parser.prop('path', v => mc.path = str(v));
+
+  return mc;
 }
 
 function parseCurationMeta(parser: IObjectParserProp<EditCurationMeta>): EditCurationMeta {

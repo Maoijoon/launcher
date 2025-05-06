@@ -317,10 +317,6 @@ export function main(init: Init): void {
       state.socket.send(BackIn.SET_LOCALE, app.getLocale().toLowerCase());
       state._sentLocaleCode = true;
     }
-    // Reject all permission requests since we don't need any permissions.
-    session.defaultSession.setPermissionRequestHandler(
-      (webContents, permission, callback) => callback(false)
-    );
     // Ignore proxy settings with chromium APIs (makes WebSockets not close when the Redirector changes proxy settings)
     session.defaultSession.setProxy({
       pacScript: '',
@@ -389,6 +385,14 @@ export function main(init: Init): void {
     // (instead of navigating to it with the electron window that opened it)
     webContents.on('will-navigate', onNewPage);
     webContents.on('new-window', onNewPage);
+
+    webContents.session.setPermissionRequestHandler((webContents, permission, requestingOrigin, details) => {
+      if (permission === 'fullscreen') {
+        return true;
+      } else {
+        return false;
+      }
+    });
 
     webContents.session.setProxy({
       proxyRules: 'http=localhost:22500;direct://',
