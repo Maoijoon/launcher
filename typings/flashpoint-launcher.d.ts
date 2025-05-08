@@ -720,7 +720,7 @@ declare module 'flashpoint-launcher' {
       /** Relative path to the screenshot file from the screenshots directory */
       screenshotPath: string;
       /** Ruffle support for flash entries
-       * Valid values: 'standalone', 'launcher', '' (none)
+       * Valid values: 'standalone', '' (none)
        */
       ruffleSupport: string;
       /** Extension data (key is ext id) */

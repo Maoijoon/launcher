@@ -1,7 +1,7 @@
 import * as remote from '@electron/remote';
 import { WithConfirmDialogProps } from '@renderer/containers/withConfirmDialog';
 import { LangContext } from '@renderer/util/lang';
-import { ArchiveState, BackIn, BackOut, BackOutTemplate } from '@shared/back/types';
+import { ArchiveState, BackIn } from '@shared/back/types';
 import { LOGOS, SCREENSHOTS } from '@shared/constants';
 import { GamePropSuggestions, PickType, ProcessAction } from '@shared/interfaces';
 import { generateTagFilterGroup, sizeToString } from '@shared/Util';

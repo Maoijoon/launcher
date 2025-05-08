@@ -34,7 +34,7 @@ async function build(done) {
     .finally(done);
 }
 
-async function watch() {
+async function watch(done) {
     const ctx = await esbuild.context({
         bundle: true,
         entryPoints: ['./src/extension.ts'],
@@ -42,7 +42,17 @@ async function watch() {
         platform: 'node',
         external: ['flashpoint-launcher'],
     });
-    return ctx.watch();
+    
+    const config = await loadConfig('./rslib.config.ts');
+    const renderer = rslibBuild({
+        ...config.content,
+        mode: 'development',
+        watch: true
+    });
+
+    return Promise.all([ctx.watch(), renderer])
+    .catch(console.error)
+    .finally(done);
 }
 
 function clean(cb) {

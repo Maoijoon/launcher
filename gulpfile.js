@@ -203,8 +203,7 @@ async function watchRenderer() {
   const config = await loadConfig();
   const rsbuild = await createRsbuild({
     rsbuildConfig: {
-      ...config.content,
-      mode: 'development'
+      ...config.content
     }
   });
   await rsbuild.build({

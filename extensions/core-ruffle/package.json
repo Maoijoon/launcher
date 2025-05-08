@@ -30,6 +30,12 @@
             "default": false,
             "description": "Enables Ruffle Standalone for all games regardless of whether they have been checked as supported. Results my vary."
           },
+          "com.ruffle.use-launcher-embed": {
+            "title": "Use Launcher Embed",
+            "type": "boolean",
+            "default": false,
+            "description": "Uses Ruffle embedded in the Launcher instead of the Standalone application. Saves will not carry over."
+          },
           "com.ruffle.graphics-mode": {
             "title": "Graphics Mode",
             "type": "string",

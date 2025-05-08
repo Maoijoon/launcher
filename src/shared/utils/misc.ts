@@ -63,8 +63,6 @@ export function mapRuffleSupportString(rs: string) {
       return 'None';
     case 'standalone':
       return 'Standalone';
-    case 'launcher':
-      return 'Launcher Embed';
     default:
       return 'Broken Value';
   }

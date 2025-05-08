@@ -86,18 +86,23 @@ export async function activate(context: flashpoint.ExtensionContext): Promise<vo
 
     if (supportedEnabled || curation) {
       if (launchInfo.game.ruffleSupport.toLowerCase() === 'standalone') {
-        flashpoint.log.info('Using Standalone Ruffle for supported game...');
-        const defaultConfig = standaloneMiddleware.getDefaultConfig(launchInfo.game);
-        standaloneMiddleware.execute(launchInfo, {
-          middlewareId: '',
-          name: '',
-          enabled: true,
-          version: defaultConfig.version,
-          config: defaultConfig.config,
-        });
-        return;
-      } else if (launchInfo.game.ruffleSupport.toLowerCase() === 'launcher') {
-        launchInfo.launchInfo.component = 'ruffle/LauncherEmbedPage';
+        const useLauncherEmbed = flashpoint.getExtConfigValue('com.ruffle.use-launcher-embed');
+        if (useLauncherEmbed) {
+          flashpoint.log.info('Using Launcher Embed Ruffle for supported game...');
+          launchInfo.launchInfo.component = 'ruffle/LauncherEmbedPage';
+          return;
+        } else {
+          flashpoint.log.info('Using Standalone Ruffle for supported game...');
+          const defaultConfig = standaloneMiddleware.getDefaultConfig(launchInfo.game);
+          standaloneMiddleware.execute(launchInfo, {
+            middlewareId: '',
+            name: '',
+            enabled: true,
+            version: defaultConfig.version,
+            config: defaultConfig.config,
+          });
+          return;
+        }
       } else if (launchInfo.game.ruffleSupport.toLowerCase() === 'webhosted') {
         flashpoint.log.info('Using Web Embed Ruffle for supported game...');
         const defaultConfig = webEmbedMiddleware.getDefaultConfig(launchInfo.game);
