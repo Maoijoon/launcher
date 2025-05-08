@@ -14,7 +14,7 @@ import { AppPreferencesData } from 'flashpoint-launcher';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { argv } from 'process';
-import WebSocket from 'ws';
+import * as WebSocket from 'ws';
 import * as Util from './Util';
 import { Init } from './types';
 
