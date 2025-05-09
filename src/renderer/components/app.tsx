@@ -38,6 +38,8 @@ import { DisplaySettings } from 'flashpoint-launcher-renderer';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 import { ConnectedFooter } from '../containers/ConnectedFooter';
 import { ConnectedRightBrowseSidebar } from '../containers/ConnectedRightBrowseSidebar';
 import HeaderContainer from '../containers/HeaderContainer';
@@ -65,7 +67,6 @@ import { SimpleButton } from './SimpleButton';
 import { SplashScreen } from './SplashScreen';
 import { TaskBar } from './TaskBar';
 import { TitleBar } from './TitleBar';
-import { useNavigate } from 'react-router-dom';
 
 // Hide the right sidebar if the page is inside these paths
 const hiddenRightSidebarPages = [Paths.ABOUT, Paths.CURATE, Paths.CONFIG, Paths.MANUAL, Paths.LOGS, Paths.TAGS, Paths.CATEGORIES, Paths.DOWNLOADS];
@@ -1540,6 +1541,12 @@ export class App extends React.Component<AppProps> {
       <DynamicThemeProvider fileList={dynamicThemeFileList} >
         <DynamicComponentProvider manifests={remoteModules}>
           <LangContext.Provider value={this.props.main.lang}>
+            <ToastContainer
+              theme='dark'
+              className='toast-container'
+              progressClassName='toast-container-progress'
+              hideProgressBar={true}
+              position='bottom-center'/>
             {!this.props.main.stopRender ? (
               <>
                 {/* Backend Crash Log and Report */}
@@ -1940,7 +1947,7 @@ export class App extends React.Component<AppProps> {
         }
       })
       .then(() => {
-        alert('Success');
+        toast.success('Game Edit Submitted');
       }).catch((err) => {
         alert('Error submitting game changes: ' + err);
       });
