@@ -474,6 +474,8 @@ export function main(init: Init): void {
       y: mw.y,
       width: width,
       height: height,
+      minWidth: 200,
+      minHeight: 200,
       frame: !state.config.useCustomTitlebar,
       icon: path.join(__dirname, '../window/images/icon.png'),
       webPreferences: {

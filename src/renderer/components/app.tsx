@@ -290,11 +290,11 @@ export class App extends React.Component<AppProps> {
     ipcRenderer.on(WindowIPC.WINDOW_RESIZE, debounce((sender, width: number, height: number, isMaximized: boolean) => {
       if (!isMaximized) {
         // Cap minimum size
-        if (width < 300) {
-          width = 300;
+        if (width < 200) {
+          width = 200;
         }
-        if (height < 300) {
-          height = 300;
+        if (height < 200) {
+          height = 200;
         }
         updatePreferencesData({ mainWindow: { width: width | 0, height: height | 0 } });
       }
